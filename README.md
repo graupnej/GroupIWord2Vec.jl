@@ -1,5 +1,4 @@
-# Julia_ML_Group_I
-Learning Word-Embeddings with Word2Vec
+# Julia_ML_Group_I - Learning Word-Embeddings with Word2Vec
 
 Create a new Julia package that implements some tools for running and testing word-embedding algorithms. The package should include functions for:
   - Training a standard Word2Vec model on some datasets.
