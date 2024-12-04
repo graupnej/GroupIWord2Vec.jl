@@ -18,3 +18,8 @@ Create a new Julia package that implements some tools for running and testing wo
   - Some reviewable basic functionality implemented, e.g. functions for loading a pre-trained Word2Vec model from a file in binary and text format and generating word embeddings for a given word using the loaded model.
   - Select a pre-trained Word2Vec model from a reputable source (e.g., Gensim, FastText). You can find various models online.
   - Minimal documentation, including a basic "Getting Started”.
+
+# References
+  - Mikolov, Tomas, et al. https://papers.nips.cc/paper/5021-distributedrepresentations-of-words-and-phrases-and-their-compositionality.pdf
+  - Horn, Franziska, “Context encoders as a simple but powerful extension of word2vec“ https://arxiv.org/abs/1706.02496. ACL (2017).
+  - Joulin, Armand et al.,"FastText.zip: Compressing text classification models", CoRR abs/1612.03651 (2016). https://fasttext.cc
