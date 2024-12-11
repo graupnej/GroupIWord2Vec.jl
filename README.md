@@ -2,10 +2,11 @@
 
 ## How to install the package
 1) Move to the GroupIWord2Vec directory
-2) Here, insert:
+2) Here, insert
 
        using Pkg
-3) And:
+   to load the Pkg package.
+4) And:
 
        using Pkg.activate(".")
 5) Move to the package mode using:
