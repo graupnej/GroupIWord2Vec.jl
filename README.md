@@ -17,3 +17,7 @@
 10) Leave package mode and insert:
     
         using GroupIWord2Vec
+
+## Dependencies
+
+## Examples
