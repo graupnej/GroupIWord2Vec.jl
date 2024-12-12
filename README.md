@@ -12,11 +12,11 @@ Move to the GroupIWord2Vec directory and activate a project environment in this 
        Pkg.instantiate()  # Install dependencies from the Manifest.toml
 
 This instructs Julia to use the Project.toml and Manifest.toml files in the current directory for managing dependencies.
-In Julia's package management system (activate with ]) trigger the build process for the package:
+In Julia's package management system (Pkg mode, entered by typing ]) trigger the build process for the package:
 
        build GroupIWord2Vec
 
-Load the package into the current session
+Within the Julia REPL, load the package into the current session
 
        using GroupIWord2Vec
 
