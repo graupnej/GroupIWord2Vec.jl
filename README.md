@@ -8,7 +8,7 @@ To install the package, use Julia's package manager:
        
 Move to the GroupIWord2Vec directory and activate a project environment in this directory:
 
-       Pkg.activate(".") # Activate the local environment
+       Pkg.activate(".")  # Activate the local environment
        Pkg.instantiate()  # Install dependencies from the Manifest.toml
 
 This instructs Julia to use the Project.toml and Manifest.toml files in the current directory for managing dependencies.
@@ -24,7 +24,7 @@ Load the package into the current session
 GroupIWord2Vec.jl relies on the following non-standard Julia packages:
 
        DelimitedFiles # Provides functionality for reading and writing delimited text files
-       LinearAlgebra # Offers a suite of mathematical tools and operations for linear algebra
+       LinearAlgebra  # Offers a suite of mathematical tools and operations for linear algebra
 
 ## 3) Examples
 
