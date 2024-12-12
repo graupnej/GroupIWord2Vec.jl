@@ -27,5 +27,20 @@ GroupIWord2Vec.jl relies on the following non-standard Julia packages:
        LinearAlgebra  # Offers a suite of mathematical tools and operations for linear algebra
 
 ## 3) Examples
+Select a pre-trained Word2Vec model from a reputable source e.g. FastText (binary & text format file):
+
+       https://fasttext.cc/docs/en/pretrained-vectors.html
+
+Load a pre-trained model from a file in text format:
+
+       model = load_text_model("path/to/model.vec")
+
+Alternatively, load a pre-trained model from a file in binary format:
+
+       ...
+
+Generate a word embedding for a given word using the loaded model:
+
+       embedding = get_word_embedding(model, "example")
 
 ## 4) References
