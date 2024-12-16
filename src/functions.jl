@@ -6,17 +6,21 @@ to their indices and a matrix of vectors where each column corresponds to a word
 
 function load_text_model(filename::String)
     # Read lines from file into a vector of strings.
+    println("Reading file...")
     lines = readlines(filename)
 
+    println("Parsing header...")
     # Parse first line to get vocab and vec size. First line is expected to have two integers separated by a space.
     vocab_size, vector_size = parse.(Int, split(lines[1]))
 
+    println("Initializing structures...")
     # Dictionary to store vocabulary. Dict maps vocab to its index in the vectors matrix 
     vocab = Dict{String, Int}()
 
     # Initialize a matrix to store the word vectors with 'vector_size' rows (one for each dimension of the vector) and 'vocab_size' columns (one for each word in the vocabulary).
     vectors = Matrix{Float64}(undef, vector_size, vocab_size)
 
+    println("Processing vectors...")
     # Iterate over each line starting from the second line (i.e., the word vectors).
     for (i, line) in enumerate(@view lines[2:end])
         # A valid line should have (vector_size + 1) elements: one word and its vector. Skips line if malformed (doesn't have the correct number of elements)
@@ -36,6 +40,7 @@ function load_text_model(filename::String)
         end
     end
 
+    println("Completed processing vectors from .vec file")
     # Return a Word2VecModel object containing the vocabulary dictionary and the vectors matrix.
     return Word2VecModel(vocab, vectors)
 end
@@ -60,6 +65,7 @@ Still figuring out this shit
 
 function load_fasttext_embeddings(file_name::String)
     open(file_name, "r") do f
+        println("Reading file...")
         # Original working header skipping
         skip(f, 8)
         dim = ltoh(read(f, Int32))
@@ -98,12 +104,6 @@ function load_fasttext_embeddings(file_name::String)
             vocab[word] = i
             skip(f, 9)
             
-            if i ≤ 10
-                println("Word $i: '$word'")
-            end
-            if i % 100000 == 0
-                println("Processed $i words...")
-            end
         end
         
         # Original working vector reading logic
@@ -117,20 +117,9 @@ function load_fasttext_embeddings(file_name::String)
             for j in 1:dim
                 vectors[j, i] = ltoh(read(f, Float32))
             end
-            if i % 100000 == 0
-                println("Read vectors for $i words...")
-            end
         end
-        
-        println("\nLoaded $(length(vocab)) words with dimension $dim")
-        
-        # Verify first few words
-        for word in [",", ".", "the", "of", "in"]
-            if haskey(vocab, word)
-                println("\nWord: '$word' at position $(vocab[word])")
-                println("Vector[1:5]: ", vectors[1:5, vocab[word]])
-            end
-        end
+    
+        println("\nCompleted loading $(length(vocab)) words with dimension $dim from .bin file")
         
         return Word2VecModel(vocab, Float64.(vectors))
     end
