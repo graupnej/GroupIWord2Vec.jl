@@ -1,4 +1,9 @@
-# Getting Started
+# Getting Started - Installation and Usage Guide
+
+## 1) Clone the github repository
+First, clone the repository to your local machine:
+
+       git clone
 
 ## 1) How to install, build and load the package
 To install the package, use Julia's package manager:
