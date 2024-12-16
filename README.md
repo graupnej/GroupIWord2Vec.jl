@@ -1,11 +1,18 @@
 # Getting Started - Installation and Usage Guide
 
 ## 1) Clone the github repository
-First, clone the repository to your local machine:
+First, clone the repository to your local machine (replace <username> with your details):
 
-       git clone
+       git clone https://github.com/<username>/GroupIWord2Vec.jl.git
 
-## 1) How to install, build and load the package
+Once downloaded navigate to the cloned directory.
+
+## 2) Open the package in Julia
+Launch the Julia REPL and navigate to the cloned directory:
+
+       cd ~
+
+and activate the package environment.
 To install the package, use Julia's package manager:
 
        using Pkg
