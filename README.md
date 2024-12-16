@@ -5,20 +5,20 @@ First, clone the repository to your local machine (replace <username> with your 
 
        git clone https://github.com/<username>/GroupIWord2Vec.jl.git
 
-Once downloaded navigate to the cloned directory.
+Once downloaded, move the directory into your julia directory:
+
+       mv GroupIWord2Vec.jl ~.julia/dev/
 
 ## 2) Open the package in Julia
 Launch the Julia REPL and navigate to the cloned directory:
 
-       cd ~
+       cd ~.julia/dev/GroupIWord2Vec
 
-and activate the package environment.
-To install the package, use Julia's package manager:
+and activate Julia's package environment:
 
        using Pkg
-       Pkg.add(GroupIWord2Vec)
        
-Move to the GroupIWord2Vec directory and activate a project environment in this directory:
+Here, activate the project environment:
 
        Pkg.activate(".")         # Activate the local environment
        Pkg.instantiate()         # Install dependencies from the Manifest.toml
@@ -56,3 +56,6 @@ Generate a word embedding for a given word using the loaded model:
        embedding = get_word_embedding(model, "example")
 
 ## 4) References
+We have used the word vectors that were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
+
+       P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
