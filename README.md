@@ -32,17 +32,24 @@ Within the Julia REPL, load the package into the current session
 
        using GroupIWord2Vec
 
-## 2) Dependencies
+## 3) Select and implement a pre-trained Word2Vec model from a reputable source e.g. FastText English (.bin & .vec file):
+
+       https://fasttext.cc/docs/en/pretrained-vectors.html
+
+Once downloaded, move the directory to the package directory:
+
+       mv wiki.en ~.julia/dev/GroupIWord2Vec
+
+This is what the file structure should look like:
+
+
+# Dependencies
 GroupIWord2Vec.jl relies on the following non-standard Julia packages:
 
        DelimitedFiles        # Provides functionality for reading and writing delimited text files
        LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
 
-## 3) Examples
-Select a pre-trained Word2Vec model from a reputable source e.g. FastText (binary & text format file):
-
-       https://fasttext.cc/docs/en/pretrained-vectors.html
-
+# Examples
 Load a pre-trained model from a file in text format:
 
        model = load_text_model("path/to/model.vec")
@@ -55,7 +62,7 @@ Generate a word embedding for a given word using the loaded model:
 
        embedding = get_word_embedding(model, "example")
 
-## 4) References
+# References
 We have used the word vectors that were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
 
        P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
