@@ -32,7 +32,7 @@ Within the Julia REPL, load the package into the current session
 
        using GroupIWord2Vec
 
-## 3) Select and implement a pre-trained Word2Vec model from a reputable source e.g. FastText English (.bin & .vec file):
+## 3) Select and implement a pre-trained Word2Vec model e.g. FastText English (.bin & .vec file):
 
        https://fasttext.cc/docs/en/pretrained-vectors.html
 
@@ -42,6 +42,22 @@ Once downloaded, move the directory to the package directory:
 
 This is what the file structure should look like:
 
+       .julia/
+       └── dev/
+           └── GroupIWord2Vec/         # Development directory for the package
+               ├── src/
+               │   ├── GroupIWord2Vec.jl      # Main package file
+               │   ├── functions.jl           # Main functions
+               ├── test/
+               │   ├── runtests.jl            # Test suite
+               ├── wiki.en/                   # Pretrained embeddings
+               │   ├── wiki.en.vec            # Vector file
+               │   ├── wiki.en.bin            # Binary file
+               ├── LICENSE                    # License file
+               ├── .gitignore                 # Git ignore rules
+               ├── Project.toml               # Package dependencies
+               ├── Manifest.toml              # Dependency snapshot
+               └── README.md                  # Documentation
 
 # Dependencies
 GroupIWord2Vec.jl relies on the following non-standard Julia packages:
