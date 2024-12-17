@@ -68,6 +68,9 @@ function load_fasttext_embeddings(file_name::String)
         println("Reading file...")
         # Original working header skipping
         skip(f, 8)
+        # The ltoh function converts a little-endian representation into the byte order used by your host system.
+        # Little-Endian: The least significant byte (LSB) is stored first in memory. This is common on x86 architectures.
+        # Big-Endian: The most significant byte (MSB) is stored first.
         dim = ltoh(read(f, Int32))
         skip(f, 96)  # Changed from 100 to get to word start
         
