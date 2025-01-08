@@ -1,4 +1,3 @@
-![Logo](WordEmbeddings.png)
 <img src="WordEmbeddings.png" alt="Logo" width="300" height="200" />
 
 # Getting Started - Installation and Usage Guide
