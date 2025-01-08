@@ -1,4 +1,10 @@
-<img src="WordEmbeddings.png" alt="Logo" width="300" height="200" />
+<div align="center">
+  <img src="WordEmbeddings.png" alt="Logo" width="300" height="300" />
+       <h1>Word2Vec</h1>
+       A Julia package that implements some tools for running and testing word-embedding algorithms
+</div>
+
+#
 
 # Getting Started - Installation and Usage Guide
 
