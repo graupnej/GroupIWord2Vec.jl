@@ -1,3 +1,7 @@
+![Logo](WordEmbeddings.png)
+
+
+
 # Getting Started - Installation and Usage Guide
 
 ## 1) Clone the github repository
