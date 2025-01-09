@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl/graph/badge.svg?token=WRWRU7P5WQ)](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl)
+
 <div align="center">
   <img src="WordEmbeddings.png" alt="Logo" width="300" height="300" />
        <h1>Word2Vec</h1>
