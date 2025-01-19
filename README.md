@@ -55,7 +55,7 @@ Further, the package includes the following functions
 - Get the vector representation of a word (``get_vector``)
 
 ```julia
-julia> get_vector(model, "book")'
+julia> get_vector(model, "king")'
 100-element Vector{Float64}:
  -0.0915921031903591
  -0.10155618557541449
