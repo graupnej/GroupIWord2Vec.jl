@@ -48,7 +48,6 @@ In the next step the obtained word vectors in ``text8.txt`` can be imported to J
 
 ```julia
 julia> model = load_embeddings("./text8.txt")
-WordVectors 71291 words, 100-element Float64 vectors
 ```
 
 Further, the package includes the following functions
