@@ -37,7 +37,7 @@ julia> train_model("text8", "text8.txt", verbose = true)
 Starting training using file text8
 Vocab size: 71291
 Words in train file: 16718843
-Alpha: 0.000002  Progress: 100.04%  Words/thread/sec: 350.44k  
+Alpha: 0.000002  Progress: 100.01%  Words/thread/sec: 159.38k  
 ```
 
 The resultung word vectors are saved in a text format file.
