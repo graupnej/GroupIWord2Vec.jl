@@ -49,7 +49,7 @@ to their indices and a matrix of vectors where each column corresponds to a word
         verbose <Bool>
             Print output from training 
 """
-function word2vec(train::AbstractString, output::AbstractString; 
+function train_model(train::AbstractString, output::AbstractString; 
                   size::Int=100, window::Int=5, sample::AbstractFloat=1e-3,
                   hs::Int=0, negative::Int=5, threads::Int=12, iter::Int=5, 
                   min_count::Int=5, alpha::AbstractFloat=0.025,
