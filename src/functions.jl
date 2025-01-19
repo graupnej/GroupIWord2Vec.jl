@@ -163,6 +163,13 @@ function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,s
     end
 end
 
+"""
+     get_vector(wv, word)
+
+# Return the vector representation of `word` from the WordVectors `wv`.
+"""
+get_vector(wv::WordEmbedding, word) = (idx = wv.vocab_hash[word]; wv.vectors[:,idx])
+
 
 # # Generate a WordVectors object from text file
 # function _from_text(::Type{T}, filename::AbstractString, normalize::Bool=true, delim::Char=' ',fasttext::Bool=false) where T<:Real
@@ -207,15 +214,6 @@ end
 #         return WordVectors(vocab, vectors)
 #     end
 # end
-
-
-# """
-#     get_vector(wv, word)
-
-# Return the vector representation of `word` from the WordVectors `wv`.
-# """
-# get_vector(wv::WordVectors, word) =
-#       (idx = wv.vocab_hash[word]; wv.vectors[:,idx])
 
 
 # function load_text_model(filename::String)
