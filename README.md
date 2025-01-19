@@ -28,6 +28,63 @@ using OneTwoTree
 ```
 
 ## 2) Running a simple example
+In order to train a model some text corpus is required. For a simple example use http://mattmahoney.net/dc/text8.zip. Store this file in the current working directory
+
+To train the model based on ``text8`` use the function ``train_model``
+
+```julia
+julia> train_model("text8", "text8.txt", verbose = true)
+Starting training using file text8
+Vocab size: 71291
+Words in train file: 16718843
+Alpha: 0.000002  Progress: 100.04%  Words/thread/sec: 350.44k  
+```
+
+The resultung word vectors are saved in a text format file.
+
+- Note that this function currently interfaces with C code and is therefore not pure Julia. This will be updated asap.
+
+In the next step the obtained word vectors in ``text8.txt`` can be imported to Julia.
+
+```julia
+julia> model = load_embeddings("./text8.txt")
+WordVectors 71291 words, 100-element Float64 vectors
+```
+
+Further, the package includes the following functions
+
+- Get the vector representation of a word (``get_vector``)
+
+```julia
+julia> get_vector(model, "book")'
+100-element Array{Float64,1}:
+ -0.05446138539336186
+  0.001090934639284009
+  0.06498087707990222
+  ⋮
+ -0.0024113040415322516
+  0.04755140828570571
+  0.039764719065723826
+```
+
+- Get the top-n most similar words to a given word (``get_similar``)
+
+```
+Will be implemented soon
+```
+
+# Dependencies
+GroupIWord2Vec.jl relies on the following non-standard Julia packages:
+
+       DelimitedFiles        # Provides functionality for reading and writing delimited text files
+       LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
+
+# References
+The text corpus for the simple example (``text8``) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
+
+The text corpus for the complex example were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
+
+       P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
 
 
 ## 1) Clone the github repository
@@ -118,7 +175,3 @@ In order to compare the vectors from both files you can run a test in the packag
 
 This compares the vectors for certain predefined words from both files to check whether the files have been read similarly or not.
 
-# References
-We have used the word vectors that were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
-
-       P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
