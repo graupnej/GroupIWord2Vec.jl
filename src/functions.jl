@@ -168,7 +168,7 @@ end
 
 # Return the vector representation of `word` from the WordVectors `wv`.
 """
-get_vector(wv::WordEmbedding, word) = (idx = wv.vocab_hash[word]; wv.vectors[:,idx])
+get_vector(wv::WordEmbedding, word) = (idx = wv.word_indices[word]; wv.embeddings[:,idx])
 
 
 # # Generate a WordVectors object from text file
