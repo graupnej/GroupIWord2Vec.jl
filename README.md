@@ -23,7 +23,7 @@ We can't use Pluto's environments but have to create our own
 ```julia
 using Pkg
 Pkg.activate("MyEnvironment")
-Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl")
+Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
 using OneTwoTree
 ```
 
