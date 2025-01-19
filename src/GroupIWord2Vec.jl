@@ -6,14 +6,25 @@ module GroupIWord2Vec
 # Importing modules from Julia's standard libraries
 using LinearAlgebra         # For linear algebra functionalities
 using DelimitedFiles        # For reading and writing delimited text files
+import Word2Vec_jll
 
 # Exporting public types and functions for use by external modules or scripts
-export Word2VecModel, load_text_model, get_word_embedding, load_fasttext_embeddings, find_similar_words
+export word2vec, get_vector, WordEmbedding, load_embeddings, read_binary_format, read_text_format
 
-# Define a struct to represent the Word2Vec model. Containing a dictionary mapping words to indices and a matrix where each column is the embedding vector for a word
-struct Word2VecModel
-    vocab::Dict{String, Int}
-    vectors::Matrix{Float64}
+# Define the mutable struct for word embeddings
+mutable struct WordEmbedding{S<:AbstractString, T<:Real}
+    words::Vector{S}
+    embeddings::Matrix{T}
+    word_indices::Dict{S, Int}
+    
+    # Custom constructor with validation
+    function WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
+        if length(words) != size(matrix, 2)
+            throw(ArgumentError("Number of words ($(length(words))) must match matrix columns ($(size(matrix, 2)))"))
+        end
+        indices = Dict(word => idx for (idx, word) in enumerate(words))
+        new{S,T}(words, matrix, indices)
+    end
 end
 
 # Include the "functions.jl" file, which contains the implementation of functions
