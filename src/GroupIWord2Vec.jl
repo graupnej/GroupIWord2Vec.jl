@@ -9,7 +9,7 @@ using DelimitedFiles        # For reading and writing delimited text files
 import Word2Vec_jll
 
 # Exporting public types and functions for use by external modules or scripts
-export word2vec, get_vector, WordEmbedding, load_embeddings, read_binary_format, read_text_format
+export train_model, get_vector, WordEmbedding, load_embeddings, read_binary_format, read_text_format
 
 # Define the mutable struct for word embeddings
 mutable struct WordEmbedding{S<:AbstractString, T<:Real}
