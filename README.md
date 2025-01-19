@@ -56,14 +56,14 @@ Further, the package includes the following functions
 
 ```julia
 julia> get_vector(model, "book")'
-100-element Array{Float64,1}:
- -0.05446138539336186
-  0.001090934639284009
-  0.06498087707990222
+100-element Vector{Float64}:
+ -0.0915921031903591
+ -0.10155618557541449
+  0.05258880267427831
   ⋮
- -0.0024113040415322516
-  0.04755140828570571
-  0.039764719065723826
+ -0.05509991571538997
+ -0.06181055625996383
+ -0.08482664361123718
 ```
 
 - Get the top-n most similar words to a given word (``get_similar``)
