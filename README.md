@@ -6,9 +6,29 @@
        A Julia package that implements some tools for running and testing word-embedding algorithms
 </div>
 
-#
+## What's it about
+[Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks.
 
-# Getting Started - Installation and Usage Guide
+# Getting Started
+
+## 1) Download
+Via `Pkg>` mode (press `]` in Julia REPL):
+
+```bash
+add https://github.com/graupnej/GroupIWord2Vec.jl
+```
+
+We can't use Pluto's environments but have to create our own
+
+```julia
+using Pkg
+Pkg.activate("MyEnvironment")
+Pkg.add(url="https://github.com/nichtJakob/OneTwoTree.jl")
+using OneTwoTree
+```
+
+## 2) Running a simple example
+
 
 ## 1) Clone the github repository
 First, clone the repository to your local machine (replace <username> with your details):
