@@ -84,6 +84,8 @@ GroupIWord2Vec.jl relies on the following non-standard Julia packages:
 
        DelimitedFiles        # Provides functionality for reading and writing delimited text files
        LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
+       Plots                 # For visualisation
+       Word2vec.jll          # 
 
 # References
 The text corpus for the simple example (``text8``) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
@@ -92,15 +94,6 @@ The text corpus for the complex example were obtained using the skip-gram model 
 
        P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
 
-
-## 1) Clone the github repository
-First, clone the repository to your local machine (replace <username> with your details):
-
-       git clone https://github.com/<username>/GroupIWord2Vec.jl.git
-
-Once downloaded, move the directory into your julia directory:
-
-       mv GroupIWord2Vec.jl ~.julia/
 
 ## 2) Open the package in Julia
 Launch the Julia REPL and navigate to the cloned directory:
@@ -117,13 +110,6 @@ Here, activate the project environment:
        Pkg.instantiate()         # Install dependencies from the Manifest.toml
 
 This instructs Julia to use the Project.toml and Manifest.toml files in the current directory for managing dependencies.
-In Julia's package management system (Pkg mode, entered by typing ]) trigger the build process for the package:
-
-       build GroupIWord2Vec
-
-Within the Julia REPL, load the package into the current session
-
-       using GroupIWord2Vec
 
 ## 3) Select and implement a pre-trained Word2Vec model e.g. FastText English (.bin & .vec file):
 
@@ -132,47 +118,6 @@ Within the Julia REPL, load the package into the current session
 Once downloaded, move the directory to the package directory:
 
        mv wiki.en ~.julia/GroupIWord2Vec
-
-This is what the file structure should look like:
-
-       .julia/
-           └── GroupIWord2Vec/         # Development directory for the package
-               ├── src/
-               │   ├── GroupIWord2Vec.jl      # Main package file
-               │   ├── functions.jl           # Main functions
-               ├── test/
-               │   ├── runtests.jl            # Test suite
-               ├── wiki.en/                   # Pretrained embeddings
-               │   ├── wiki.en.vec            # Vector file
-               │   ├── wiki.en.bin            # Binary file
-               ├── LICENSE                    # License file
-               ├── .gitignore                 # Git ignore rules
-               ├── Project.toml               # Package dependencies
-               ├── Manifest.toml              # Dependency snapshot
-               └── README.md                  # Documentation
-
-# Dependencies
-GroupIWord2Vec.jl relies on the following non-standard Julia packages:
-
-       DelimitedFiles        # Provides functionality for reading and writing delimited text files
-       LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
-
-# Examples
-In the package directory:
-
-       ~.julia/GroupIWord2Vec
-
-Load a pre-trained model from a file in text format:
-
-       model_vec = load_text_model("wiki.en/wiki.en.vec")
-
-Alternatively, load a pre-trained model from a file in binary format:
-
-       model_bin = load_text_model("wiki.en/wiki.en.bin")
-
-Generate a word embedding for a given word using one of the loaded models:
-
-       embedding = get_word_embedding(model_, "test")
 
 # Run a test
 In order to compare the vectors from both files you can run a test in the package directory:
