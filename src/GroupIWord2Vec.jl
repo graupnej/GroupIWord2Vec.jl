@@ -1,6 +1,6 @@
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # This is the main module file that organizes all the word embedding functionality
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 module GroupIWord2Vec
 
 # Importing modules from Julia's standard libraries
@@ -20,14 +20,15 @@ export train_model,          # Function to train new word embeddings
       plot_similarity        # Function to visualize similarities
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # WordEmbedding is a structure that holds three related pieces of information
 # 1) A list of all words
 # 2) The corresponding vectors
 # 3) A lookup dictionary
 # to keep words and their vectors organized and linked together
 # It is mutable (can be modified after creation) and works with any string and number types
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
+
 mutable struct WordEmbedding{S<:AbstractString, T<:Real}
      # List of all words in the vocabulary
     words::Vector{S}
