@@ -177,7 +177,7 @@ Return the position of `n` (by default `n = 10`) neighbors of `word` and their
 cosine similarities.
 """
 function get_similarity(wv::WordEmbedding, word, n=10)
-    metrics = wv.vectors'*get_vector(wv, word)
+    metrics = wv.embeddings'*get_vector(wv, word)
     topn_positions = sortperm(metrics[:], rev = true)[1:n]
     topn_metrics = metrics[topn_positions]
     return topn_positions, topn_metrics
