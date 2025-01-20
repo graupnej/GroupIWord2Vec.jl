@@ -6,10 +6,11 @@ module GroupIWord2Vec
 # Importing modules from Julia's standard libraries
 using LinearAlgebra         # For linear algebra functionalities
 using DelimitedFiles        # For reading and writing delimited text files
+using Plots
 import Word2Vec_jll
 
 # Exporting public types and functions for use by external modules or scripts
-export train_model, WordEmbedding, load_embeddings, read_binary_format, read_text_format, get_vector, get_similarity
+export train_model, WordEmbedding, load_embeddings, read_binary_format, read_text_format, get_vector, get_similarity, plot_similarity
 
 # Define the mutable struct for word embeddings
 mutable struct WordEmbedding{S<:AbstractString, T<:Real}
