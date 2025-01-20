@@ -3,7 +3,6 @@ The load_text_model function takes a file in text format containing the pre-trai
 and gives an object of type Word2VecModel as output. This object includes a dictionary mapping words
 to their indices and a matrix of vectors where each column corresponds to a word's vector
 """
-
 function load_text_model(filename::String)
     # Read lines from file into a vector of strings.
     println("Reading file...")
@@ -48,7 +47,6 @@ end
 """
 The function retrieves the embedding vector for a specific word based on a pre-loaded Word2VecModel
 """
-
 function get_word_embedding(model::Word2VecModel, word::String)
     # Check if the word exists in the model's vocabulary and raise an error if not found
     if !haskey(model.vocab, word)
@@ -62,7 +60,6 @@ end
 """
 Still figuring out this shit
 """
-
 function load_fasttext_embeddings(file_name::String)
     open(file_name, "r") do f
         println("Reading file...")
