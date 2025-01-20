@@ -66,7 +66,7 @@ julia> get_vector(model, "king")
  -0.08482664361123718
 ```
 
-- Get the top-n most similar words to a given word (``get_similar``)
+- Get the top-n most similar words to a given word (``get_similarity``)
 
 ```
 Will be implemented soon
