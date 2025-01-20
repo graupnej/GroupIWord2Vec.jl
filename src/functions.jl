@@ -81,7 +81,7 @@ function train_model(train::AbstractString, output::AbstractString;
     end
 end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # This is the main function that loads word embeddings from a file. It supports different formats
 # and allows customization of how the data should be loaded. It requires the following parameters:
 #
@@ -105,8 +105,7 @@ end
 #
 # Word2Vec models often come in both formats because the text format is for inspection and modifcation
 # and binary format is for efficient application usage
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
+"""
 # Main loading function
 function load_embeddings(path::AbstractString; format::Symbol=:text,data_type::Type{T}=Float64,normalize_vectors::Bool=true,separator::Char=' ',skip_bytes::Int=1) where T<:Real
      # For a text file use the read_text_format function
@@ -120,7 +119,7 @@ function load_embeddings(path::AbstractString; format::Symbol=:text,data_type::T
     end
 end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # This function reads word embeddings (word->vector mappings) from a text file
 # It requires the following Parameters:
 #   filepath: where the file is located
@@ -129,7 +128,7 @@ end
 #               ---> This can be useful for comparison since the length of the vector does not
 #                    matter, only its direction
 #   separator: what character separates the values in the file (like space or comma)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
 
     open(filepath) do file
@@ -170,7 +169,7 @@ function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,se
     end
 end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # This function reads word embeddings (word->vector mappings) from a binary file
 # It requires the following Parameters:
 #   filepath: where the file is located
@@ -182,7 +181,7 @@ end
 #   skip_bytes: how many bytes to skip after each word-vector pair (usually for handling separators)
 # Instead of reading lines of text and parsing numbers it reads words until it hits a separator
 # Reads raw bytes and converts them directly to numbers
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,separator::Char,skip_bytes::Int) where T<:Real
 
     open(filepath, "r") do file
@@ -221,9 +220,9 @@ function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,s
     end
 end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # Purpose: Get the vector representation of a specific word from the WordEmbedding
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 function get_vector(wv::WordEmbedding, word)
     # Performance steps are separated using semicolon
     # Step 1: idx = wv.word_indices[word]     --> Checks the word's index in the dictionary
@@ -231,9 +230,9 @@ function get_vector(wv::WordEmbedding, word)
     idx = wv.word_indices[word]; wv.embeddings[:,idx]
 end
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 # Purpose: Find the n (default n = 10) most similar words to a given word
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
      # Purpose: 
 function get_similarity(wv::WordEmbedding, word, n=10)
     # Step 1: Calculate similarity scores for all words
@@ -254,10 +253,7 @@ function get_similarity(wv::WordEmbedding, word, n=10)
     # Return both positions and their similarity scores
     return topn_positions, topn_metrics
 end
-  
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-# Work in progress
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 """
 function plot_similarity(wv::WordEmbedding, word, n=10)
     # Get similarities
