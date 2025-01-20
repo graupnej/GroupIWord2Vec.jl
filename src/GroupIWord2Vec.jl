@@ -1,16 +1,24 @@
-"""
-This is the main module file that organizes all the word embedding functionality
-"""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# This is the main module file that organizes all the word embedding functionality
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 module GroupIWord2Vec
 
 # Importing modules from Julia's standard libraries
-using LinearAlgebra         # For linear algebra functionalities
-using DelimitedFiles        # For reading and writing delimited text files
-using Plots
-import Word2Vec_jll
+using LinearAlgebra         # Provides functions for vector/matrix operations (e.g. multiplication and normalization)
+using DelimitedFiles        # Helps read/write files with separators (like binary files)
+using Plots                 # For visualization functions
+import Word2Vec_jll         # Links to the underlying Word2Vec implementation (C code)
 
-# Exporting public types and functions for use by external modules or scripts
-export train_model, WordEmbedding, load_embeddings, read_binary_format, read_text_format, get_vector, get_similarity, plot_similarity
+# Make these functions and types available to anyone using this module. Other programs can use these functions after importing GroupIWord2Vec
+export train_model,          # Function to train new word embeddings
+      WordEmbedding,         # The main data structure for word embeddings
+      load_embeddings,       # Function to load pre-trained embeddings
+      read_binary_format,    # Function to read binary embedding files
+      read_text_format,      # Function to read text embedding files
+      get_vector,            # Function to get a word's vector
+      get_similarity,        # Function to find similar words
+      plot_similarity        # Function to visualize similarities
+
 
 # Define the mutable struct for word embeddings
 mutable struct WordEmbedding{S<:AbstractString, T<:Real}
@@ -28,7 +36,7 @@ mutable struct WordEmbedding{S<:AbstractString, T<:Real}
     end
 end
 
-# Include the "functions.jl" file, which contains the implementation of functions
+# Include all the functions defined in functions.jl
 include("functions.jl")
 
 end
