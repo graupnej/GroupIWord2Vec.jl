@@ -81,18 +81,42 @@ function train_model(train::AbstractString, output::AbstractString;
     end
 end
 
-# Main structure
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# WordEmbedding is a structure that holds three related pieces of information
+# 1) A list of all words
+# 2) The corresponding vectors
+# 3) A lookup dictionary
+# to keep words and their vectors organized and linked together
+# It is mutable (can be modified after creation) and works with any string and number types
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 mutable struct WordEmbedding{S<:AbstractString, T<:Real}
+     # List of all words in the vocabulary
     words::Vector{S}
+
+     # Matrix containing all word vectors
+   # - Each column represents one word's vector
+   # - If we have 3 words and vectors of length 4 we have a 4×3 matrix
     embeddings::Matrix{T}
+
+     # Dictionary for quick word lookup
+   # Maps each word to its position in the words vector and embeddings matrix
     word_indices::Dict{S, Int}
     
-    # Custom constructor with validation
+    # Custom constructor: This is called when creating a new WordEmbedding
+   # It makes sure the data is valid and sets everything up correctly
     function WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
+          # Check if the number of words matches the number of vectors
+       # If we have 3 words, we need exactly 3 vectors (columns in the matrix)
         if length(words) != size(matrix, 2)
             throw(ArgumentError("Number of words ($(length(words))) must match matrix columns ($(size(matrix, 2)))"))
         end
+
+          # Create the lookup dictionary
+       # This makes a dictionary where each word points to its position
+       # It's like creating an index in a book for quick reference
         indices = Dict(word => idx for (idx, word) in enumerate(words))
+
+          # Create the new WordEmbedding with all its parts
         new{S,T}(words, matrix, indices)
     end
 end
@@ -108,29 +132,52 @@ function load_embeddings(path::AbstractString; format::Symbol=:text,data_type::T
     end
 end
 
-# Text format reader
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# This function reads word embeddings (word->vector mappings) from a text file
+# It requires the following Parameters:
+#   filepath: where the file is located
+#   T: what kind of numbers we want (like decimal numbers)
+#   normalize: whether to make all vectors have length 1
+#               ---> This can be useful for comparison since the length of the vector does not
+#                    matter, only its direction
+#   separator: what character separates the values in the file (like space or comma)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
 
     open(filepath) do file
-        # Parse header
+          
+        # Read the first line which contains information on two numbers: 
+        # how many words (vocab_size) and how long each vector is (vector_size)
         header = split(strip(readline(file)), separator)
-        vocab_size, vector_size = parse.(Int, header)
-
+        vocab_size, vector_size = parse.(Int, header
+               
+        # Create empty arrays to store our data:
+        # - words: will hold all the words
+        # - vectors: will hold all the corresponding number vectors
         words = Vector{String}(undef, vocab_size)
         vectors = Matrix{T}(undef, vector_size, vocab_size)
 
+        # For each remaining line in the file:
         for (idx, line) in enumerate(eachline(file))
+            # Split the line into parts using our separator
             parts = split(strip(line), separator)
+
+            # The first part is the word
             words[idx] = parts[1]
+
+            # The rest are numbers that make up the vector
             vector = parse.(T, parts[2:end])
 
+            # If normalize is true, make the vector length 1
             if normalize
                 vector = vector ./ norm(vector)
             end
 
+            # Store the vector in our matrix
             vectors[:, idx] = vector
         end
 
+        # Create a WordEmbedding object with our words and vectors
         return WordEmbedding(words, vectors)
     end
 end
