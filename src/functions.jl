@@ -167,17 +167,16 @@ end
 #   separator: what character separates the values in the file (like space or comma)
 """
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
-
     open(filepath) do file
           
-        # Read the first line which contains information on two numbers: 
-        # how many words (vocab_size) and how long each vector is (vector_size)
+          # Read the first line which contains information on two numbers: 
+          # how many words (vocab_size) and how long each vector is (vector_size)
         header = split(strip(readline(file)), separator)
         vocab_size, vector_size = parse.(Int, header
                
-        # Create empty arrays to store our data:
-        # - words: will hold all the words
-        # - vectors: will hold all the corresponding number vectors
+               # Create empty arrays to store our data:
+               # - words: will hold all the words
+               # - vectors: will hold all the corresponding number vectors
         words = Vector{String}(undef, vocab_size)
         vectors = Matrix{T}(undef, vector_size, vocab_size)
 
@@ -226,7 +225,7 @@ function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,s
         header = split(strip(readline(file)), separator)
         vocab_size, vector_size = parse.(Int, header)
 
-        # Prepare arrays for words and vectors
+          # Prepare arrays for words and vectors
         words = Vector{String}(undef, vocab_size)
         vectors = zeros(T, vector_size, vocab_size)
 
