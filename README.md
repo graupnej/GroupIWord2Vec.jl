@@ -84,8 +84,8 @@ GroupIWord2Vec.jl relies on the following non-standard Julia packages:
 
        DelimitedFiles        # Provides functionality for reading and writing delimited text files
        LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
-       Plots                 # For visualisation
-       Word2vec.jll          # 
+       Plots                 # For visualization functions
+       Word2vec.jll          # Links to the underlying Word2Vec implementation (C code)
 
 # References
 The text corpus for the simple example (``text8``) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
