@@ -169,7 +169,7 @@ end
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
     open(filepath) do file
           header = split(strip(readline(file)), separator)
-          vocab_size, vector_size = parse.(Int, header
+          vocab_size, vector_size = parse.(Int, header)
           words = Vector{String}(undef, vocab_size)
           vectors = Matrix{T}(undef, vector_size, vocab_size)
 
