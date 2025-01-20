@@ -258,6 +258,7 @@ end
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Work in progress
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""
 function plot_similarity(wv::WordEmbedding, word, n=10)
     # Get similarities
     positions, metrics = get_similarity(wv, word, n)
@@ -277,3 +278,4 @@ function plot_similarity(wv::WordEmbedding, word, n=10)
     )
     return p
 end
+"""
