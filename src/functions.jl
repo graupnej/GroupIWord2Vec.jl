@@ -282,25 +282,3 @@ function get_similarity(wv::WordEmbedding, word, n=10)
     # Return both positions and their similarity scores
     return topn_positions, topn_metrics
 end
-
-"""
-function plot_similarity(wv::WordEmbedding, word, n=10)
-    # Get similarities
-    positions, metrics = get_similarity(wv, word, n)
-    
-    # Get the actual words
-    similar_words = [wv.words[i] for i in positions]
-    
-    # Create horizontal bar plot
-    p = bar(
-        reverse(similar_words),  # Reverse to show most similar at top
-        reverse(metrics),
-        orientation=:horizontal,
-        title="Words Similar to '$(word)'",
-        xlabel="Cosine Similarity",
-        ylabel="Words",
-        legend=false
-    )
-    return p
-end
-"""
