@@ -188,7 +188,7 @@ function plot_similarity(wv::WordEmbedding, word, n=10)
     positions, metrics = get_similarity(wv, word, n)
     
     # Get the actual words
-    similar_words = [wv.vocab[i] for i in positions]
+    similar_words = [wv.words[i] for i in positions]
     
     # Create horizontal bar plot
     p = bar(
