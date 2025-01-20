@@ -1,9 +1,12 @@
-using Flux, Statistics, ProgressMeter
+using Flux, Statistics, Distributed, ProgressMeter
 using Random
 #using Cuda
 
 function create_vocabulary(text::String)
-    
+    """
+    strips "." => "", "," => "", "!" => "", "?" => "", ";" => ""
+    from text and returns a vocabulary and the cleaned lowercase text  
+    """
     #Join text from file
     #text = join(readlines(filename), " ")
 
@@ -28,6 +31,8 @@ function make_model(text::String, emb_dim::Int)
     
     sorted_vocabulary = sort(collect(vocabulary)) 
 
+    embedding_matrix = fill(input_dimensions, emb_dim)
+
     weights = Embedding(input_dimensions, emb_dim)
 
     #print("i am called from training!!!")
@@ -44,17 +49,19 @@ function train_embedding(train_file::String, embedding_dim::Int, epochs::Int)
     token_num = length(tokenized_text)
     vocab_size = length(sorted_vocabulary)
 
-    for epoch in range(1, epochs)
+    @showprogress dt=1 desc="Training vocabulary vectors..." for epoch in range(1, epochs)
         
         #create random order
         order = shuffle(1:vocab_size)
 
-        for i in range(1, vocab_size)
-            
+        for i in 1:vocab_size
+        
             #select word in dataset
             word = sorted_vocabulary[order[i]]
+            
             #println("find word: \"$(word)\"")
             
+            #select random occurence
             occur = findall(x -> x == word, tokenized_text)
             token_id = rand(occur)
 
@@ -71,6 +78,8 @@ function train_embedding(train_file::String, embedding_dim::Int, epochs::Int)
             successor = tokenized_text[token_id+1]
             
             pre_emb = findfirst(x => x == predecessor, sorted_vocabulary)
+            suc_emb = findfirst(x => x == successor, sorted_vocabulary)
+            
             #println("$(word): The predecessor is $(predecessor) and the successor is $(successor)")
            
             

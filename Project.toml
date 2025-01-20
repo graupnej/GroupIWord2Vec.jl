@@ -5,11 +5,15 @@ version = "1.0.0-DEV"
 
 [deps]
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+GR = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+RDatasets = "ce6b1742-4840-55fa-b093-852dadbb1d8b"
 
 [compat]
 DelimitedFiles = "1.9.1"
-# Change to Versio "1.10.0" if Julia is version 1.10.0
 LinearAlgebra = "1.10.0"
 julia = "1.6.7"
 
