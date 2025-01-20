@@ -1,5 +1,5 @@
 """
-Defines a module named GroupIWord2Vec which includes all functionalities
+This is the main module file that organizes all the word embedding functionality
 """
 module GroupIWord2Vec
 
