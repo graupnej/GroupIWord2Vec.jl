@@ -206,54 +206,94 @@ function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,se
     end
 end
 
-# Binary format reader
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# This function reads word embeddings (word->vector mappings) from a binary file
+# It requires the following Parameters:
+#   filepath: where the file is located
+#   T: what kind of numbers we want (like decimal numbers)
+#   normalize: whether to make all vectors have length 1
+#               ---> This can be useful for comparison since the length of the vector does not
+#                    matter, only its direction
+#   separator: what character separates the values in the file (like space or comma)
+#   skip_bytes: how many bytes to skip after each word-vector pair (usually for handling separators)
+# Instead of reading lines of text and parsing numbers it reads words until it hits a separator
+# Reads raw bytes and converts them directly to numbers
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,separator::Char,skip_bytes::Int) where T<:Real
 
     open(filepath, "r") do file
-        # Parse header
+        # Read header with vocabulary size and vector dimension
         header = split(strip(readline(file)), separator)
         vocab_size, vector_size = parse.(Int, header)
 
+        # Prepare arrays for words and vectors
         words = Vector{String}(undef, vocab_size)
         vectors = zeros(T, vector_size, vocab_size)
+
+        # Calculate how many bytes each vector takes. Each number in the vector is stored as a Float32
         vector_bytes = sizeof(Float32) * vector_size
 
         for i in 1:vocab_size
+            # Read the word until we hit the separator
             words[i] = strip(readuntil(file, separator))
+
+            # Read the raw bytes for the vector and interpret them as Float32 numbers (faster than parsing text numbers)
             vector = reinterpret(Float32, read(file, vector_bytes))
 
+            # Normalize if requested
             if normalize
                 vector = vector ./ norm(vector)
             end
 
+            # Convert to desired number type and store
             vectors[:, i] = T.(vector)
-            read(file, skip_bytes)  # handle newline or other separators
+                    
+            # Skip extra bytes (like newlines) after each word-vector pair
+            read(file, skip_bytes)
         end
 
+        # Return the WordEmbedding object
         return WordEmbedding(words, vectors)
     end
 end
 
-"""
-     get_vector(wv, word)
-
-# Return the vector representation of `word` from the WordVectors `wv`.
-"""
-get_vector(wv::WordEmbedding, word) = (idx = wv.word_indices[word]; wv.embeddings[:,idx])
-
-"""
-    cosine(wv, word, n=10)
-
-Return the position of `n` (by default `n = 10`) neighbors of `word` and their
-cosine similarities.
-"""
-function get_similarity(wv::WordEmbedding, word, n=10)
-    metrics = wv.embeddings'*get_vector(wv, word)
-    topn_positions = sortperm(metrics[:], rev = true)[1:n]
-    topn_metrics = metrics[topn_positions]
-    return topn_positions, topn_metrics
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# Purpose: Get the vector representation of a specific word from the WordEmbedding
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function get_vector(wv::WordEmbedding, word)
+    # Performance steps are separated using semicolon
+    # Step 1: idx = wv.word_indices[word]     --> Checks the word's index in the dictionary
+    # Step 2: wv.embeddings[:,idx]            --> Checks column from the embeddings matrix
+    idx = wv.word_indices[word]; wv.embeddings[:,idx]
 end
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# Purpose: Find the n (default n = 10) most similar words to a given word
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+     # Purpose: 
+function get_similarity(wv::WordEmbedding, word, n=10)
+    # Step 1: Calculate similarity scores for all words
+    # - get_vector(wv, word) gets our target word's vector
+    # - wv.embeddings' is the transpose of all vectors
+    # - Multiplying these gives cosine similarities (because vectors are normalized)
+    metrics = wv.embeddings'*get_vector(wv, word)
+
+    # Step 2: Find positions of top n most similar words
+    # - sortperm gets the positions that would sort the array
+    # - rev = true means sort in descending order (highest similarity first)
+    # - [1:n] takes the first n positions
+    topn_positions = sortperm(metrics[:], rev = true)[1:n]
+
+    # Step 3: Get the similarity scores for these positions
+    topn_metrics = metrics[topn_positions]
+
+    # Return both positions and their similarity scores
+    return topn_positions, topn_metrics
+end
+  
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+# Work in progress
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function plot_similarity(wv::WordEmbedding, word, n=10)
     # Get similarities
     positions, metrics = get_similarity(wv, word, n)
@@ -273,173 +313,3 @@ function plot_similarity(wv::WordEmbedding, word, n=10)
     )
     return p
 end
-
-
-# # Generate a WordVectors object from text file
-# function _from_text(::Type{T}, filename::AbstractString, normalize::Bool=true, delim::Char=' ',fasttext::Bool=false) where T<:Real
-#     open(filename) do f
-#         header = strip(readline(f))
-#         vocab_size,vector_size = map(x -> parse(Int, x), split(header, delim))
-#         vocab = Vector{String}(undef, vocab_size)
-#         vectors = Matrix{T}(undef, vector_size, vocab_size)
-#         for (i, line) in enumerate(readlines(f))
-#             !fasttext && (line = strip(line))
-#             parts = split(line, delim)
-#             word = parts[1]
-#             vector = map(x-> parse(T, x), parts[2:end])
-#             vocab[i] = word
-#             if normalize
-#                 vector = vector ./ norm(vector)  # unit vector
-#             end
-#             vectors[:, i] = vector
-#         end
-#         return WordVectors(vocab, vectors)
-#     end
-# end
-
-# # Generate a WordVectors object from binary file
-# function _from_binary(::Type{T},filename::AbstractString,skip::Bool=true,normalize::Bool=true,delim::Char=' ') where T<:Real
-#     sb = ifelse(skip, 0, 1)
-#     open(filename) do f
-#         header = strip(readline(f))
-#         vocab_size,vector_size = map(x -> parse(Int, x), split(header, delim))
-#         vocab = Vector{String}(undef, vocab_size)
-#         vectors = zeros(T, vector_size, vocab_size)
-#         binary_length = sizeof(Float32) * vector_size
-#         for i in 1:vocab_size
-#             vocab[i] = strip(readuntil(f, delim))
-#             vector = reinterpret(Float32, read(f, binary_length))
-#             if normalize
-#                 vector = vector ./ norm(vector)  # unit vector
-#             end
-#             vectors[:,i] = T.(vector)
-#             read(f, sb) # new line
-#         end
-#         return WordVectors(vocab, vectors)
-#     end
-# end
-
-
-# function load_text_model(filename::String)
-#     # Read lines from file into a vector of strings.
-#     println("Reading file...")
-#     lines = readlines(filename)
-
-#     println("Parsing header...")
-#     # Parse first line to get vocab and vec size. First line is expected to have two integers separated by a space.
-#     vocab_size, vector_size = parse.(Int, split(lines[1]))
-
-#     println("Initializing structures...")
-#     # Dictionary to store vocabulary. Dict maps vocab to its index in the vectors matrix 
-#     vocab = Dict{String, Int}()
-
-#     # Initialize a matrix to store the word vectors with 'vector_size' rows (one for each dimension of the vector) and 'vocab_size' columns (one for each word in the vocabulary).
-#     vectors = Matrix{Float64}(undef, vector_size, vocab_size)
-
-#     println("Processing vectors...")
-#     # Iterate over each line starting from the second line (i.e., the word vectors).
-#     for (i, line) in enumerate(@view lines[2:end])
-#         # A valid line should have (vector_size + 1) elements: one word and its vector. Skips line if malformed (doesn't have the correct number of elements)
-#         if length(split(line)) != vector_size + 1
-#             continue
-#         end
-
-#         # Split the line into parts since the first part is the word, and the rest are the vector components.
-#         parts = split(line)
-#         word = parts[1]                       # The word is the first element.
-#         vector = parse.(Float64, parts[2:end]) # Parse the vector components as Float64.
-
-#         # Proceed if the parsed vector has the expected size
-#         if length(vector) == vector_size
-#             vocab[word] = i                  # Map the word to its index in the dictionary.
-#             vectors[:, i] = vector           # Store the vector in the matrix at the corresponding column.
-#         end
-#     end
-
-#     println("Completed processing vectors from .vec file")
-#     # Return a Word2VecModel object containing the vocabulary dictionary and the vectors matrix.
-#     return Word2VecModel(vocab, vectors)
-# end
-
-# """
-# The function retrieves the embedding vector for a specific word based on a pre-loaded Word2VecModel
-# """
-
-# function get_word_embedding(model::Word2VecModel, word::String)
-#     # Check if the word exists in the model's vocabulary and raise an error if not found
-#     if !haskey(model.vocab, word)
-#         throw(KeyError("Word '$word' not found in vocabulary"))
-#     end
-
-#     # Function looks up word's index in the vocab dict and accesses the corresponding column in the vectors matrix. Then returns word embedding vector for the word
-#     return model.vectors[:, model.vocab[word]]
-# end
-
-# """
-# Still figuring out this shit
-# """
-
-# function load_fasttext_embeddings(file_name::String)
-#     open(file_name, "r") do f
-#         println("Reading file...")
-#         # Original working header skipping
-#         skip(f, 8)
-#         # The ltoh function converts a little-endian representation into the byte order used by your host system.
-#         # Little-Endian: The least significant byte (LSB) is stored first in memory. This is common on x86 architectures.
-#         # Big-Endian: The most significant byte (MSB) is stored first.
-#         dim = ltoh(read(f, Int32))
-#         skip(f, 96)  # Changed from 100 to get to word start
-        
-#         # Constants
-#         vocab_size = 2_519_370
-        
-#         # Initialize storage
-#         vocab = Dict{String, Int}()
-#         vectors = Matrix{Float32}(undef, dim, vocab_size)
-        
-#         # Special handling for first two tokens
-#         vocab[","] = 1
-#         vocab["."] = 2
-#         skip(f, 20)  # Skip their metadata
-        
-#         # Read remaining words (starting from 3)
-#         for i in 3:vocab_size
-#             # Original working word reading logic
-#             while !eof(f) && read(f, UInt8) == 0x00
-#                 continue
-#             end
-#             skip(f, -1)
-            
-#             word_bytes = UInt8[]
-#             while !eof(f)
-#                 byte = read(f, UInt8)
-#                 if byte == 0x00
-#                     break
-#                 end
-#                 push!(word_bytes, byte)
-#             end
-            
-#             word = String(word_bytes)
-#             vocab[word] = i
-#             skip(f, 9)
-            
-#         end
-        
-#         # Original working vector reading logic
-#         pos = position(f)
-#         alignment = (4 - pos % 4) % 4
-#         if alignment > 0
-#             skip(f, alignment)
-#         end
-        
-#         for i in 1:vocab_size
-#             for j in 1:dim
-#                 vectors[j, i] = ltoh(read(f, Float32))
-#             end
-#         end
-    
-#         println("\nCompleted loading $(length(vocab)) words with dimension $dim from .bin file")
-        
-#         return Word2VecModel(vocab, Float64.(vectors))
-#     end
-# end
