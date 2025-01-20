@@ -168,40 +168,33 @@ end
 """
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
     open(filepath) do file
-          
-          # Read the first line which contains information on two numbers: 
-          # how many words (vocab_size) and how long each vector is (vector_size)
-        header = split(strip(readline(file)), separator)
-        vocab_size, vector_size = parse.(Int, header
-               
-               # Create empty arrays to store our data:
-               # - words: will hold all the words
-               # - vectors: will hold all the corresponding number vectors
-        words = Vector{String}(undef, vocab_size)
-        vectors = Matrix{T}(undef, vector_size, vocab_size)
+          header = split(strip(readline(file)), separator)
+          vocab_size, vector_size = parse.(Int, header
+          words = Vector{String}(undef, vocab_size)
+          vectors = Matrix{T}(undef, vector_size, vocab_size)
 
-        # For each remaining line in the file:
-        for (idx, line) in enumerate(eachline(file))
+          # For each remaining line in the file:
+          for (idx, line) in enumerate(eachline(file))
             # Split the line into parts using our separator
             parts = split(strip(line), separator)
-
+          
             # The first part is the word
             words[idx] = parts[1]
-
+          
             # The rest are numbers that make up the vector
             vector = parse.(T, parts[2:end])
-
+          
             # If normalize is true, make the vector length 1
             if normalize
                 vector = vector ./ norm(vector)
             end
-
+          
             # Store the vector in our matrix
             vectors[:, idx] = vector
-        end
-
-        # Create a WordEmbedding object with our words and vectors
-        return WordEmbedding(words, vectors)
+          end
+          
+          # Create a WordEmbedding object with our words and vectors
+          return WordEmbedding(words, vectors)
     end
 end
 
