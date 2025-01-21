@@ -83,29 +83,14 @@ GroupIWord2Vec.jl relies on the following non-standard Julia packages:
        Plots                 # For visualization functions
        Word2vec.jll          # Links to the underlying Word2Vec implementation (C code)
 
+The files Project.toml and Manifest.toml in the created environment manage dependencies.
+
 # References
 The text corpus for the simple example (``text8``) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
 
 The text corpus for the complex example were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
 
        P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
-
-
-## 2) Open the package in Julia
-Launch the Julia REPL and navigate to the cloned directory:
-
-       cd ~.julia/GroupIWord2Vec
-
-and activate Julia's package environment:
-
-       using Pkg
-       
-Here, activate the project environment:
-
-       Pkg.activate(".")         # Activate the local environment
-       Pkg.instantiate()         # Install dependencies from the Manifest.toml
-
-This instructs Julia to use the Project.toml and Manifest.toml files in the current directory for managing dependencies.
 
 ## 3) Select and implement a pre-trained Word2Vec model e.g. FastText English (.bin & .vec file):
 
