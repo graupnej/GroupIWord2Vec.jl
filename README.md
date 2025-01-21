@@ -56,11 +56,16 @@ julia> get_vector(model, "king")
  -0.08482664361123718
 ```
 
+- Get the cosine similarity of two words (``cosine_similarity``)
+
+```julia
+julia> cosine_similarity(model, "king", "prince")
+```
+
 - Get the top-n most similar words to a given word (``get_similarity``)
 
 ```julia
 julia> get_similarity(model, "king", 5)
-([188, 1062, 904, 527, 1245], [1.0, 0.7518736087237998, 0.715927240172969, 0.6939850961445455, 0.678069618100706])
 ```
 
 - Display one of the similar words
