@@ -75,13 +75,9 @@ julia> model.words[1062]
 Work in progress
 ```
 
-## 3) Select and implement a pre-trained Word2Vec model e.g. FastText English (.bin & .vec file):
-
-       https://fasttext.cc/docs/en/pretrained-vectors.html
-
-Once downloaded, move the directory to the package directory:
-
-       mv wiki.en ~.julia/GroupIWord2Vec
+## 3) Running a large example
+Use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html. This file includes about 33049795 words in the training file.
+Store this file in the current working directory and use the same functions presented in the simple example.
 
 # Run a test
 For code coverage we have implemented testing routines
