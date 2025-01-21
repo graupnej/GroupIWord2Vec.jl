@@ -301,7 +301,6 @@ and the similarity values of the top `n` similar words will be returned.
 For example,
 `king - man + woman = queen` will be
 `pos=[\"king\", \"woman\"], neg=[\"man\"]`.
-"""
 function analogy(wv::WordEmbedding{S,T,H}, pos::AbstractArray, neg::AbstractArray, n= 5) where {S<:AbstractString, T<:Real, H<:Integer}
     m, n_vocab = size(wv)
     n_pos = length(pos)
@@ -328,3 +327,4 @@ function analogy(wv::WordEmbedding{S,T,H}, pos::AbstractArray, neg::AbstractArra
     topn_metrics = metrics[topn_positions]
     return topn_positions, topn_metrics
 end
+"""
