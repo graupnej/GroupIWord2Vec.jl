@@ -273,16 +273,36 @@ function cosine_similarity(wv::WordEmbedding, word_1, word_2)
 end
 
 """
-    analogy(wv, pos, neg, n=5)
+# Purpose: Find the n (default n = 10) most similar words to a given word
+"""
+function get_similarity(wv::WordEmbedding, word, n=10)
+    # Step 1: Calculate similarity scores for all words
+    # - get_vector(wv, word) gets our target word's vector
+    # - wv.embeddings' is the transpose of all vectors
+    # - Multiplying these gives cosine similarities (because vectors are normalized)
+    metrics = wv.embeddings'*get_vector(wv, word)
 
+    # Step 2: Find positions of top n most similar words
+    # - sortperm gets the positions that would sort the array
+    # - rev = true means sort in descending order (highest similarity first)
+    # - [1:n] takes the first n positions
+    topn_positions = sortperm(metrics[:], rev = true)[1:n]
+
+    # Step 3: Get the similarity scores for these positions
+    topn_metrics = metrics[topn_positions]
+
+    # Return both positions and their similarity scores
+    return topn_positions, topn_metrics
+end
+
+"""
 Compute the analogy similarity between two lists of words. The positions
 and the similarity values of the top `n` similar words will be returned.
 For example,
 `king - man + woman = queen` will be
 `pos=[\"king\", \"woman\"], neg=[\"man\"]`.
 """
-function analogy(wv::WordEmbedding{S,T,H}, pos::AbstractArray, neg::AbstractArray, n= 5
-                ) where {S<:AbstractString, T<:Real, H<:Integer}
+function analogy(wv::WordEmbedding{S,T,H}, pos::AbstractArray, neg::AbstractArray, n= 5) where {S<:AbstractString, T<:Real, H<:Integer}
     m, n_vocab = size(wv)
     n_pos = length(pos)
     n_neg = length(neg)
@@ -306,28 +326,5 @@ function analogy(wv::WordEmbedding{S,T,H}, pos::AbstractArray, neg::AbstractArra
     end
     topn_positions = top_positions[1:n]
     topn_metrics = metrics[topn_positions]
-    return topn_positions, topn_metrics
-end
-
-"""
-# Purpose: Find the n (default n = 10) most similar words to a given word
-"""
-function get_similarity(wv::WordEmbedding, word, n=10)
-    # Step 1: Calculate similarity scores for all words
-    # - get_vector(wv, word) gets our target word's vector
-    # - wv.embeddings' is the transpose of all vectors
-    # - Multiplying these gives cosine similarities (because vectors are normalized)
-    metrics = wv.embeddings'*get_vector(wv, word)
-
-    # Step 2: Find positions of top n most similar words
-    # - sortperm gets the positions that would sort the array
-    # - rev = true means sort in descending order (highest similarity first)
-    # - [1:n] takes the first n positions
-    topn_positions = sortperm(metrics[:], rev = true)[1:n]
-
-    # Step 3: Get the similarity scores for these positions
-    topn_metrics = metrics[topn_positions]
-
-    # Return both positions and their similarity scores
     return topn_positions, topn_metrics
 end
