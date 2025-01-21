@@ -263,7 +263,7 @@ function get_vector(wv::WordEmbedding, word)
 end
 
 """
-Return the cosine similarity value between two words `word1` and `word2`.
+# Purpose: Return the cosine similarity value between two words
 """
 function cosine_similarity(wv::WordEmbedding, word_1, word_2)
    # 1. Get vector representations for both words 
