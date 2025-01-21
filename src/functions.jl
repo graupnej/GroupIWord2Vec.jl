@@ -168,8 +168,11 @@ end
 """
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
     open(filepath) do file
+          # Read header with vocabulary size and vector dimension
           header = split(strip(readline(file)), separator)
           vocab_size, vector_size = parse.(Int, header)
+
+          # Prepare arrays for words and vectors
           words = Vector{String}(undef, vocab_size)
           vectors = Matrix{T}(undef, vector_size, vocab_size)
 
@@ -262,7 +265,6 @@ end
 """
 # Purpose: Find the n (default n = 10) most similar words to a given word
 """
-     # Purpose: 
 function get_similarity(wv::WordEmbedding, word, n=10)
     # Step 1: Calculate similarity scores for all words
     # - get_vector(wv, word) gets our target word's vector
