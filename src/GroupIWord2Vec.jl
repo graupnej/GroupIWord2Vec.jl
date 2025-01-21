@@ -17,8 +17,8 @@ export train_model,          # Function to train new word embeddings
       read_text_format,      # Function to read text embedding files
       get_vector,            # Function to get a word's vector
       get_similarity,        # Function to find top n similar words
-      plot_similarity        # Function to visualize similarities
-      cosine_similarity      # Function to compute similarity of two words
+      plot_similarity,       # Function to visualize similarities
+      cosine_similarity,     # Function to compute similarity of two words
       analogy
 
 # Include all the functions defined in functions.jl
