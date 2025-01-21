@@ -63,10 +63,17 @@ julia> get_similarity(model, "king", 5)
 ([188, 1062, 904, 527, 1245], [1.0, 0.7518736087237998, 0.715927240172969, 0.6939850961445455, 0.678069618100706])
 ```
 
-- And plot them using e.g. Gadfly (``plot_similarity``)
+- Display one of the similar words
 
 ```julia
-julia> plot_similarity(model, "king", 5)
+julia> get_similarity(model, "king", 5)
+([188, 1062, 904, 527, 1245], [1.0, 0.7518736087237998, 0.715927240172969, 0.6939850961445455, 0.678069618100706])
+```
+
+- Plot the top-n most similar words
+
+```
+Work in progress
 ```
 
 # Dependencies
