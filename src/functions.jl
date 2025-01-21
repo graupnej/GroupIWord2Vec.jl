@@ -266,11 +266,9 @@ end
 Return the cosine similarity value between two words `word1` and `word2`.
 """
 function cosine_similarity(wv::WordEmbedding, word_1, word_2)
-   # Compute cosine similarity by:
-   # 1. Get vector representations for both words from the embedding model
+   # 1. Get vector representations for both words 
    # 2. Transpose first vector (') and multiply (*) with second vector
-   # 3. Since word vectors are typically normalized, this dot product 
-   #    directly gives us the cosine similarity in range [-1,1]
+   # 3. Since word vectors are normalized, this dot product directly gives the cosine similarity
    return get_vector(wv, word_1)'*get_vector(wv, word_2)
 end
 
