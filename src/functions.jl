@@ -313,7 +313,6 @@ function get_similarity(wv::WordEmbedding, vec::Vector, n=10::Int)
 
     # Step 3: Get the similarity scores for these positions
     topn_metrics = metrics[topn_positions]
-    println("i am updated")
     # Return both positions and their similarity scores
     return topn_positions, topn_metrics
 end
