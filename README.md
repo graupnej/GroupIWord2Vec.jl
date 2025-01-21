@@ -75,6 +75,19 @@ julia> model.words[1062]
 Work in progress
 ```
 
+## 3) Select and implement a pre-trained Word2Vec model e.g. FastText English (.bin & .vec file):
+
+       https://fasttext.cc/docs/en/pretrained-vectors.html
+
+Once downloaded, move the directory to the package directory:
+
+       mv wiki.en ~.julia/GroupIWord2Vec
+
+# Run a test
+For code coverage we have implemented testing routines
+
+       This is still in progress
+
 # Dependencies
 GroupIWord2Vec.jl relies on the following non-standard Julia packages:
 
@@ -91,19 +104,4 @@ The text corpus for the simple example (``text8``) is a preprocessed version of 
 The text corpus for the complex example were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
 
        P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
-
-## 3) Select and implement a pre-trained Word2Vec model e.g. FastText English (.bin & .vec file):
-
-       https://fasttext.cc/docs/en/pretrained-vectors.html
-
-Once downloaded, move the directory to the package directory:
-
-       mv wiki.en ~.julia/GroupIWord2Vec
-
-# Run a test
-In order to compare the vectors from both files you can run a test in the package directory:
-
-       Pkg.test("GroupIWord2Vec")
-
-This compares the vectors for certain predefined words from both files to check whether the files have been read similarly or not.
 
