@@ -273,6 +273,43 @@ function cosine_similarity(wv::WordEmbedding, word_1, word_2)
 end
 
 """
+    analogy(wv, pos, neg, n=5)
+
+Compute the analogy similarity between two lists of words. The positions
+and the similarity values of the top `n` similar words will be returned.
+For example,
+`king - man + woman = queen` will be
+`pos=[\"king\", \"woman\"], neg=[\"man\"]`.
+"""
+function analogy(wv::WordEmbedding{S,T,H}, pos::AbstractArray, neg::AbstractArray, n= 5
+                ) where {S<:AbstractString, T<:Real, H<:Integer}
+    m, n_vocab = size(wv)
+    n_pos = length(pos)
+    n_neg = length(neg)
+    anal_vecs = Matrix{T}(undef, m, n_pos + n_neg)
+
+    for (i, word) in enumerate(pos)
+        anal_vecs[:,i] = get_vector(wv, word)
+    end
+    for (i, word) in enumerate(neg)
+        anal_vecs[:,i+n_pos] = -get_vector(wv, word)
+    end
+    mean_vec = mean(anal_vecs, dims=2)
+    metrics = wv.vectors'*mean_vec
+    top_positions = sortperm(metrics[:], rev = true)[1:n+n_pos+n_neg]
+    for word in [pos;neg]
+        idx = index(wv, word)
+        loc = findfirst(x->x==idx, top_positions)
+        if loc != nothing
+            splice!(top_positions, loc)
+        end
+    end
+    topn_positions = top_positions[1:n]
+    topn_metrics = metrics[topn_positions]
+    return topn_positions, topn_metrics
+end
+
+"""
 # Purpose: Find the n (default n = 10) most similar words to a given word
 """
 function get_similarity(wv::WordEmbedding, word, n=10)
