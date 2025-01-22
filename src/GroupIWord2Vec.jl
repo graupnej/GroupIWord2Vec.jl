@@ -1,5 +1,17 @@
 """
-# This is the main module file that organizes all the word embedding functionality
+# GroupIWord2Vec
+
+This is the main module file that organizes all the word embedding functionality.
+
+## Types
+- `WordEmbedding`: Main data structure for word embeddings
+
+## Functions
+- `train_model`: Train new word embeddings
+- `load_embeddings`: Load pre-trained embeddings
+- `get_vector`: Get a word's vector
+- `get_similarity`: Find top n similar words
+- `cosine_similarity`: Compute similarity of two words
 """
 module GroupIWord2Vec
 
