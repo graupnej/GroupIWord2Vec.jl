@@ -22,7 +22,7 @@ export train_model,          # Function to train new word embeddings
       cosine_similarity     # Function to compute similarity of two words
 
 # Include all the functions defined in functions.jl and model.jl
-include("functions.jl")
 include("model.jl")
+include("functions.jl")
 
 end
