@@ -1,3 +1,5 @@
+export WordEmbedding
+
 """
 The load_text_model function takes a file in text format containing the pre-trained Word2Vec model as input 
 and gives an object of type Word2VecModel as output. This object includes a dictionary mapping words
