@@ -1,6 +1,5 @@
 using Test
 using GroupIWord2Vec
-include("../src/model.jl")
 
 @testset "get_vector_from_word" begin
    vocab = ["cat", "dog", "bird", "fish"]
