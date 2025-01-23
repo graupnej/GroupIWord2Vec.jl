@@ -15,6 +15,10 @@ This is the main module file that organizes all the word embedding functionality
 """
 module GroupIWord2Vec
 
+# Include all the functions defined in functions.jl and model.jl
+include("model.jl")
+include("functions.jl")
+
 # Importing modules from Julia's standard libraries
 using LinearAlgebra         # Provides functions for vector/matrix operations (e.g. multiplication and normalization)
 using DelimitedFiles        # Helps read/write files with separators (like binary files)
@@ -35,9 +39,5 @@ export train_model,          # Function to train new word embeddings
       get_top_similarity_of_vector,
       word_analogy,
       plot_similarity       # Function to visualize similarities
-
-# Include all the functions defined in functions.jl and model.jl
-include("model.jl")
-include("functions.jl")
 
 end
