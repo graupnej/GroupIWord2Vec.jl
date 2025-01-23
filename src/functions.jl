@@ -87,49 +87,72 @@ end
 """
     word_analogy(wv::WordEmbedding, pos_words::Vector{String}, neg_words::Vector{String}, n::Int=5)
 
-Finds analogies using vector arithmetic on word embeddings. For example: king - man + woman = queen
+Performs word analogy calculations like: king - man + woman = queen
+Returns the n most similar words to the resulting vector.
 
 # Arguments
-- `wv`: WordEmbedding structure containing the embeddings
-- `pos_words`: Words to add (e.g., ["king", "woman"])
-- `neg_words`: Words to subtract (e.g., ["man"])
-- `n`: Number of results to return (default: 5)
+- `wv`: WordEmbedding containing the vocabulary and vectors
+- `pos_words`: Words to add to the calculation
+- `neg_words`: Words to subtract from the calculation
+- `n`: Number of similar words to return (default: 5)
 
 # Returns
-- Vector of the n most similar words
+- Vector{String}: n most similar words to the resulting vector
+
+# Example
+```julia
+# Find: king - man + woman = ?
+result = word_analogy(wv, ["king", "woman"], ["man"])
+# Should return ["queen", ...]
+```
 """
 function word_analogy(wv::WordEmbedding, pos_words::Vector{String}, neg_words::Vector{String}, n::Int=5)
-    # Validate inputs
+    # Check if n makes sense (must be positive)
     if n < 1
         throw(ArgumentError("Number of results (n) must be positive"))
     end
     
-    # Verify all words exist in vocabulary
-    all_words = [pos_words; neg_words]
+    # Make sure all input words exist in our vocabulary
+    all_words = [pos_words; neg_words]  # Combine positive and negative words
     for word in all_words
         if !haskey(wv.word_indices, word)
             throw(ArgumentError("Word '$word' not found in vocabulary"))
         end
     end
     
-    # Calculate result vector directly
+    # Create a zero vector with same dimensions as our word vectors
+    # This will store our accumulated calculation result
     result_vector = zeros(size(wv.embeddings, 1))
+    
+    # Add vectors for positive words
+    # Example: king + woman
     for word in pos_words
         result_vector += get_vector_from_word(wv, word)
     end
+    
+    # Subtract vectors for negative words
+    # Example: - man
     for word in neg_words
         result_vector -= get_vector_from_word(wv, word)
     end
     
-    # Calculate similarities
+    # Calculate similarities between our result vector and ALL word vectors
+    # embeddings' is the transpose of our matrix (faster matrix multiplication)
+    # Higher similarity scores mean words are more similar to our result
     similarities = wv.embeddings'*result_vector
     
-    # Exclude input words efficiently using Set
+    # Create a Set of indices for input words
+    # Using Set for faster lookup when excluding these words
     exclude_set = Set(wv.word_indices[word] for word in all_words)
     
-    # Get top n results
-    filtered_indices = filter(i -> !(i in exclude_set), sortperm(similarities[:], rev=true))[1:min(n, end)]
+    # Get indices sorted by similarity (highest first)
+    # Filter out our input words
+    # Take only the top n results (or less if not enough results)
+    filtered_indices = filter(i -> !(i in exclude_set),        # Remove input words
+                            sortperm(similarities[:], rev=true) # Sort by similarity
+                            )[1:min(n, end)]                   # Take top n
     
+    # Convert indices to actual words and return
     return wv.words[filtered_indices]
 end
 
