@@ -1,7 +1,9 @@
 """
-# Purpose: Get the vector representation of a specific word from the WordEmbedding
+    get_vector(wv, string)
+
+# Purpose: Get the vector representation of an input word from the WordEmbedding
 """
-function get_vector(wv::WordEmbedding, word)
+function get_vector_from_word(wv::WordEmbedding, word)
     # Performance steps are separated using semicolon
     # Step 1: idx = wv.word_indices[word]     --> Checks the word's index in the dictionary
     # Step 2: wv.embeddings[:,idx]            --> Checks column from the embeddings matrix
@@ -15,7 +17,7 @@ function cosine_similarity(wv::WordEmbedding, word_1, word_2)
    # 1. Get vector representations for both words 
    # 2. Transpose first vector (') and multiply (*) with second vector
    # 3. Since word vectors are normalized, this dot product directly gives the cosine similarity
-   return get_vector(wv, word_1)'*get_vector(wv, word_2)
+   return get_vector_from_word(wv, word_1)'*get_vector_from_word(wv, word_2)
 end
 
 """
@@ -26,7 +28,7 @@ function get_similarity(wv::WordEmbedding, word::String, n=10::Int)
     # - get_vector(wv, word) gets our target word's vector
     # - wv.embeddings' is the transpose of all vectors
     # - Multiplying these gives cosine similarities (because vectors are normalized)
-    metrics = wv.embeddings'*get_vector(wv, word)
+    metrics = wv.embeddings'*get_vector_from_word(wv, word)
 
     # Step 2: Find positions of top n most similar words
     # - sortperm gets the positions that would sort the array
@@ -94,7 +96,7 @@ function get_similarity_as_string(wv::WordEmbedding, word::String, n=10::Int)
     # - get_vector(wv, word) gets our target word's vector
     # - wv.embeddings' is the transpose of all vectors
     # - Multiplying these gives cosine similarities (because vectors are normalized)
-    metrics = wv.embeddings'*get_vector(wv, word)
+    metrics = wv.embeddings'*get_vector_from_word(wv, word)
 
     # Step 2: Find positions of top n most similar words
     # - sortperm gets the positions that would sort the array
