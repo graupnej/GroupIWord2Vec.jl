@@ -1,5 +1,5 @@
 """
-    get_vector(wv, string)
+    get_vector_from_word(wv, string)
 
 # Purpose: Get the vector representation of an input word from the WordEmbedding
 """
@@ -8,6 +8,21 @@ function get_vector_from_word(wv::WordEmbedding, word)
     # Step 1: idx = wv.word_indices[word]     --> Checks the word's index in the dictionary
     # Step 2: wv.embeddings[:,idx]            --> Checks column from the embeddings matrix
     idx = wv.word_indices[word]; wv.embeddings[:,idx]
+end
+
+"""
+    get_word_from_vector(wv, vector)
+
+# Purpose: Get the word representation of an input vector from the WordEmbedding
+"""
+
+function get_word_from_vector(wv::WordEmbedding, vector)
+    # Find which column in embeddings matches our vector
+    # Use findfirst to get the first matching column index
+    idx = findfirst(i -> wv.embeddings[:, i] == vector, 1:size(wv.embeddings, 2))
+    
+    # Return the word at that index
+    return wv.words[idx]
 end
 
 """
