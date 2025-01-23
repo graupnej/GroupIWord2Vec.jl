@@ -101,7 +101,7 @@ julia> ...
 To not only use but also work on the code yourself download the repository by typing
 
 ``` bash
-git clone https://github.com/nichtJakob/OneTwoTree.jl.git
+git clone https://github.com/graupnej/GroupIWord2Vec.jl.git
 ```
 
 # Dependencies
