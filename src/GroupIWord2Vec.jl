@@ -31,7 +31,8 @@ export train_model,          # Function to train new word embeddings
       get_similarity,        # Function to find top n similar words
       get_similarity_as_string, # Function to find top n similar words as strings
       plot_similarity,       # Function to visualize similarities
-      cosine_similarity     # Function to compute similarity of two words
+      cosine_similarity,     # Function to compute similarity of two words
+      get_word_from_vector
 
 # Include all the functions defined in functions.jl and model.jl
 include("model.jl")
