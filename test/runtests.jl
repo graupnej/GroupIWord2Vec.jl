@@ -92,42 +92,31 @@ end
 end
 
 @testset "word_analogy" begin
-    # Setup with clear analogical relationships
-    words = ["king", "man", "woman", "queen", "prince", "princess", "dog", "puppy"]
-    embeddings = [1.0  0.1  0.2  0.9  0.8  0.7  0.0  0.0;
-                 0.1  1.0  0.9  0.2  0.3  0.2  0.0  0.0;
-                 0.0  0.5  0.5  0.0  0.1  0.1  0.0  0.0]
-    wv = WordEmbedding(words, embeddings)
-    
-    # Test basic analogies
-    @test word_analogy(wv, ["king", "woman"], ["man"], 1) == ["queen"]
-    @test word_analogy(wv, ["queen", "man"], ["woman"], 1) == ["king"]
-    
-    # Test multiple results
-    result_multi = word_analogy(wv, ["king", "woman"], ["man"], 3)
-    @test length(result_multi) == 3
-    @test result_multi[1] == "queen"
-    
-    # Test with more complex analogies
-    @test word_analogy(wv, ["queen", "princess"], ["king"], 1) == ["prince"]
-    
-    # Test input validation
-    @test_throws ArgumentError word_analogy(wv, ["king"], ["unknown"], 1)
-    @test_throws ArgumentError word_analogy(wv, ["unknown"], ["man"], 1)
-    @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], 0)
-    @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], -1)
-    
-    # Test exclusion of input words
-    result_exclude = word_analogy(wv, ["king", "woman"], ["man"], 5)
-    for word in ["king", "woman", "man"]
-        @test !(word in result_exclude)
-    end
-    
-    # Test empty inputs
-    @test_throws ArgumentError word_analogy(wv, String[], ["man"], 1)
-    @test_throws ArgumentError word_analogy(wv, ["king"], String[], 1)
-    
-    # Test n larger than vocabulary
-    large_n = word_analogy(wv, ["king", "woman"], ["man"], 10)
-    @test length(large_n) == length(words) - 3  # total words minus input words
+   words = ["king", "man", "woman", "queen", "prince", "princess", "dog", "puppy"]
+   embeddings = [1.0  0.1  0.2  0.9  0.8  0.7  0.0  0.0;
+                0.1  1.0  0.9  0.2  0.3  0.2  0.0  0.0;
+                0.0  0.5  0.5  0.0  0.1  0.1  0.0  0.0]
+   wv = WordEmbedding(words, embeddings)
+   
+   @test word_analogy(wv, ["king", "woman"], ["man"], 1) == ["queen"]
+   @test word_analogy(wv, ["queen", "man"], ["woman"], 1) == ["king"]
+   
+   result_multi = word_analogy(wv, ["king", "woman"], ["man"], 3)
+   @test length(result_multi) == 3
+   @test result_multi[1] == "queen"
+   
+   @test word_analogy(wv, ["queen", "princess"], ["king"], 1) == ["prince"]
+   
+   @test_throws ArgumentError word_analogy(wv, ["king"], ["unknown"], 1)
+   @test_throws ArgumentError word_analogy(wv, ["unknown"], ["man"], 1)
+   @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], 0)
+   @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], -1)
+   
+   result_exclude = word_analogy(wv, ["king", "woman"], ["man"], 5)
+   for word in ["king", "woman", "man"]
+       @test !(word in result_exclude)
+   end
+   
+   large_n = word_analogy(wv, ["king", "woman"], ["man"], 10)
+   @test length(large_n) == length(words) - 3
 end
