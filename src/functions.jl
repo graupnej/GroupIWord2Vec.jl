@@ -156,24 +156,22 @@ function word_analogy(wv::WordEmbedding, pos_words::Vector{String}, neg_words::V
     return wv.words[filtered_indices]
 end
 
-function word_difference(wv::WordEmbedding, words::Vector{String})
-    # Check if words exist in vocabulary
-   for word in words
+function word_addition(wv::WordEmbedding, word1::String, word2::String)
+   # Validate inputs
+   for word in [word1, word2]
        if !haskey(wv.word_indices, word)
            throw(ArgumentError("Word '$word' not found in vocabulary"))
        end
    end
    
-   # Sum vectors of input words
-   result_vector = zeros(size(wv.embeddings, 1))
-   for word in words
-       result_vector += get_vector_from_word(wv, word)
-   end
+   # Combine vectors
+   vec1 = get_vector_from_word(wv, word1)
+   vec2 = get_vector_from_word(wv, word2)
+   result_vector = vec1 + vec2
    
-   # Get closest word to combined vector
-   # (reusing logic from get_top_similarity_of_vector)
+   # Get most similar word
    similarities = wv.embeddings'*result_vector
-   exclude_set = Set(wv.word_indices[word] for word in words)
+   exclude_set = Set([wv.word_indices[word1], wv.word_indices[word2]])
    filtered_indices = filter(i -> !(i in exclude_set),
                            sortperm(similarities[:], rev=true))[1]
    
