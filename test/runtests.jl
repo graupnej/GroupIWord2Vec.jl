@@ -38,3 +38,19 @@ end
    # Test non-existent vector error
    @test_throws ArgumentError get_word_from_vector(wv, [0.0, 0.0, 0.0])
 end
+
+@testset "cosine_similarity" begin
+   words = ["cat", "dog", "bird", "fish"]
+   # Using normalized vectors for predictable cosine similarities
+   embeddings = [1.0 0.0 0.0 0.5;
+                0.0 1.0 0.0 0.5;
+                0.0 0.0 1.0 0.7071]
+   wv = WordEmbedding(words, embeddings)
+   
+   @test cosine_similarity(wv, "cat", "cat") ≈ 1.0  # Same word
+   @test cosine_similarity(wv, "cat", "dog") ≈ 0.0  # Orthogonal vectors
+   @test cosine_similarity(wv, "cat", "fish") ≈ 0.5  # Known angle
+   
+   @test_throws KeyError cosine_similarity(wv, "cat", "unknown")
+   @test_throws KeyError cosine_similarity(wv, "unknown", "cat")
+end
