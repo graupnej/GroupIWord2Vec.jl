@@ -99,37 +99,38 @@ Finds analogies using vector arithmetic on word embeddings. For example: king - 
 - Vector of the n most similar words
 """
 function word_analogy(wv::WordEmbedding, pos_words::Vector{String}, neg_words::Vector{String}, n::Int=5)
-    # Get dimensions
-    vec_size = size(wv.embeddings, 1)
-    
-    # Create matrix for all vectors
-    n_total = length(pos_words) + length(neg_words)
-    all_vectors = Matrix{Float64}(undef, vec_size, n_total)
-    
-    # Add positive word vectors
-    for (i, word) in enumerate(pos_words)
-        all_vectors[:,i] = get_vector_from_word(wv, word)
+    # Validate inputs
+    if n < 1
+        throw(ArgumentError("Number of results (n) must be positive"))
     end
     
-    # Add negative word vectors (with minus sign)
-    for (i, word) in enumerate(neg_words)
-        all_vectors[:,i+length(pos_words)] = -get_vector_from_word(wv, word)
+    # Verify all words exist in vocabulary
+    all_words = [pos_words; neg_words]
+    for word in all_words
+        if !haskey(wv.word_indices, word)
+            throw(ArgumentError("Word '$word' not found in vocabulary"))
+        end
     end
     
-    # Calculate mean vector
-    result_vector = vec(mean(all_vectors, dims=2))
+    # Calculate result vector directly
+    result_vector = zeros(size(wv.embeddings, 1))
+    for word in pos_words
+        result_vector += get_vector_from_word(wv, word)
+    end
+    for word in neg_words
+        result_vector -= get_vector_from_word(wv, word)
+    end
     
-    # Calculate similarities with all words
+    # Calculate similarities
     similarities = wv.embeddings'*result_vector
     
-    # Get top positions
-    top_positions = sortperm(similarities[:], rev=true)
+    # Exclude input words efficiently using Set
+    exclude_set = Set(wv.word_indices[word] for word in all_words)
     
-    # Remove input words from results
-    filter!(idx -> !(wv.words[idx] in [pos_words; neg_words]), top_positions)
+    # Get top n results
+    filtered_indices = filter(i -> !(i in exclude_set), sortperm(similarities[:], rev=true))[1:min(n, end)]
     
-    # Return top n words
-    return [wv.words[i] for i in top_positions[1:n]]
+    return wv.words[filtered_indices]
 end
 
 """
