@@ -23,6 +23,8 @@ function get_word_from_vector(wv::WordEmbedding, vector)
 end
 
 """
+    cosine_similarity(wv, string_1, string_2)
+
 # Purpose: Return the cosine similarity value between two words
 """
 function cosine_similarity(wv::WordEmbedding, word_1, word_2)
@@ -33,6 +35,8 @@ function cosine_similarity(wv::WordEmbedding, word_1, word_2)
 end
 
 """
+    get_top_similarity_of_word(wv, string, int)
+
 # Purpose: Find the n (default n = 10) most similar words to a given word and return the matching strings
 """
 function get_top_similarity_of_word(wv::WordEmbedding, word::String, n=10::Int)
@@ -56,6 +60,8 @@ function get_top_similarity_of_word(wv::WordEmbedding, word::String, n=10::Int)
 end
 
 """
+    get_top_similarity_of_vector(wv, vector, int)
+
 # Purpose: Find the n (default n = 10) most similar words to a given vector and return the matching strings
 """
 function get_top_similarity_of_vector(wv::WordEmbedding, vec::Vector, n=10::Int)
