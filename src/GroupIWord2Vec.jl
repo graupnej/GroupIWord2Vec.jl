@@ -28,11 +28,12 @@ export train_model,          # Function to train new word embeddings
       read_binary_format,    # Function to read binary embedding files
       read_text_format,      # Function to read text embedding files
       get_vector_from_word,            # Function to get a word's vector
-      get_similarity,        # Function to find top n similar words
-      get_similarity_as_string, # Function to find top n similar words as strings
-      plot_similarity,       # Function to visualize similarities
+      get_word_from_vector,
       cosine_similarity,     # Function to compute similarity of two words
-      get_word_from_vector
+      get_top_similarity_of_word, # Function to find top n similar words as strings
+      get_top_similarity_of_vector,
+      get_similarity,        # Function to find top n similar words
+      plot_similarity       # Function to visualize similarities
 
 # Include all the functions defined in functions.jl and model.jl
 include("model.jl")
