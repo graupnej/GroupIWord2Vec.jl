@@ -85,6 +85,54 @@ function get_top_similarity_of_vector(wv::WordEmbedding, vec::Vector, n=10::Int)
 end
 
 """
+    word_analogy(wv::WordEmbedding, pos_words::Vector{String}, neg_words::Vector{String}, n::Int=5)
+
+Finds analogies using vector arithmetic on word embeddings. For example: king - man + woman = queen
+
+# Arguments
+- `wv`: WordEmbedding structure containing the embeddings
+- `pos_words`: Words to add (e.g., ["king", "woman"])
+- `neg_words`: Words to subtract (e.g., ["man"])
+- `n`: Number of results to return (default: 5)
+
+# Returns
+- Vector of the n most similar words
+"""
+function word_analogy(wv::WordEmbedding, pos_words::Vector{String}, neg_words::Vector{String}, n::Int=5)
+    # Get dimensions
+    vec_size = size(wv.embeddings, 1)
+    
+    # Create matrix for all vectors
+    n_total = length(pos_words) + length(neg_words)
+    all_vectors = Matrix{Float64}(undef, vec_size, n_total)
+    
+    # Add positive word vectors
+    for (i, word) in enumerate(pos_words)
+        all_vectors[:,i] = get_vector_from_word(wv, word)
+    end
+    
+    # Add negative word vectors (with minus sign)
+    for (i, word) in enumerate(neg_words)
+        all_vectors[:,i+length(pos_words)] = -get_vector_from_word(wv, word)
+    end
+    
+    # Calculate mean vector
+    result_vector = vec(mean(all_vectors, dims=2))
+    
+    # Calculate similarities with all words
+    similarities = wv.embeddings'*result_vector
+    
+    # Get top positions
+    top_positions = sortperm(similarities[:], rev=true)
+    
+    # Remove input words from results
+    filter!(idx -> !(wv.words[idx] in [pos_words; neg_words]), top_positions)
+    
+    # Return top n words
+    return [wv.words[i] for i in top_positions[1:n]]
+end
+
+"""
 # Purpose: Find the n (default n = 10) most similar words to a given word
 """
 function get_similarity(wv::WordEmbedding, word::String, n=10::Int)
