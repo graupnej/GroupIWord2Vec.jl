@@ -163,8 +163,8 @@ function word_addition(wv::WordEmbedding, word1::String, word2::String)
     
     vec1 = get_vector_from_word(wv, word1)
     vec2 = get_vector_from_word(wv, word2)
-    result_vector = vec1 + vec2
-    result_vector = result_vector / norm(result_vector)  # Normalize after addition
+    result_vector = (vec1 + 2*vec2)  # Give more weight to second word
+    result_vector = result_vector / norm(result_vector)
     
     similarities = wv.embeddings'*result_vector
     exclude_set = Set([wv.word_indices[word1], wv.word_indices[word2]])
