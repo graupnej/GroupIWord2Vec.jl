@@ -19,10 +19,7 @@ end
 function get_word_from_vector(wv::WordEmbedding, vector)
     # Find which column in embeddings matches our vector
     # Use findfirst to get the first matching column index
-    idx = findfirst(i -> wv.embeddings[:, i] == vector, 1:size(wv.embeddings, 2))
-    
-    # Return the word at that index
-    return wv.words[idx]
+    dx = findfirst(i -> wv.embeddings[:, i] == vector, 1:size(wv.embeddings, 2)); wv.words[idx]
 end
 
 """
