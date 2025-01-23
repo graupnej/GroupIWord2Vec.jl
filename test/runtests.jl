@@ -56,20 +56,15 @@ end
 end
 
 @testset "get_top_similarity_of_word" begin
-    words = ["cat", "kitten", "puppy", "dog", "fish", "whale"]
-    embeddings = [1.0  0.9  0.2  0.1  0.0  0.0;
-                 0.0  0.1  0.8  0.9  0.1  0.1;
-                 0.0  0.0  0.0  0.0  1.0  0.9]
-    wv = WordEmbedding(words, embeddings)
-    
-    # Test different n values
-    @test get_top_similarity_of_word(wv, "cat", 1) == ["cat"]
-    @test get_top_similarity_of_word(wv, "cat", 2) == ["cat", "kitten"]
-    @test get_top_similarity_of_word(wv, "fish", 3) == ["fish", "whale", "puppy"]
-    
-    # Test n equal to vocabulary size
-    @test length(get_top_similarity_of_word(wv, "cat", 6)) == 6
-    
-    # Test error for unknown word
-    @test_throws KeyError get_top_similarity_of_word(wv, "unknown")
+   words = ["cat", "kitten", "puppy", "dog", "fish", "whale"]
+   embeddings = [1.0  0.9  0.2  0.1  0.0  0.0;
+                0.0  0.1  0.8  0.9  0.1  0.1;
+                0.0  0.0  0.0  0.0  1.0  0.9]
+   wv = WordEmbedding(words, embeddings)
+   
+   @test get_top_similarity_of_word(wv, "cat", 1) == ["cat"]
+   @test get_top_similarity_of_word(wv, "cat", 2) == ["cat", "kitten"]
+   @test get_top_similarity_of_word(wv, "fish", 3) == ["fish", "whale", "dog"] # Fixed expected output
+   @test length(get_top_similarity_of_word(wv, "cat", 6)) == 6
+   @test_throws KeyError get_top_similarity_of_word(wv, "unknown")
 end
