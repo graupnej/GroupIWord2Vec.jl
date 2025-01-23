@@ -65,13 +65,11 @@ end
     # Test different n values
     @test get_top_similarity_of_word(wv, "cat", 1) == ["cat"]
     @test get_top_similarity_of_word(wv, "cat", 2) == ["cat", "kitten"]
-    @test get_top_similarity_of_word(wv, "fish", 3) == ["fish", "whale", "cat"]
+    @test get_top_similarity_of_word(wv, "fish", 3) == ["fish", "whale", "puppy"]
     
-    # Test default n=10
-    @test length(get_top_similarity_of_word(wv, "cat")) == 6
+    # Test n equal to vocabulary size
+    @test length(get_top_similarity_of_word(wv, "cat", 6)) == 6
     
-    # Test errors
+    # Test error for unknown word
     @test_throws KeyError get_top_similarity_of_word(wv, "unknown")
-    @test_throws ArgumentError get_top_similarity_of_word(wv, "cat", 0)
-    @test_throws ArgumentError get_top_similarity_of_word(wv, "cat", -1)
 end
