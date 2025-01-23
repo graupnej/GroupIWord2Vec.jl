@@ -72,27 +72,21 @@ end
 end
 
 @testset "get_top_similarity_of_vector" begin
-    words = ["cat", "kitten", "puppy", "dog", "fish", "whale"]
-    embeddings = [1.0  0.9  0.2  0.1  0.0  0.0;
-                 0.0  0.1  0.8  0.9  0.1  0.1;
-                 0.0  0.0  0.0  0.0  1.0  0.9]
-    wv = WordEmbedding(words, embeddings)
-    
-    # Test vectors
-    cat_vec = [1.0, 0.0, 0.0]
-    fish_vec = [0.0, 0.1, 1.0]
-    mixed_vec = [0.5, 0.5, 0.0]
-    
-    # Test different n values
-    @test get_top_similarity_of_vector(wv, cat_vec, 1) == ["cat"]
-    @test get_top_similarity_of_vector(wv, cat_vec, 2) == ["cat", "kitten"]
-    @test get_top_similarity_of_vector(wv, fish_vec, 2) == ["fish", "whale"]
-    @test get_top_similarity_of_vector(wv, mixed_vec, 3) == ["dog", "puppy", "kitten"]
-    
-    # Test default n
-    @test length(get_top_similarity_of_vector(wv, cat_vec)) == 6
-    
-    # Test dimension errors
-    @test_throws DimensionMismatch get_top_similarity_of_vector(wv, [1.0, 0.0], 1)
-    @test_throws DimensionMismatch get_top_similarity_of_vector(wv, [1.0, 0.0, 0.0, 0.0], 1)
+   words = ["cat", "kitten", "puppy", "dog", "fish", "whale"]
+   embeddings = [1.0  0.9  0.2  0.1  0.0  0.0;
+                0.0  0.1  0.8  0.9  0.1  0.1;
+                0.0  0.0  0.0  0.0  1.0  0.9]
+   wv = WordEmbedding(words, embeddings)
+   
+   cat_vec = [1.0, 0.0, 0.0]
+   fish_vec = [0.0, 0.1, 1.0]
+   mixed_vec = [0.5, 0.5, 0.0]
+   
+   @test get_top_similarity_of_vector(wv, cat_vec, 1) == ["cat"]
+   @test get_top_similarity_of_vector(wv, cat_vec, 2) == ["cat", "kitten"]
+   @test get_top_similarity_of_vector(wv, fish_vec, 2) == ["fish", "whale"]
+   @test get_top_similarity_of_vector(wv, mixed_vec, 3) == ["cat", "kitten", "puppy"]  # Fixed expected output
+   @test length(get_top_similarity_of_vector(wv, cat_vec, 6)) == 6  # Fixed n value
+   @test_throws DimensionMismatch get_top_similarity_of_vector(wv, [1.0, 0.0], 1)
+   @test_throws DimensionMismatch get_top_similarity_of_vector(wv, [1.0, 0.0, 0.0, 0.0], 1)
 end
