@@ -33,6 +33,52 @@ function cosine_similarity(wv::WordEmbedding, word_1, word_2)
 end
 
 """
+# Purpose: Find the n (default n = 10) most similar words to a given word and return the matching strings
+"""
+function get_top_similarity_of_word(wv::WordEmbedding, word::String, n=10::Int)
+    # Step 1: Calculate similarity scores for all words
+    # - get_vector(wv, word) gets our target word's vector
+    # - wv.embeddings' is the transpose of all vectors
+    # - Multiplying these gives cosine similarities (because vectors are normalized)
+    metrics = wv.embeddings'*get_vector_from_word(wv, word)
+
+    # Step 2: Find positions of top n most similar words
+    # - sortperm gets the positions that would sort the array
+    # - rev = true means sort in descending order (highest similarity first)
+    # - [1:n] takes the first n positions
+    topn_positions = sortperm(metrics[:], rev = true)[1:n]
+
+
+    word_str = [wv.words[i] for i in topn_positions]
+    # Return both positions and their similarity scores
+    return word_str
+
+end
+
+"""
+# Purpose: Find the n (default n = 10) most similar words to a given vector and return the matching strings
+"""
+function get_top_similarity_of_vector(wv::WordEmbedding, vec::Vector, n=10::Int)
+    # Step 1: Calculate similarity scores for all words
+    # - get_vector(wv, word) gets our target word's vector
+    # - wv.embeddings' is the transpose of all vectors
+    # - Multiplying these gives cosine similarities (because vectors are normalized)
+    metrics = wv.embeddings'*vec
+
+    # Step 2: Find positions of top n most similar words
+    # - sortperm gets the positions that would sort the array
+    # - rev = true means sort in descending order (highest similarity first)
+    # - [1:n] takes the first n positions
+    topn_positions = sortperm(metrics[:], rev = true)[1:n]
+
+
+    word_str = [wv.words[i] for i in topn_positions]
+    # Return both positions and their similarity scores
+    return word_str
+
+end
+
+"""
 # Purpose: Find the n (default n = 10) most similar words to a given word
 """
 function get_similarity(wv::WordEmbedding, word::String, n=10::Int)
@@ -77,48 +123,4 @@ function get_similarity(wv::WordEmbedding, vec::Vector, n=10::Int)
     return topn_positions, topn_metrics
 end
 
-"""
-# Purpose: Find the n (default n = 10) most similar words to a given word and return the matching strings
-"""
-function get_similarity_as_string(wv::WordEmbedding, vec::Vector, n=10::Int)
-    # Step 1: Calculate similarity scores for all words
-    # - get_vector(wv, word) gets our target word's vector
-    # - wv.embeddings' is the transpose of all vectors
-    # - Multiplying these gives cosine similarities (because vectors are normalized)
-    metrics = wv.embeddings'*vec
 
-    # Step 2: Find positions of top n most similar words
-    # - sortperm gets the positions that would sort the array
-    # - rev = true means sort in descending order (highest similarity first)
-    # - [1:n] takes the first n positions
-    topn_positions = sortperm(metrics[:], rev = true)[1:n]
-
-
-    word_str = [wv.words[i] for i in topn_positions]
-    # Return both positions and their similarity scores
-    return word_str
-
-end
-
-"""
-# Purpose: Find the n (default n = 10) most similar words to a given word and return the matching strings
-"""
-function get_similarity_as_string(wv::WordEmbedding, word::String, n=10::Int)
-    # Step 1: Calculate similarity scores for all words
-    # - get_vector(wv, word) gets our target word's vector
-    # - wv.embeddings' is the transpose of all vectors
-    # - Multiplying these gives cosine similarities (because vectors are normalized)
-    metrics = wv.embeddings'*get_vector_from_word(wv, word)
-
-    # Step 2: Find positions of top n most similar words
-    # - sortperm gets the positions that would sort the array
-    # - rev = true means sort in descending order (highest similarity first)
-    # - [1:n] takes the first n positions
-    topn_positions = sortperm(metrics[:], rev = true)[1:n]
-
-
-    word_str = [wv.words[i] for i in topn_positions]
-    # Return both positions and their similarity scores
-    return word_str
-
-end
