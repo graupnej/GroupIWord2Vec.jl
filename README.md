@@ -94,7 +94,7 @@ julia> Pkg.test("GroupIWord2Vec")
 This covers all the tests. To execute a specific test (example), type in your Julia REPL
 
 ```julia
-julia> ...
+julia> Pkg.test("GroupIWord2Vec", test_args=["Functions"])
 ```
 
 # Downloading the code
