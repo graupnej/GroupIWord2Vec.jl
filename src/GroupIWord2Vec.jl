@@ -33,6 +33,7 @@ export train_model,          # Function to train new word embeddings
       get_top_similarity_of_word, # Function to find top n similar words as strings
       get_top_similarity_of_vector,
       get_similarity,        # Function to find top n similar words
+      word_analogy,
       plot_similarity       # Function to visualize similarities
 
 # Include all the functions defined in functions.jl and model.jl
