@@ -84,10 +84,25 @@ Work in progress
 Use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html. This file includes about 33049795 words in the training file.
 Store this file in the current working directory and use the same functions presented in the simple example.
 
-# Run a test
-For code coverage we have implemented testing routines
+# How to run tests
+For code coverage we have implemented testing routines. To execute the tests, type in your Julia REPL
 
-       This is still in progress
+```julia
+julia> Pkg.test("GroupIWord2Vec")
+```
+
+This covers all the tests. To execute a specific test (example), type in your Julia REPL
+
+```julia
+julia> ...
+```
+
+# Downloading the code
+To not only use but also work on the code yourself download the repository by typing
+
+``` bash
+git clone https://github.com/nichtJakob/OneTwoTree.jl.git
+```
 
 # Dependencies
 GroupIWord2Vec.jl relies on the following non-standard Julia packages:
@@ -106,3 +121,4 @@ The text corpus for the large example were obtained using the skip-gram model de
 
        P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
 
+As inspiration on how to properly develop julia packages, organize source files, write meaningful tests and more read [here](https://adrianhill.de/julia-ml-course/write/).
