@@ -56,15 +56,17 @@ end
 end
 
 @testset "get_top_similarity_of_word" begin
+   # Test setup: 6 words with known similarity relationships
    words = ["cat", "kitten", "puppy", "dog", "fish", "whale"]
-   embeddings = [1.0  0.9  0.2  0.1  0.0  0.0;
-                0.0  0.1  0.8  0.9  0.1  0.1;
-                0.0  0.0  0.0  0.0  1.0  0.9]
+   # 3D embeddings making: cat/kitten similar, dog/puppy similar, fish/whale similar
+   embeddings = [1.0  0.9  0.2  0.1  0.0  0.0;    # First dimension
+                0.0  0.1  0.8  0.9  0.1  0.1;    # Second dimension
+                0.0  0.0  0.0  0.0  1.0  0.9]    # Third dimension
    wv = WordEmbedding(words, embeddings)
    
-   @test get_top_similarity_of_word(wv, "cat", 1) == ["cat"]
-   @test get_top_similarity_of_word(wv, "cat", 2) == ["cat", "kitten"]
-   @test get_top_similarity_of_word(wv, "fish", 3) == ["fish", "whale", "dog"] # Fixed expected output
-   @test length(get_top_similarity_of_word(wv, "cat", 6)) == 6
-   @test_throws KeyError get_top_similarity_of_word(wv, "unknown")
+   @test get_top_similarity_of_word(wv, "cat", 1) == ["cat"]  # Self-similarity (always highest)
+   @test get_top_similarity_of_word(wv, "cat", 2) == ["cat", "kitten"]  # Most similar pair
+   @test get_top_similarity_of_word(wv, "fish", 3) == ["fish", "whale", "dog"]  # Top 3 similar
+   @test length(get_top_similarity_of_word(wv, "cat", 6)) == 6  # Full vocabulary size
+   @test_throws KeyError get_top_similarity_of_word(wv, "unknown")  # Unknown word handling
 end
