@@ -23,7 +23,6 @@ include("functions.jl")
 using LinearAlgebra         # Provides functions for vector/matrix operations (e.g. multiplication and normalization)
 using DelimitedFiles        # Helps read/write files with separators (like binary files)
 using Statistics
-# using Plots                 # For visualization functions
 import Word2Vec_jll         # Links to the underlying Word2Vec implementation (C code)
 
 # Make these functions and types available to anyone using this module. Other programs can use these functions after importing GroupIWord2Vec
