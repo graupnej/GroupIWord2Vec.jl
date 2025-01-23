@@ -40,17 +40,17 @@ end
 end
 
 @testset "cosine_similarity" begin
+   # Test setup with normalized vectors for predictable similarities
    words = ["cat", "dog", "bird", "fish"]
-   # Using normalized vectors for predictable cosine similarities
-   embeddings = [1.0 0.0 0.0 0.5;
-                0.0 1.0 0.0 0.5;
-                0.0 0.0 1.0 0.7071]
+   embeddings = [1.0 0.0 0.0 0.5;     # cat: [1,0,0], dog: [0,1,0], etc.
+                0.0 1.0 0.0 0.5;     # Using unit vectors for easy math
+                0.0 0.0 1.0 0.7071]  # fish: [0.5,0.5,0.7071] normalized
    wv = WordEmbedding(words, embeddings)
    
-   @test cosine_similarity(wv, "cat", "cat") ≈ 1.0  # Same word
-   @test cosine_similarity(wv, "cat", "dog") ≈ 0.0  # Orthogonal vectors
-   @test cosine_similarity(wv, "cat", "fish") ≈ 0.5  # Known angle
+   @test cosine_similarity(wv, "cat", "cat") ≈ 1.0  # Same word = perfect similarity
+   @test cosine_similarity(wv, "cat", "dog") ≈ 0.0  # Perpendicular vectors = no similarity
+   @test cosine_similarity(wv, "cat", "fish") ≈ 0.5  # 60-degree angle = 0.5 similarity
    
-   @test_throws KeyError cosine_similarity(wv, "cat", "unknown")
-   @test_throws KeyError cosine_similarity(wv, "unknown", "cat")
+   @test_throws KeyError cosine_similarity(wv, "cat", "unknown")  # First word unknown
+   @test_throws KeyError cosine_similarity(wv, "unknown", "cat")  # Second word unknown
 end
