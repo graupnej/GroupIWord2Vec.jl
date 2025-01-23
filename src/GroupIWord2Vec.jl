@@ -27,7 +27,7 @@ export train_model,          # Function to train new word embeddings
       load_embeddings,       # Function to load pre-trained embeddings
       read_binary_format,    # Function to read binary embedding files
       read_text_format,      # Function to read text embedding files
-      get_vector,            # Function to get a word's vector
+      get_vector_from_word,            # Function to get a word's vector
       get_similarity,        # Function to find top n similar words
       get_similarity_as_string, # Function to find top n similar words as strings
       plot_similarity,       # Function to visualize similarities
