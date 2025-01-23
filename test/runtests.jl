@@ -92,31 +92,38 @@ end
 end
 
 @testset "word_analogy" begin
+   # Setup test data with clear relationships
    words = ["king", "man", "woman", "queen", "prince", "princess", "dog", "puppy"]
-   embeddings = [1.0  0.1  0.2  0.9  0.8  0.7  0.0  0.0;
-                0.1  1.0  0.9  0.2  0.3  0.2  0.0  0.0;
-                0.0  0.5  0.5  0.0  0.1  0.1  0.0  0.0]
+   embeddings = [1.0  0.1  0.2  0.9  0.8  0.7  0.0  0.0;   # Coordinates in first dimension
+                0.1  1.0  0.9  0.2  0.3  0.2  0.0  0.0;   # Second dimension
+                0.0  0.5  0.5  0.0  0.1  0.1  0.0  0.0]   # Third dimension
    wv = WordEmbedding(words, embeddings)
    
+   # Test basic analogies (king - man + woman = queen)
    @test word_analogy(wv, ["king", "woman"], ["man"], 1) == ["queen"]
-   @test word_analogy(wv, ["queen", "man"], ["woman"], 1) == ["king"]
+   @test word_analogy(wv, ["queen", "man"], ["woman"], 1) == ["king"]  # Reverse
    
+   # Test multiple results
    result_multi = word_analogy(wv, ["king", "woman"], ["man"], 3)
-   @test length(result_multi) == 3
-   @test result_multi[1] == "queen"
+   @test length(result_multi) == 3  # Check number of results
+   @test result_multi[1] == "queen"  # Check top result
    
+   # Test complex relationships
    @test word_analogy(wv, ["queen", "princess"], ["king"], 1) == ["prince"]
    
-   @test_throws ArgumentError word_analogy(wv, ["king"], ["unknown"], 1)
-   @test_throws ArgumentError word_analogy(wv, ["unknown"], ["man"], 1)
-   @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], 0)
-   @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], -1)
+   # Test error handling
+   @test_throws ArgumentError word_analogy(wv, ["king"], ["unknown"], 1)  # Unknown word
+   @test_throws ArgumentError word_analogy(wv, ["unknown"], ["man"], 1)   # Unknown word
+   @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], 0)      # Invalid n=0
+   @test_throws ArgumentError word_analogy(wv, ["king"], ["man"], -1)     # Invalid n<0
    
+   # Test input word exclusion
    result_exclude = word_analogy(wv, ["king", "woman"], ["man"], 5)
    for word in ["king", "woman", "man"]
-       @test !(word in result_exclude)
+       @test !(word in result_exclude)  # Input words shouldn't appear in results
    end
    
+   # Test n larger than vocabulary
    large_n = word_analogy(wv, ["king", "woman"], ["man"], 10)
-   @test length(large_n) == length(words) - 3
+   @test length(large_n) == length(words) - 3  # Results = vocab size minus input words
 end
