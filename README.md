@@ -1,5 +1,5 @@
-[![codecov](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl/graph/badge.svg?token=WRWRU7P5WQ)](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl)
-![CI](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml/badge.svg)
+[![Coverage](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl)
+[![Build Status](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 <div align="center">
   <img src="WordEmbeddings.png" alt="Logo" width="300" height="300" />
