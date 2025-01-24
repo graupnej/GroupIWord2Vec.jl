@@ -38,6 +38,7 @@ export train_model,          # Function to train new word embeddings
       get_top_similarity_of_vector,
       word_analogy,
       word_addition,
+      word_subtraction,
       plot_similarity       # Function to visualize similarities
 
 end
