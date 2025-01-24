@@ -195,3 +195,19 @@ function word_subtraction(wv::WordEmbedding, word1::String, word2::String)
     
     return wv.words[filtered_indices]
 end
+
+function euclidean_distance(wv::WordEmbedding, word1::String, word2::String)
+   # Check if words exist in vocabulary
+   for word in [word1, word2]
+       if !haskey(wv.word_indices, word)
+           throw(ArgumentError("Word '$word' not found in vocabulary"))
+       end
+   end
+   
+   # Get vectors for both words
+   vec1 = get_vector_from_word(wv, word1)
+   vec2 = get_vector_from_word(wv, word2)
+   
+   # Calculate Euclidean distance
+   return sqrt(sum((vec1 - vec2).^2))
+end
