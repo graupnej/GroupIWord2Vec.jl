@@ -179,3 +179,23 @@ function word_addition(wv::WordEmbedding, words::Vector{String})
    
    return wv.words[filtered_indices]
 end
+
+function word_subtraction(wv::WordEmbedding, word1::String, word2::String)
+    # Check if words exist in vocabulary
+    for word in [word1, word2]
+        if !haskey(wv.word_indices, word)
+            throw(ArgumentError("Word '$word' not found in vocabulary"))
+        end
+    end
+    
+    # Get difference between word vectors
+    result_vector = get_vector_from_word(wv, word1) - get_vector_from_word(wv, word2)
+    
+    # Get closest word to difference vector
+    similarities = wv.embeddings'*result_vector
+    exclude_set = Set([wv.word_indices[word1], wv.word_indices[word2]])
+    filtered_indices = filter(i -> !(i in exclude_set),
+                            sortperm(similarities[:], rev=true))[1]
+    
+    return wv.words[filtered_indices]
+end
