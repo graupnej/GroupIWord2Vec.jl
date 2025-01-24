@@ -51,7 +51,7 @@ Further, the package includes the following functions
 - Get the vector representation of a word (``get_vector``)
 
 ```julia
-julia> get_vector(model, "king")
+julia> get_vector_from_word(model, "king")
 ```
 ```julia
 100-element Vector{Float64}:
