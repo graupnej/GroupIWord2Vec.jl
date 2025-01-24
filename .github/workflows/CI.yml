@@ -74,5 +74,5 @@ jobs:
         run: |
           using Documenter: DocMeta, doctest
           using GroupIWord2Vec
-          DocMeta.setdocmeta!(OneTwoTree, :DocTestSetup, :(using GroupIWord2Vec); recursive=true)
+          DocMeta.setdocmeta!(GroupIWord2Vec, :DocTestSetup, :(using GroupIWord2Vec); recursive=true)
           doctest(GroupIWord2Vec)
