@@ -16,8 +16,14 @@ We can't use Pluto's environments but have to create our own
 
 ```julia
 using Pkg
+```
+```julia
 Pkg.activate("MyEnvironment")
+```
+```julia
 Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
+```
+```julia
 using GroupIWord2Vec
 ```
 
@@ -46,6 +52,8 @@ Further, the package includes the following functions
 
 ```julia
 julia> get_vector(model, "king")
+```
+```julia
 100-element Vector{Float64}:
  -0.0915921031903591
  -0.10155618557541449
