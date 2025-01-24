@@ -14,7 +14,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 DelimitedFiles = "1.9.1"
 # Change to Versio "1.10.0" if Julia is version 1.10.0
 LinearAlgebra = "1.10.0"
-julia = "1.6.7"
+julia = "1.10"
 # Plots = "1.38"  # or whatever recent stable version you want to use
 
 [extras]
