@@ -1,13 +1,23 @@
 using Documenter
-using GroupIWord2Vec  # Replace this with your package name
+using GroupIWord2Vec
+
+DocMeta.setdocmeta!(GroupIWord2Vec, :DocTestSetup, :(using GroupIWord2Vec); recursive=true)
 
 makedocs(
-    modules = [GroupIWord2Vec],                   # Include the modules you want to document
+    modules = [GroupIWord2Vec],                  
     authors="Julian Graupner <...>, Pablo Ramos Erpenbeck <...>, Knut Bunge <...>, Ladislaus Finger <...e>",
-    sitename = "GroupIWord2Vec.jl Documentation",  # Replace with your documentation title
-    format = Documenter.HTML(),                   # Generate HTML docs
+    sitename = "GroupIWord2Vec.jl",  
+    format=Documenter.HTML(;
+        canonical="https://graupnej.github.io/GroupIWord2Vec.jl",
+        edit_link="main",
+        assets=String[],
+    ),
     pages = [
-        "Home" => "index.md",                     # Define the pages of the documentation
+        "Home" => "index.md",                     
     ],
-    clean = true,                                 # Clean previously built files
+)
+
+deploydocs(;
+    repo="github.com/graupnej/GroupIWord2Vec.jl",
+    devbranch="main",
 )
