@@ -1,1 +1,1 @@
-
+Modules = [GroupIWord2Vec]
