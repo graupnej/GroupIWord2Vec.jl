@@ -1,1 +1,3 @@
-Modules = [GroupIWord2Vec]
+```@meta
+CurrentModule = GroupIWord2Vec
+```
