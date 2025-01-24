@@ -113,6 +113,40 @@ To not only use but also work on the code yourself download the repository by ty
 git clone https://github.com/graupnej/GroupIWord2Vec.jl.git
 ```
 
+Navigate to the cloned directory
+
+``` bash
+cd GroupIWord2Vec.jl
+```
+
+Launch julia from the directory and activate the project environment (this tells julia to use the Project.toml)
+
+``` bash
+julia
+```
+```julia
+julia> using Pkg
+julia> Pkg.activate(".")
+```
+
+Run the following command to resolve dependencies and create a Manifest.toml file
+
+```julia
+julia> Pkg.instantiate()
+```
+
+Precompile the project to ensure all dependencies and your code are ready
+
+```julia
+julia> Pkg.precompile()
+```
+
+Run the tests to verify everything is working
+
+```julia
+julia> Pkg.test()
+```
+
 # Dependencies
 GroupIWord2Vec.jl relies on the following non-standard Julia packages:
 
