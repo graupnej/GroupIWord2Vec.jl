@@ -166,3 +166,6 @@ The text corpus for the large example were obtained using the skip-gram model de
        P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
 
 As inspiration on how to properly develop julia packages, organize source files, write meaningful tests and more read [here](https://adrianhill.de/julia-ml-course/write/).
+
+## Contributors
+[![Contributors](https://contrib.rocks/image?repo=graupnej/GroupIWord2Vec)](https://github.com/graupnej/GroupIWord2Vec.jl/graphs/contributors)
