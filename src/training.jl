@@ -76,10 +76,12 @@ end
 a = []
 push!(a, [1,4])
 
-
-text = load_corpus("data/example.txt")
-vocab, sequence = create_vocab_and_index_text(text)
-my_model = create_model(2, 1:5)
-typeof(my_model)
-my_model([5, 3, 1])
-train_model(10, my_model, 1, sequence)
+####basic examples
+if false
+    text = load_corpus("data/example.txt")
+    vocab, sequence = create_vocab_and_index_text(text)
+    my_model = create_model(2, 1:5)
+    typeof(my_model)
+    my_model([5, 3, 1])
+    train_model(10, my_model, 1, sequence)
+end
