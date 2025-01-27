@@ -12,7 +12,7 @@
   </a>
 </div>
 
-### What's it about
+## What's it about
 [Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks.
 
 ## Getting Started
@@ -139,7 +139,7 @@ The package relies on the following non-standard Julia packages:
 
 The files Project.toml and Manifest.toml in the created environment manage dependencies.
 
-# References
+## References
 The text corpus for the simple example (``text8``) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
 
 The text corpus for the large example were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
