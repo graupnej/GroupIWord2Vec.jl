@@ -3,34 +3,50 @@
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://graupnej.github.io/GroupIWord2Vec.jl/dev/)
 
 <div align="center">
-  <img src="WordEmbeddings.png" alt="Logo" width="300" height="300" />
-       <h1>Word2Vec</h1>
-       A Julia package that implements some tools for running and testing word-embedding algorithms
+  <img src="WordEmbeddings.png" alt="Logo" width="250" height="250" />
+  <h1>Word2Vec</h1>
+  A Julia package that implements some tools for running and testing word-embedding algorithms
+  <br/>
+  <a href="https://julialang.org/downloads/">
+    <img src="https://img.shields.io/badge/Julia-v1.10-blue" alt="Julia Version"/>
+  </a>
 </div>
 
-## What's it about
+### What's it about
 [Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks.
 
-# Getting Started
+## Getting Started
 
-## 1) Download
+### 1) Download
 We can't use Pluto's environments but have to create our own
 
 ```julia
-using Pkg
-```
-```julia
-Pkg.activate("MyEnvironment")
-```
-```julia
-Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
-```
-```julia
-using GroupIWord2Vec
+julia> using Pkg
+julia> Pkg.activate("MyEnv")
+julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
+julia> using GroupIWord2Vec
 ```
 
-## 2) Running a simple example
-In order to train a model some text corpus is required. For a simple example use http://mattmahoney.net/dc/text8.zip. Store this file in the current working directory
+Below is an overview of the project's main components
+
+```
+Word2Vec.jl
+├── src/
+│   ├── GroupIWord2Vec.jl
+│   ├── functions.jl
+│   └── model.jl
+├── test/
+│   ├── runtests.jl
+│   ├── test_functions.jl
+│   └── test_model.jl
+├── docs/
+├── Manifest.toml
+├── Project.toml
+└── README.md
+```
+
+### 2) Running a simple example
+For a simple example use http://mattmahoney.net/dc/text8.zip as text corpus to train the model. Store this file in the current working directory
 
 To train the model based on ``text8`` use the function ``train_model``
 
