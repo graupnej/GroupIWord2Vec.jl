@@ -119,7 +119,7 @@ julia> Pkg.precompile()
 To verify everything is working correctly run the code coverage tests
 
 ```julia
-julia> Pkg.test()
+julia> Pkg.test("GroupIWord2Vec")
 ```
 
 This covers all the tests. To execute a specific test (e.g. Functions)
