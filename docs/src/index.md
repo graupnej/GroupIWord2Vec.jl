@@ -1,10 +1,9 @@
 ```@meta
 CurrentModule = GroupIWord2Vec
 ```
+
+### Explanation
+
 ```@index
 
-```
-
-```@autodocs
-Modules = [GroupIWord2Vec]
 ```
