@@ -28,7 +28,7 @@ GroupIWord2Vec.jl
 ```
 
 ### 2) Running a simple example
-Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with text8 use ``train``_``model()``
+Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with _text8_ use ``train``_``model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
