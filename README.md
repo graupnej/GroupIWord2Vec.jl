@@ -45,14 +45,14 @@ GroupIWord2Vec.jl
 ```
 
 ### 2) Running a simple example
-Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with ``text8`` use ``train_model()``
+Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with _text8_ use ``train_model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
 ```
 
-The resulting word vectors are saved in a text format file (here) named ``text8.txt``.
-Import the obtained word vectors from ``text8.txt`` into Julia using ``load_embeddings()``
+The resulting word vectors are saved in a text format file (here) named _text8.txt_.
+Import the obtained word vectors from _text8.txt_ into Julia using ``load_embeddings()``
 
 ```julia
 julia> model = load_embeddings("./text8.txt")
@@ -142,7 +142,7 @@ The package relies on the following non-standard Julia packages:
 The files Project.toml and Manifest.toml in the created environment manage dependencies.
 
 ## References
-The text corpus for the simple example (``text8``) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
+The text corpus for the simple example (_text8_) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
 
 The text corpus for the large example were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
 
