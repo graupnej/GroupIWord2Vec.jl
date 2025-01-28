@@ -18,6 +18,6 @@ makedocs(
 )
 
 deploydocs(;
-    repo="github.com/graupnej/GroupIWord2Vec.jl",
+    repo="graupnej/GroupIWord2Vec.jl",
     devbranch="main",
 )
