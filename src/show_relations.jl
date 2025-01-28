@@ -98,16 +98,29 @@ function show_relations(words::String...)
         arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
 
         # plot 2d embeddings
-        gr()
-        scatter(projection[1, :], projection[2, :], 
-        title="PCA Projection to 2D",
-        xlabel="first principal component",
-        ylabel="second principal component",
-        legend=false, series_annotations = labels)
+        p = scatter(projection[1, :], projection[2, :], 
+                title="PCA Projection to 2D",
+                xlabel="first principal component",
+                ylabel="second principal component",
+                legend=false, series_annotations = labels)
+
+        # plot 2d embeddings
+        # gr()
+        # scatter(projection[1, :], projection[2, :], 
+        # title="PCA Projection to 2D",
+        # xlabel="first principal component",
+        # ylabel="second principal component",
+        # legend=false, series_annotations = labels)
         
         # plot the arrows
         quiver!(projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
 
+        # Save if path provided
+        if !isnothing(save_path)
+                savefig(p, save_path)
+        end
+
+        return p
 end
-show_relations("berlin", "germany", "paris", "testable", "madrid", "spain")
+# show_relations("berlin", "germany", "paris", "testable", "madrid", "spain")
 
