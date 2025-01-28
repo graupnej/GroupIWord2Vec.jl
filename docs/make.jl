@@ -5,7 +5,7 @@ DocMeta.setdocmeta!(GroupIWord2Vec, :DocTestSetup, :(using GroupIWord2Vec); recu
 
 makedocs(
     modules = [GroupIWord2Vec],                  
-    authors="Julian Graupner <...>, Pablo Ramos Erpenbeck <...>, Knut Bunge <...>, Ladislaus Finger <...e>",
+    authors="Julian Graupner <Julian.Graupner@physik.hu-berlin.de>, Pablo Ramos Erpenbeck <p.ramoserpenbeck@campus.tu-berlin.de>, Knut Bunge <knut.c.bunge@campus.tu-berlin.de>, Ladislaus Finger <l.finger@campus.tu-berlin.de>",
     sitename = "GroupIWord2Vec.jl",  
     format=Documenter.HTML(;
         canonical="https://graupnej.github.io/GroupIWord2Vec.jl",
