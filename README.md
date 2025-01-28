@@ -5,7 +5,7 @@
 <div align="center">
   <img src="assets/WordEmbeddings.png" alt="Logo" width="250" height="250" />
   <h1>Word2Vec</h1>
-  A Julia package that implements some tools for running and testing word-embedding algorithms
+  A Julia package that implements some tools for running and testing word-embedding algorithmss
   <br/>
   <a href="https://julialang.org/downloads/">
     <img src="https://img.shields.io/badge/Julia-v1.10-blue" alt="Julia Version"/>
