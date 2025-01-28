@@ -68,12 +68,14 @@ julia> get_vector_from_word(model, "king")
 
 
 
-- ``cosine_similarity()``: Return the cosine similarity between two words
+- ``cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
 
 ```julia
 julia> cosine_similarity(model, "king", "prince")
 ```
 
+It ranges from -1 to 1, where 1 indicates high similarity, 0 indicates no similarity and -1 indicates opposite directions.
+ 
 - ``get_top_similarity_of_word()``: Find the n most similar words to a given word and return the matching strings
 
 ```julia
