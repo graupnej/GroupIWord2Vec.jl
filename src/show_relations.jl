@@ -78,7 +78,7 @@ arg3==>arg4,
 ...
 Note: Use an even number of inputs!
 """
-function show_relations(words::String...)
+function show_relations(words::String...; save_path::Union{String, Nothing}=nothing)
         #check input
         word_count = length(words)
         if Bool(word_count%2)
