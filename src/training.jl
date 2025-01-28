@@ -1,4 +1,5 @@
 using Flux, ProgressMeter
+using Flux: train!
 using Random
 using OneHotArrays
 using Statistics
@@ -49,39 +50,32 @@ end
 
 
 function train_model(epochs::Int, model::Chain, window_size::Int, sequences, opt=Descent())
-    
-    loss(model, input, target) = Flux.Losses.crossentropy(target, model(input))
+    word_count = size(model[1].weight)[2]
+    loss(model, input, target) = Flux.Losses.crossentropy(target, reshape(model(input), size(target)))
 
     @showprogress dt=1 desc="Train embedding" for epoch in 1:epochs
         
-        context = []
-        target = []
+        context = Array{Int}(undef, window_size*2, 0)
+        target = Array{Float32}(undef, word_count, 0)
         for sequence in sequences
             length(sequence)<=2*window_size ? continue : 
             for i in window_size+1:length(sequence)-window_size
-                
-                push!(context, vcat(sequence[i-window_size:i-1], sequence[i+1:i+window_size]))
-                push!(target, sequence[i])
+                context = hcat(context, vcat(sequence[i-window_size:i-1], sequence[i+1:i+window_size]))
+                target = hcat(target, onehot(sequence[i], 1:word_count))
             end
 
         end
         data=[(context, target)]
-        println(data)
-        Flux.Train.train!(loss, model, data, opt)            
+        train!(loss, model, data, opt)            
 
     
     end
     return model    
 end
-a = []
-push!(a, [1,4])
 
 ####basic examples
-if false
-    text = load_corpus("data/example.txt")
-    vocab, sequence = create_vocab_and_index_text(text)
-    my_model = create_model(2, 1:5)
-    typeof(my_model)
-    my_model([5, 3, 1])
-    train_model(10, my_model, 1, sequence)
-end
+text = load_corpus("data/example.txt")
+vocab, sequence = create_vocab_and_index_text(text)
+my_model = create_model(10, vocab)
+my_model = train_model(1000, my_model, 2, sequence)
+trained_embeddning = my_model[1]
