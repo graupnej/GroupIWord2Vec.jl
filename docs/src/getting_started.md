@@ -1,20 +1,3 @@
-[![Coverage](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl)
-[![Build Status](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://graupnej.github.io/GroupIWord2Vec.jl/dev/)
-
-<div align="center">
-  <img src="assets/WordEmbeddings.png" alt="Logo" width="250" height="250" />
-  <h1>Word2Vec</h1>
-  A Julia package that implements some tools for running and testing word-embedding algorithms
-  <br/>
-  <a href="https://julialang.org/downloads/">
-    <img src="https://img.shields.io/badge/Julia-v1.10-blue" alt="Julia Version"/>
-  </a>
-</div>
-
-## What's it about
-[Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks.
-
 ## Getting Started
 ### 1) Download
 We can't use Pluto's environments but have to create our own
@@ -45,14 +28,14 @@ GroupIWord2Vec.jl
 ```
 
 ### 2) Running a simple example
-Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with _text8_ use ``train_model()``
+Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with ``text8`` use ``train``_``model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
 ```
 
-The resulting word vectors are saved in a text format file (here) named _text8.txt_.
-Import the obtained word vectors from _text8.txt_ into Julia using ``load_embeddings()``
+The resulting word vectors are saved in a text format file (here) named ``text8.txt``.
+Import the obtained word vectors from ``text8.txt`` into Julia using ``load``_``embeddings()``
 
 ```julia
 julia> model = load_embeddings("./text8.txt")
@@ -130,25 +113,3 @@ This covers all the tests. To execute a specific test (e.g. Functions)
 julia> Pkg.test("GroupIWord2Vec", test_args=["Functions"])
 ```
 
-## Dependencies
-The package relies on the following non-standard Julia packages:
-
-       DelimitedFiles        # Provides functionality for reading and writing delimited text files
-       LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
-       Plots                 # For visualization functions
-       Word2vec.jll          # Links to the underlying Word2Vec implementation (C code)
-       Statistics            # For basic statistical operations (mean, std, var, etc.)
-
-The files Project.toml and Manifest.toml in the created environment manage dependencies.
-
-## References
-The text corpus for the simple example (_text8_) is a preprocessed version of the first 100 million bytes of the English Wikipedia dump from March 3, 2006. It has been filtered to include only lowercase letters (a–z) and spaces, reducing the dataset's size to approximately 100 MB. It is commonly used for training and evaluating language models.
-
-The text corpus for the large example were obtained using the skip-gram model described in Bojanowski et al. (2016) with default parameters.
-
-       P. Bojanowski*, E. Grave*, A. Joulin, T. Mikolov, Enriching Word Vectors with Subword Information
-
-As inspiration on how to properly develop julia packages, organize source files, write meaningful tests and more read [here](https://adrianhill.de/julia-ml-course/write/).
-
-## Contributors
-[![Contributors](https://contrib.rocks/image?repo=graupnej/GroupIWord2Vec)](https://github.com/graupnej/GroupIWord2Vec.jl/graphs/contributors)
