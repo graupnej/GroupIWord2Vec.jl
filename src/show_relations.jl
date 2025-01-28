@@ -1,6 +1,3 @@
-#using Statistics, Plots, LinearAlgebra
-
-
 """
 placeholder for real function. only works for berlin, germany, rome, italy, madrid, spain, paris, france
 returns 300d embedding for a string
