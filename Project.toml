@@ -1,6 +1,6 @@
 name = "GroupIWord2Vec"
 uuid = "7a6bfa58-2648-412f-8de3-83cf04c5e4b2"
-authors = ["Julian Graupner <...>, Pablo Ramos Erpenbeck <...>, Knut Bunge <...>, Ladislaus Finger <...>"]
+authors = ["Julian Graupner <...>", "Pablo Ramos Erpenbeck <...>", "Knut Bunge <...>", "Ladislaus Finger <...>"]
 version = "1.0.0-DEV"
 
 [deps]
