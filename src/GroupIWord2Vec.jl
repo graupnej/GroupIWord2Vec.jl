@@ -18,11 +18,13 @@ module GroupIWord2Vec
 # Include all the functions defined in functions.jl and model.jl
 include("model.jl")
 include("functions.jl")
+include("show_relations.jl")
 
 # Importing modules from Julia's standard libraries
 using LinearAlgebra         # Provides functions for vector/matrix operations (e.g. multiplication and normalization)
 using DelimitedFiles        # Helps read/write files with separators (like binary files)
 using Statistics
+using Plots
 import Word2Vec_jll         # Links to the underlying Word2Vec implementation (C code)
 
 # Make these functions and types available to anyone using this module. Other programs can use these functions after importing GroupIWord2Vec
@@ -40,6 +42,6 @@ export train_model,          # Function to train new word embeddings
       word_addition,
       word_subtraction,
       euclidean_distance,
-      plot_similarity       # Function to visualize similarities
+      show_relations
 
 end
