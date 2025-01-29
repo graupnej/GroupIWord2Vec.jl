@@ -17,7 +17,6 @@ makedocs(
         "Getting Started" => "getting_started.md",
         "Functions" => "functions.md",
     ],
-    assets = String["../assets/PCAProjection.png"]
 )
 
 deploydocs(;
