@@ -75,6 +75,8 @@ julia> word_analogy(model, ["king", "woman"], ["man"])
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
 ```
 
+![Word Relations Plot](assets/PCAProjection.png)
+
 For information on PCA Projection and first/second principal component click here and here.
 
 ## Running a large example
