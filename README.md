@@ -66,8 +66,6 @@ julia> model = load_embeddings("./text8.txt")
 julia> get_vector_from_word(model, "king")
 ```
 
-
-
 - ``cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
 
 ```julia
@@ -88,15 +86,21 @@ julia> get_top_similarity_of_word(model, "king", 5)
 julia> word_analogy(model, ["king", "woman"], ["man"])
 ```
 
-### 3) Running a large example
-As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
-
-### 4) Output
-To generate relations plot
+#### Display Data
+- ``show``_``relations()``: Creates a PCA Projection to 2D of words with connecting vectors 
 
 ```julia
-julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot_2.png")
+julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
 ```
+
+<div align="center">
+  <img src="assets/PCAProjection.png" alt="Logo" width="400" height="250" />
+</div>
+
+For information on PCA Projection and first/second principal component click here and here.
+
+### 3) Running a large example
+As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
 ## For Developers
 ### 1) Download the code
