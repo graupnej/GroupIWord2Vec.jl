@@ -3,7 +3,6 @@ using Statistics, Plots, LinearAlgebra
 """
 placeholder for real function. only works for berlin, germany, rome, italy, madrid, spain, paris, france
 returns 300d embedding for a string
-"""
 function get_word_embedding(word::String)::Vector
         
         berlin_str ="-0.10052 -0.017 -0.21077 -0.50765 -0.13132 0.21765 -0.26609 0.22856 -0.19865 0.33651 -0.11927 0.12591 0.47005 0.3127 -0.23583 -0.23453 -0.014921 0.07109 0.434 0.57627 0.09705 0.27706 -0.35411 0.19945 0.04167 -0.13174 -0.049887 -0.088114 0.23986 0.19416 -0.34101 0.18284 -0.038464 0.34261 0.20358 0.064062 -0.050313 -0.34356 0.17962 -0.096653 0.23099 -0.11119 -0.14206 0.017161 -0.10122 0.03682 0.0799 -0.031689 0.40153 -0.023915 0.31156 0.021064 -0.29796 -0.11779 0.035163 -0.37074 -0.0058891 0.3212 -0.090729 0.082942 0.28965 -0.10532 0.36011 -0.13221 -0.37254 0.072096 0.19259 0.202 -0.59373 -0.28543 0.27862 -0.31069 -0.27128 0.15297 -0.33777 0.11989 0.40642 0.24152 -0.13345 -0.46217 0.11127 0.47736 0.31819 -0.1213 -0.19735 -0.19502 0.13229 -0.39477 -0.083519 0.069615 0.16632 -0.21403 0.087144 -0.15085 -0.29616 0.25719 -0.46212 0.057489 -0.15393 -0.053855 -0.097108 0.29466 0.10151 -0.0075112 -0.054118 0.077753 -0.21713 0.15798 0.24575 -0.089792 -0.2821 -0.50229 0.39801 -0.31282 0.16383 -0.19914 0.24878 0.18505 -0.10793 0.089811 0.16746 0.14221 -0.02886 0.27972 -0.15821 0.071109 -0.04185 0.32773 0.48422 0.10852 0.0059997 0.10709 -0.052773 -0.53095 -0.13066 -0.032268 -0.21193 -0.14371 -0.49284 0.46708 -0.273 -0.36204 0.062994 -0.20143 0.0027814 0.19583 0.015716 0.17015 -0.0093628 0.16376 -0.073737 -0.3116 -0.18126 -0.35548 -0.28484 -0.12904 -0.062218 -0.2456 -0.52714 0.42998 0.44444 0.62813 0.033329 0.18109 -0.13282 -0.16096 -0.26294 0.31051 0.34078 -0.16779 -0.64985 -0.26081 -0.099533 0.042371 0.10895 0.059171 -0.21959 -0.4401 0.057538 -0.097591 -0.30488 -0.2746 -0.32697 0.040428 0.1185 0.35537 -0.11794 0.044468 -0.17292 0.028476 0.063188 -0.52779 0.061395 0.14078 -0.33479 -0.034258 -0.36712 0.082368 -0.28874 -0.38247 0.86799 0.19181 -0.04134 0.035703 0.32484 -0.51533 -0.58314 0.012628 0.40387 0.055428 0.35311 -0.15689 0.00097598 0.0538 0.19946 -0.37907 -0.12751 -0.51687 -0.32145 -0.20275 -0.096348 0.01612 -0.16761 -0.062865 -0.19366 -0.066753 0.058816 -0.26176 0.43434 -0.24779 0.5044 0.24896 0.26848 0.086134 0.091979 -0.047441 0.37085 0.13166 -0.062037 0.42314 -0.0026331 -0.18796 0.35673 -0.022603 -0.031035 -0.088854 -0.1549 -0.086829 -0.40554 -0.41943 0.22638 0.051392 -0.058888 -0.1738 -0.037833 -0.17967 -0.29044 -0.16025 -0.31979 0.23111 -0.28515 0.21077 0.11575 0.26087 -0.14531 0.048127 -0.0044873 -0.076777 -0.23207 -0.19785 -0.20284 0.058001 -0.076868 -0.15327 -0.064433 -0.14932 -0.02172 0.1706 0.42813 -0.048095 -0.25063 -0.49081 -0.32223 0.25426 -0.22155 0.30175 -0.43747 0.11183 -0.38952 0.51956 -0.20163 -0.082513 0.34158 0.067009 -0.077654 -0.093298 -0.28296 0.045193 -0.068595 0.27074 "
@@ -42,6 +41,7 @@ function get_word_embedding(word::String)::Vector
         
         return embedding
 end
+"""
 
 """
 This function reduces the dimension of a matrix from NxM to Nx"number_of_pc" with a PCA. 
@@ -78,11 +78,58 @@ arg3==>arg4,
 ...
 Note: Use an even number of inputs!
 """
-function show_relations(words::String...)
+function show_relations(wv::WordEmbedding, words::String...)
+    # Check input
+    word_count = length(words)
+    if Bool(word_count%2)
+        throw(error("need words in multiples of 2 but $word_count are given"))
+    end
+    
+    # Check if all words exist in the embedding
+    for word in words
+        if !haskey(wv.word_indices, word)
+            throw(error("Word '$word' not found in embeddings"))
+        end
+    end
+    
+    # Get embeddings by looking up each word's index and getting its vector
+    embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
+    labels = text.([word for word in words], :bottom)
+    
+    # Rest of the function remains the same
+    # reduce dimension
+    projection = reduce_to_2d(embeddings)
+    
+    # preparation for plotting the arrows, infill with zeros and split x, y
+    arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
+    arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
+    arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
+    
+    # plot 2d embeddings
+    gr()
+    scatter(projection[1, :], projection[2, :], 
+    title="PCA Projection to 2D",
+    xlabel="first principal component",
+    ylabel="second principal component",
+    legend=false, series_annotations = labels)
+    
+    # plot the arrows
+    quiver!(projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
+end
+
+"""
+function show_relations(wv::WordEmbedding, words::String...)
         #check input
         word_count = length(words)
         if Bool(word_count%2)
                 throw(error("need words in multiples of 2 but $word_count are given"))
+        end
+
+        # Check if all words exist in the embedding
+        for word in words
+            if !haskey(word_embedding.word_indices, word)
+                    throw(error("Word '$word' not found in embeddings"))
+                end
         end
         
         #get embeddings and list labels
@@ -108,5 +155,6 @@ function show_relations(words::String...)
         # plot the arrows
         quiver!(projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
 end
+"""
 # show_relations("berlin", "germany", "paris", "testable", "madrid", "spain")
 
