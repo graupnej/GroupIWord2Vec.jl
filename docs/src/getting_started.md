@@ -42,7 +42,7 @@ julia> model = load_embeddings("./text8.txt")
 
 ### Some functionalities
 
-- ``get``_``vector``_``from``_``word()``: Get the vector representation of a word
+- ``get`` _``vector`` _``from`` _``word()``: Get the vector representation of a word
 
 ```julia
 julia> get_vector_from_word(model, "king")
@@ -56,7 +56,7 @@ julia> cosine_similarity(model, "king", "prince")
 
 It ranges from -1 to 1, where 1 indicates high similarity, 0 indicates no similarity and -1 indicates opposite directions.
  
-- ``get``_``top``_``similarity``_``of``_``word()``: Find the n most similar words to a given word and return the matching strings
+- ``get`` _``top`` _``similarity`` _``of`` _``word()``: Find the n most similar words to a given word and return the matching strings
 
 ```julia
 julia> get_top_similarity_of_word(model, "king", 5)
@@ -69,15 +69,18 @@ julia> word_analogy(model, ["king", "woman"], ["man"])
 ```
 
 ### Display Data
+- ``show``_``relations()``: Creates a PCA Projection to 2D of words with connecting vectors 
 
 ```julia
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
 ```
 
+For information on PCA Projection and first/second principal component click here and here.
+
 ## Running a large example
 As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
-## 1) Download - For Developers
+Download - For Developers
 Clone the code using
 
 ``` bash
