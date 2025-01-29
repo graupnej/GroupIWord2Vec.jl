@@ -60,30 +60,56 @@ julia> model = load_embeddings("./text8.txt")
 
 #### Some functionalities
 
-- ``get_vector_from_word()``: Get the vector representation of a word
+- ``get_word2vec()``: Retrieves the embedding vector corresponding to a given word.
 
 ```julia
-julia> get_vector_from_word(model, "king")
+julia> get_word2vec(model, "king")
 ```
 
-- ``cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
+- ``get_vec2word()``: Retrieves the closest word in the embedding space to a given vector.
 
 ```julia
-julia> cosine_similarity(model, "king", "prince")
+julia> get_vec2word(model, king_vec)
+```
+
+- ``get_any2vec()``: Converts a word into its corresponding vector or returns the vector unchanged if already provided. This allows other functions to take both words and vectors as input.
+
+```julia
+julia> get_any2vec(model, "king")
+```
+or
+```julia
+julia> get_any2vec(model, king_vec)
+```
+
+- ``get_cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
+
+```julia
+julia> get_cosine_similarity(model, "king", "prince")
 ```
 
 It ranges from -1 to 1, where 1 indicates high similarity, 0 indicates no similarity and -1 indicates opposite directions.
  
-- ``get_top_similarity_of_word()``: Find the n most similar words to a given word and return the matching strings
+- ``get_similar_words()``: Find the n most similar words to a given word or embedding vector and return the matching strings
 
 ```julia
-julia> get_top_similarity_of_word(model, "king", 5)
+julia> get_similar_words(model, "king", 5)
 ```
 
-- ``word_analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
+- ``get_vector_operation()``: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
+
+```julia
+julia> get_vector_operation(model, "king", "queen","+")
+```
+or
+```julia
+julia> get_vector_operation(model, king_vec, "queen","euclid")
+```
+
+- ``get_word_analogy()``: Performs word analogy calculations (e.g. king - queen + woman = man)
   
 ```julia
-julia> word_analogy(model, ["king", "woman"], ["man"])
+julia> word_analogy(model, "king", "queen", ["woman"])
 ```
 
 #### Display Data
