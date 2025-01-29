@@ -45,7 +45,7 @@ GroupIWord2Vec.jl
 ```
 
 ### 2) Running a simple example
-Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with _text8_ use ``train_model()``
+Download [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
@@ -87,7 +87,7 @@ julia> word_analogy(model, ["king", "woman"], ["man"])
 ```
 
 #### Display Data
-- ``show``_``relations()``: Creates a [PCA Projection](https://adrianhill.de/julia-ml-course/write/) to 2D of words with connecting vectors 
+- ``show``_``relations()``: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
 
 ```julia
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
@@ -98,7 +98,7 @@ julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", w
 </div>
 
 ### 3) Running a large example
-As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
+As an alternative (larger) example use a text corpus from e.g. [FastText](https://fasttext.cc/docs/en/pretrained-vectors.html) (.bin & .vec file) with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
 ## For Developers
 ### 1) Download the code
