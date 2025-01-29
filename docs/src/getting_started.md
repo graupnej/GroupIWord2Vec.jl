@@ -1,5 +1,4 @@
-## Getting Started
-### 1) Download
+## Download - For users
 We can't use Pluto's environments but have to create our own
 
 ```julia
@@ -27,7 +26,7 @@ GroupIWord2Vec.jl
 └── README.md                   # Main documentation file containing getting started
 ```
 
-### 2) Running a simple example
+## Running a simple example
 Download https://mattmahoney.net/dc/text8.zip and store it in the current working directory. To train the model with ``text8`` use ``train``_``model()``
 
 ```julia
@@ -41,17 +40,15 @@ Import the obtained word vectors from ``text8.txt`` into Julia using ``load``_``
 julia> model = load_embeddings("./text8.txt")
 ```
 
-#### Some functionalities
+### Some functionalities
 
-- ``get_vector_from_word()``: Get the vector representation of a word
+- ``get``_``vector``_``from``_``word()``: Get the vector representation of a word
 
 ```julia
 julia> get_vector_from_word(model, "king")
 ```
 
-
-
-- ``cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
+- ``cosine``_``similarity()``: Returns cosine of the angle between two vectors in a word embedding space
 
 ```julia
 julia> cosine_similarity(model, "king", "prince")
@@ -59,23 +56,29 @@ julia> cosine_similarity(model, "king", "prince")
 
 It ranges from -1 to 1, where 1 indicates high similarity, 0 indicates no similarity and -1 indicates opposite directions.
  
-- ``get_top_similarity_of_word()``: Find the n most similar words to a given word and return the matching strings
+- ``get``_``top``_``similarity``_``of``_``word()``: Find the n most similar words to a given word and return the matching strings
 
 ```julia
 julia> get_top_similarity_of_word(model, "king", 5)
 ```
 
-- ``word_analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
+- ``word``_``analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
   
 ```julia
 julia> word_analogy(model, ["king", "woman"], ["man"])
 ```
 
-### 3) Running a large example
+### Display Data
+
+```julia
+julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
+```
+
+## Running a large example
 As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
-## For Developers
-### 1) Download the code
+## 1) Download - For Developers
+Clone the code using
 
 ``` bash
 git clone https://github.com/graupnej/GroupIWord2Vec.jl.git
@@ -88,7 +91,7 @@ julia> using Pkg
 julia> Pkg.activate(".")
 ```
 
-Resolve dependencies and create a Manifest.toml file
+Resolve dependencies and create Manifest.toml file
 
 ```julia
 julia> Pkg.instantiate()
@@ -100,7 +103,7 @@ Precompile the project to ensure all dependencies and the code is ready
 julia> Pkg.precompile()
 ```
 
-### 2) Run tests
+### Run tests
 To verify everything is working correctly run the code coverage tests
 
 ```julia
