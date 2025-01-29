@@ -78,7 +78,7 @@ arg3==>arg4,
 ...
 Note: Use an even number of inputs!
 """
-function show_relations(wv::WordEmbedding, words::String...)
+function show_relations(wv::WordEmbedding, words::String..., save_path::String="word_relations.png")
     # Check input
     word_count = length(words)
     if Bool(word_count%2)
@@ -104,17 +104,26 @@ function show_relations(wv::WordEmbedding, words::String...)
     arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
     arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
     arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
+        
+        p = scatter(projection[1, :], projection[2, :], 
+                title="PCA Projection to 2D",
+                xlabel="first principal component",
+                ylabel="second principal component",
+                legend=false, series_annotations = labels)
     
     # plot 2d embeddings
-    gr()
-    scatter(projection[1, :], projection[2, :], 
-    title="PCA Projection to 2D",
-    xlabel="first principal component",
-    ylabel="second principal component",
-    legend=false, series_annotations = labels)
+    #gr()
+    #scatter(projection[1, :], projection[2, :], 
+    #title="PCA Projection to 2D",
+    #xlabel="first principal component",
+    #ylabel="second principal component",
+    #legend=false, series_annotations = labels)
     
     # plot the arrows
-    quiver!(projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
+        quiver!(p, projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
+
+        # Save the plot
+        savefig(p, save_path)
 end
 
 """
