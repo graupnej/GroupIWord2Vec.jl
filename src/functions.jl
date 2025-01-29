@@ -139,7 +139,7 @@ function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{
     similarities = wv.embeddings' * vec
     # Sort similarities for highest n cosine similarity scores
     top_indices = sortperm(similarities[:], rev=true)[1:n]
-    return [wv.words[i] for i in top_indices] # Can it be wv.words[top_indices] ?
+    return wv.words[top_indices]
 end
 
 """
@@ -219,8 +219,6 @@ function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}
     # Make a set including all input words
     exclude_set = Set(wv.word_indices[word] for word in all_words)
     # Search for n vectors with highest similarity score excluding input words
-    filtered_indices = filter(i -> !(i in exclude_set),        # Remove input words
-                            sortperm(similarities[:], rev=true) # Sort by similarity
-                            )[1:min(n, end)]                   # Take top n
+    filtered_indices = first(filter(!in(exclude_set), sortperm(similarities[:], rev=true)))[1:min(n, end)]                   # Take top n
 return wv.words[filtered_indices]
 end
