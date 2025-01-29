@@ -75,8 +75,6 @@ julia> word_analogy(model, ["king", "woman"], ["man"])
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
 ```
 
-![Word Relations Plot](../../assets/word_relations.png)
-
 ## Running a large example
 As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
