@@ -91,6 +91,13 @@ julia> word_analogy(model, ["king", "woman"], ["man"])
 ### 3) Running a large example
 As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
+### 4) Output
+To generate relations plot
+
+```julia
+julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot_2.png")
+```
+
 ## For Developers
 ### 1) Download the code
 
