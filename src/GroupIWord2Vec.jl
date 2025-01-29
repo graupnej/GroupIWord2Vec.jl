@@ -7,11 +7,16 @@ This is the main module file that organizes all the word embedding functionality
 - `WordEmbedding`: Main data structure for word embeddings
 
 ## Functions
-- `train_model`: Train new word embeddings
-- `load_embeddings`: Load pre-trained embeddings
-- `get_vector`: Get a word's vector
-- `get_similarity`: Find top n similar words
-- `cosine_similarity`: Compute similarity of two words
+- `train_model`:             Train new word embeddings
+- `load_embeddings`:         Load pre-trained embeddings
+- `get_word2vec`:            Function to get a word's embedded vector
+- `get_vec2word`:            Function to get a vector's word
+- `get_any2vec`:             Function to handle word/ vector input and convert input word/ vector into vector
+- `get_cosine_similarity`:   Function to compute similarity of two words
+- `get_similar_words`:       Function to find top n similar words as strings
+- `get_vector_operation`:    Function to find perform operation on 2 input words/vectors: sum, subtract, dot-product, euclidean distance
+- `get_word_analogy`:        Function to use vector math to compute analogous words
+- `show_relations`:          Function to visualise vectors and vector distances in 2D
 """
 module GroupIWord2Vec
 
