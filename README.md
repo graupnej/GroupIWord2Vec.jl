@@ -87,7 +87,7 @@ julia> word_analogy(model, ["king", "woman"], ["man"])
 ```
 
 #### Display Data
-- ``show``_``relations()``: Creates a PCA Projection to 2D of words with connecting vectors 
+- ``show``_``relations()``: Creates a [PCA Projection](https://adrianhill.de/julia-ml-course/write/) to 2D of words with connecting vectors 
 
 ```julia
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
@@ -96,8 +96,6 @@ julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", w
 <div align="center">
   <img src="assets/PCAProjection.png" alt="Logo" width="400" height="250" />
 </div>
-
-For information on PCA Projection and first/second principal component click here and here.
 
 ### 3) Running a large example
 As an alternative (larger) example use a text corpus from e.g. FastText (.bin & .vec file) https://fasttext.cc/docs/en/pretrained-vectors.html with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
