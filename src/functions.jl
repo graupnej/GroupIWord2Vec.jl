@@ -115,7 +115,7 @@ function get_cosine_similarity(wv::WordEmbedding, inp1::Union{String, Vector{Flo
 end
 
 """
-    get_similarity(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
+    get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
 
 Finds the top `n` most similar words to a given word or vector.
 
@@ -129,10 +129,10 @@ Finds the top `n` most similar words to a given word or vector.
 
 # Example
 ```julia
-similar_words = get_similarity(wv, "king", 5)
+similar_words = get_similar_words(wv, "king", 5)
 ```
 """
-function get_similarity(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
     # Make sure input is a vector or convert it into a vector
     vec = get_any2vec(wv, word_or_vec)
     # Computes cosine similarity score between all embedding vectors and input vector
@@ -164,7 +164,7 @@ operators can be:
 
 # Example
 ```julia
-similar_words = get_similarity(wv, "king", 5)
+similar_words = get_similar_words(wv, "king", 5)
 ```
 """
 function get_vector_operation(wv::WordEmbedding, inp1::Union{String, Vector{64}}, inp2::Union{String, Vector{64}}, operator::String)
