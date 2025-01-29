@@ -78,7 +78,7 @@ arg3==>arg4,
 ...
 Note: Use an even number of inputs!
 """
-function show_relations(words::String..., wv::WordEmbedding, save_path::String="word_relations.png")
+function show_relations(words::String...; wv::WordEmbedding, save_path::String="word_relations.png")
     # Check input
     word_count = length(words)
     if Bool(word_count%2)
