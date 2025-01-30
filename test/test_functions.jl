@@ -58,3 +58,29 @@ end
     @test_throws DimensionMismatch get_vec2word(wv, [1.0, 0.0])              # Too short
     @test_throws DimensionMismatch get_vec2word(wv, [1.0, 0.0, 0.0, 0.0])    # Too long
 end
+
+@testset "get_any2vec" begin
+    # Create test embedding with meaningful test data
+    vocab = ["dog", "cat", "house"]
+    vectors = [
+        1.0 2.0 3.0;
+        -1.0 -2.0 1.5;
+        0.5 0.7 -1.0
+    ]'
+    wv = WordEmbedding(vocab, vectors)
+    
+    # Test string input
+    dog_vec = get_any2vec(wv, "dog")
+    @test dog_vec isa Vector{Float64}
+    @test dog_vec == vectors[1, :]
+    @test length(dog_vec) == size(vectors, 1)
+    
+    # Test vector input
+    test_vec = [1.0, 2.0, 3.0]
+    @test get_any2vec(wv, test_vec) === test_vec
+    
+    # Test error cases
+    @test_throws KeyError get_any2vec(wv, "nonexistent_word")
+    @test_throws ArgumentError get_any2vec(wv, 42)
+    @test_throws DimensionMismatch get_any2vec(wv, [1.0, 2.0])  # Wrong size vector
+end
