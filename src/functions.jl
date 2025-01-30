@@ -94,36 +94,6 @@ function get_any2vec(wv::WordEmbedding, word_or_vec::Any)
 end
 
 """
-    get_cosine_similarity(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}) -> Float64
-
-Computes the cosine similarity between two words or vectors.
-
-# Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `inp1::Union{String, Vector{Float64}}`: First word or vector.
-- `inp2::Union{String, Vector{Float64}}`: Second word or vector.
-
-# Returns
-- `Float64`: Cosine similarity score.
-
-# Example 1
-```julia
-similarity = get_cosine_similarity(wv, "cat", "dog")
-```
-# Example 2
-```julia
-similarity = get_cosine_similarity(wv, vector_embedding_cat, vector_embedding_dog)
-```
-
-"""
-function get_cosine_similarity(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}})
-    # Make sure both inputs are vectors or convert them into vectors
-    vec1, vec2 = get_any2vec(wv, inp1), get_any2vec(wv, inp2)
-    # Computing the dot-product gives the cosine similarity score
-    return dot(vec1, vec2)
-end
-
-"""
     get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
 
 Finds the top `n` most similar words to a given word or vector.
