@@ -178,7 +178,7 @@ function get_vector_operation(wv::WordEmbedding, inp1::Union{String, Vector{64}}
         return inp1_vec - inp2_vec
     elseif operator == '*'
         return dot(inp1_vec, inp2_vec)
-    elseif operator == 'euclid'
+    elseif operator == "euclid"
         return sqrt(sum(inp1_vec - inp2_vec).^2))
     else
         throw(ArgumentError("wrong or missing operator, please use +, -, * or euclid"))
