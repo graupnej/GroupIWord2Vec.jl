@@ -1,19 +1,22 @@
 """
-    get_word2vec(wv::WordEmbedding, word::String) -> Vector{Float64}
+    get_word2vec(wv::WordEmbedding, word::String) -> Vector{T}
 
 Retrieves the embedding vector corresponding to a given word.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `word::String`: The word to look up.
+- `wv::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
+- `word::String`: The word to look up
+
+# Throws
+- `ArgumentError`: If the word is not found in the embedding model.
 
 # Returns
-- `Vector{Float64}`: The embedding vector corresponding to the word.
+- `Vector{T}`: The embedding vector of the requested word, where `T` is the numerical type of the embeddings.
 
 # Example
 ```julia
-vec = get_word2vec(wv, "apple")
-```
+vec = get_word2vec(model, "dog")
+
 """
 function get_word2vec(wv::WordEmbedding, word::String)
     # Retrieve word index but return nothing if word is not found for ArgumentError
@@ -21,9 +24,10 @@ function get_word2vec(wv::WordEmbedding, word::String)
     if idx === nothing
         throw(ArgumentError("Word not found in the embeddings vocabulary"))
     end
-    # Return vector for given word at index location
-    return wv.embeddings[:, idx]
+    # Returns (and ensures) vector for given word at index location
+    return Vector(wv.embeddings[:, idx])
 end
+
 
 """
     get_vec2word(wv::WordEmbedding, vec::Vector{Float64}) -> String
