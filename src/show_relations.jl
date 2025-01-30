@@ -67,21 +67,21 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     # shit version: embeddings = permutedims(hcat([wv.embeddings[:, idx] for idx in values(indices)]...))
     embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
 
-    labels = text.(words, :bottom)
-    # old version: labels = text.([word for word in words], :bottom)    
+    # shit version labels = text.(words, :bottom)
+    labels = text.([word for word in words], :bottom)    
     
     # reduce dimension
     projection = reduce_to_2d(embeddings)
 
-    #maybe use this pair_count = div(word_count, 2)
-    # for this arrows = [projection[:, 2i] - projection[:, 2i-1] for i in 1:pair_count]
-    # arrows_x, arrows_y = first.(arrows), last.(arrows)
+    pair_count = div(word_count, 2)
+    arrows = [projection[:, 2i] - projection[:, 2i-1] for i in 1:pair_count]
+    arrows_x, arrows_y = first.(arrows), last.(arrows)
 
     
     # preparation for plotting the arrows, infill with zeros and split x, y
-    arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
-    arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
-    arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
+    # old arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
+    # old arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
+    # old arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
         
     p = scatter(projection[1, :], projection[2, :], 
             title="Word Embedding PCA Projection",
