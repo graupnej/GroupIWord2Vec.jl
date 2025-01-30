@@ -55,13 +55,10 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
             throw(error("Word '$word' not found in embeddings"))
         end
     end
-    # Get embeddings by looking up each word's index and getting its vector
-    embeddings = hcat([wv.embeddings[:, wv.word_indices[word]] for word in words]...)                
-    # embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
+    # Get embeddings by looking up each word's index and getting its vector                
+    embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
 
-    labels = text.(words, :bottom)
-
-    #labels = text.([word for word in words], :bottom)    
+    labels = text.([word for word in words], :bottom)    
     
     # reduce dimension
     projection = reduce_to_2d(embeddings)
