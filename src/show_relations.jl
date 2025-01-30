@@ -66,7 +66,7 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
             title="Word Embedding PCA Projection",
             xlabel="First Principal Component",
             ylabel="Second Principal Component",
-            legend=false, series_annotations=collect(labels))  # Ensure it's a vector
+            legend=false, series_annotations = labels)
 
     # plot the arrows
     quiver!(p, projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
