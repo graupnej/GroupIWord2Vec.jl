@@ -1,2 +1,3 @@
 [deps]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+LinearAlgebra = "37e2e46d-703c-5dcd-99d4-ee687192c42d"
