@@ -1,5 +1,6 @@
 using Test
 using GroupIWord2Vec
+using LinearAlgebra
 
 @testset "GroupIWord2Vec" begin
    @testset "Functions" begin
