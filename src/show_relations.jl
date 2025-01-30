@@ -15,16 +15,15 @@ function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
 
         # Perform eigen decomposition
         eigen_vals, eigen_vecs = eigen(Symmetric(cov_matrix))
-        # old version: eigen_vals, eigen_vecs = eigen(cov_matrix)
-
+        
         # Sort eigenvalues (and corresponding eigenvectors) in descending order
-        # maybe improve with: idx = sortperm(eigen_vals, rev=true)
-        # maybe improve with: pca_components = eigen_vecs[:, idx[1:number_of_pc]]  # Directly extract only needed components
-
         idx = sortperm(eigen_vals, rev=true)
-        eigen_vecs = eigen_vecs[:, idx]
+        pca_components = eigen_vecs[:, idx[1:number_of_pc]]
 
-        # # Select the top "number_of_pc" principal components
+        # old version: idx = sortperm(eigen_vals, rev=true)
+        # old version: eigen_vecs = eigen_vecs[:, idx]
+
+        # Select the top "number_of_pc" principal components
         pca_components = eigen_vecs[:, 1:number_of_pc]
 
         # Project the data onto the top 2 principal components
