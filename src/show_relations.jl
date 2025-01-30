@@ -1,13 +1,24 @@
 using Statistics, Plots, LinearAlgebra
 
 """
-This function reduces the dimension of a matrix from NxM to Nx"number_of_pc" with a PCA. 
-It returns the projected data.
+    reduce_to_2d(data::Matrix, number_of_pc::Int=2) -> Matrix{Float64}
+
+Performs Principal Component Analysis (PCA) to reduce the dimensionality of a given dataset NxM to Nx"number_of_pc" and returns a projected data
+
+# Arguments
+- `data::Matrix`: The input data matrix where rows represent samples and columns represent features.
+- `number_of_pc::Int=2`: The number of principal components to retain (default: 2).
+
+# Returns
+- `Matrix{Float64}`: A matrix of shape `(number_of_pc × N)`, where `N` is the number of samples, containing the projected data in the reduced dimensional space.
+
+# Example
+```julia
+data = randn(100, 50)  # 100 samples, 50 features
+reduced_data = reduce_to_2d(data, 2)
 """
 function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Center the data
-        # num = size(data, 1)
-
         c_data = data .- mean(data, dims=1)
 
         # Compute the covariance matrix
