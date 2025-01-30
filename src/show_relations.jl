@@ -78,11 +78,10 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     #arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
         
     p = scatter(projection[1, :], projection[2, :], 
-         title="PCA Projection to 2D",
-         xlabel="First Principal Component",
-         ylabel="Second Principal Component",
-         legend=false, series_annotations=labels)
-
+            title="Word Embedding PCA Projection",
+            xlabel="First Principal Component",
+            ylabel="Second Principal Component",
+            legend=false, series_annotations=collect(labels))  # Ensure it's a vector
 
     # plot the arrows
     quiver!(p, projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
