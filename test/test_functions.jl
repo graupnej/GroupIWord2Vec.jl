@@ -27,3 +27,5 @@ using GroupIWord2Vec
     @test_throws ArgumentError get_word2vec(wv, "unknown")
     @test_throws ArgumentError get_word2vec(wv, "")
 end
+
+
