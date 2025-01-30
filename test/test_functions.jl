@@ -101,9 +101,15 @@ end
         # Test vector identity and special cases
         vec1 = [1.0, 5.0, 9.0]
         @test get_any2vec(wv, vec1) === vec1  # Identity preservation
-        @test get_any2vec(wv, zeros(3)) === zeros(3)  # Zero vector
-        @test get_any2vec(wv, [1e6, 1e6, 1e6]) isa Vector{Float64}  # Large values
-        @test get_any2vec(wv, [Inf, -Inf, NaN]) isa Vector{Float64}  # Special values
+        
+        zero_vec = zeros(Float64, 3)  # Create zero vector once
+        @test get_any2vec(wv, zero_vec) === zero_vec  # Zero vector
+        
+        large_vec = [1e6, 1e6, 1e6]
+        @test get_any2vec(wv, large_vec) === large_vec  # Large values
+        
+        special_vec = [Inf, -Inf, NaN]
+        @test get_any2vec(wv, special_vec) === special_vec  # Special values
     end
     
     @testset "error cases" begin
