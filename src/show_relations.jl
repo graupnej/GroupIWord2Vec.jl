@@ -51,30 +51,26 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     if word_count % 2 != 0
         throw(ArgumentError("Need words in multiples of 2, but $word_count were given"))
     end
-
-    #if Bool(word_count%2)
-        #throw(error("need words in multiples of 2 but $word_count are given"))
-    #end
-
     
     # Create a dictionary mapping words to their indices (or `nothing` if missing)
-    #indices = Dict(word => get(wv.word_indices, word, nothing) for word in words)
+    indices = Dict(word => get(wv.word_indices, word, nothing) for word in words)
 
     # Find missing words
-    #missing_words = [word for (word, idx) in indices if idx === nothing]
+    missing_words = [word for (word, idx) in indices if idx === nothing]
     
     # If there are missing words, throw an error listing all of them
-    #if !isempty(missing_words)
-        #throw(ArgumentError("Words not found in embeddings: " * join(missing_words, ", ")))
-    #end
+    if !isempty(missing_words)
+        throw(ArgumentError("Words not found in embeddings: " * join(missing_words, ", ")))
+    end
     
     # Check if all words exist in the embedding
     # maybe improve with commented lines above
-    for word in words
-        if !haskey(wv.word_indices, word)
-            throw(error("Word '$word' not found in embeddings"))
-        end
-    end
+    #for word in words
+        #if !haskey(wv.word_indices, word)
+            #throw(error("Word '$word' not found in embeddings"))
+        #end
+    #end
+    
     # Get embeddings by looking up each word's index and getting its vector     
     # maybe improve with: embeddings = permutedims(hcat([wv.embeddings[:, idx] for idx in values(indices)]...))
     embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
