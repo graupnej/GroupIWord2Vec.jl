@@ -6,11 +6,10 @@ It returns the projected data.
 """
 function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Center the data
-        # old version: num = size(data)[1]
         num = size(data, 1)
 
-        c_data = data .- sum(data, dims = 1) ./ num
-        # maybe improve with: c_data = data .- mean(data, dims=1)
+        # old version: c_data = data .- sum(data, dims = 1) ./ num
+        c_data = data .- mean(data, dims=1)
 
         # Compute the covariance matrix
         cov_matrix = cov(c_data)
