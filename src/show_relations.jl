@@ -64,11 +64,11 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     end
     
     # Get embeddings by looking up each word's index and getting its vector     
-    embeddings = permutedims(hcat([wv.embeddings[:, idx] for idx in values(indices)]...))
-    # old version: embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
+    # shit version: embeddings = permutedims(hcat([wv.embeddings[:, idx] for idx in values(indices)]...))
+    embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
 
-    # maybe improve with labels = text.(words, :bottom)
-    labels = text.([word for word in words], :bottom)    
+    labels = text.(words, :bottom)
+    # old version: labels = text.([word for word in words], :bottom)    
     
     # reduce dimension
     projection = reduce_to_2d(embeddings)
