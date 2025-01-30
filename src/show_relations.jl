@@ -67,15 +67,9 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     projection = reduce_to_2d(embeddings)
     
     # preparation for plotting the arrows, infill with zeros and split x, y
-    #arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
-    arrows = projection[:, 2:2:end] .- projection[:, 1:2:end]
-    arrows_x, arrows_y = eachrow(arrows)    
-        
-    arrows_x = vcat(arrows[1, :], zeros(size(arrows, 2)))
-    arrows_y = vcat(arrows[2, :], zeros(size(arrows, 2)))
-
-    #arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
-    #arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
+    arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
+    arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
+    arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
         
     p = scatter(projection[1, :], projection[2, :], 
             title="Word Embedding PCA Projection",
