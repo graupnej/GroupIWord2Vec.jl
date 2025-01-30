@@ -39,11 +39,30 @@ end
 
 
 """
-This Function creates a plot of the relations of the arguments like this:
+    show_relations(words::String...; wv::WordEmbedding, save_path::String="word_relations.png") -> Plots.Plot
+
+Generates a 2D PCA projection of the given word embeddings and visualizes their relationships like this:
 arg1==>arg2,
 arg3==>arg4,
 ...
 Note: Use an even number of inputs!
+
+# Arguments
+- `words::String...`: A list of words to visualize. The number of words must be a multiple of 2.
+- `wv::WordEmbedding`: The word embedding model containing the word vectors.
+- `save_path::String="word_relations.png"`: The file path where the generated plot will be saved. If empty or `nothing`, the plot is not saved.
+
+# Throws
+- `ArgumentError`: If the number of words is not a multiple of 2.
+- `ArgumentError`: If any of the provided words are not found in the embedding model.
+
+# Returns
+- `Plots.Plot`: A scatter plot with arrows representing word relationships.
+
+# Example
+```julia
+p = show_relations("king", "queen", "man", "woman"; wv=model, save_path="relations.png")
+
 """
 function show_relations(words::String...; wv::WordEmbedding, save_path::String="word_relations.png")
     # Check input - word_count should only be used inside the function
@@ -66,21 +85,15 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     # Get embeddings by looking up each word's index and getting its vector
     embeddings = permutedims(hcat([wv.embeddings[:, indices[word]] for word in words]...))
 
-
     labels = text.([word for word in words], :bottom)    
 
-    
     # reduce dimension
     projection = reduce_to_2d(embeddings)
 
-
-    pair_count = div(word_count, 2)
-    arrows = [projection[:, 2i] - projection[:, 2i-1] for i in 1:pair_count]
-    arrows_x, arrows_y = first.(arrows), last.(arrows)
     # preparation for plotting the arrows, infill with zeros and split x, y
-    #arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
-    #arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
-    #arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
+    arrows = [projection[:, 2*i]-projection[:, 2*i-1] for i in 1:Int(word_count/2)]
+    arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
+    arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
         
     p = scatter(projection[1, :], projection[2, :], 
             title="Word Embedding PCA Projection",
@@ -95,7 +108,6 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     if save_path !== nothing && !isempty(save_path)
         savefig(p, save_path)
     end
-
-
+    
     return p  # Optionally return the plot object
 end
