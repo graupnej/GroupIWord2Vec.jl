@@ -1,5 +1,5 @@
 using Test
-using GroupIWord2Vec  # Import your package
+using GroupIWord2Vec
 using LinearAlgebra    # Needed for eigenvalue/eigenvector validation
 
 @testset "reduce_to_2d Tests" begin
