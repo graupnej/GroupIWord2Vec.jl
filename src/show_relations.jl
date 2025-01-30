@@ -8,15 +8,14 @@ function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Center the data
         num = size(data, 1)
 
-        # old version: c_data = data .- sum(data, dims = 1) ./ num
         c_data = data .- mean(data, dims=1)
 
         # Compute the covariance matrix
         cov_matrix = cov(c_data)
 
         # Perform eigen decomposition
-        # maybe improve with: eigen_vals, eigen_vecs = eigen(Symmetric(cov_matrix))
-        eigen_vals, eigen_vecs = eigen(cov_matrix)
+        eigen_vals, eigen_vecs = eigen(Symmetric(cov_matrix))
+        # old version: eigen_vals, eigen_vecs = eigen(cov_matrix)
 
         # Sort eigenvalues (and corresponding eigenvectors) in descending order
         # maybe improve with: idx = sortperm(eigen_vals, rev=true)
