@@ -120,20 +120,6 @@ julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", w
 ### 3) Running a large example
 As an alternative (larger) example use a text corpus from e.g. [FastText](https://fasttext.cc/docs/en/pretrained-vectors.html) (.bin & .vec file) with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
 
-### 4) Explicit Example
-
-In this example first word embedding vectors are created by loading the text8 text corpus into a model and training it:
-```@example
-using GroupIWord2Vec # hide
-train_model("text8", "text8.txt", verbose = true)
-model = load_embeddings("./text8.txt")
-```
-Now that the word embeddings exist a vector can be obtained for a word like this:
-
-```@example
-get_vec2word(model, king_vec)
-```
-
 ## For Developers
 ### 1) Download the code
 
