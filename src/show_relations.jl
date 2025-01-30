@@ -22,7 +22,7 @@ function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
 
         # Project the data onto the top 2 principal components
         projected_data = pca_components' * c_data'  
-        # old version: return projected_data
+        
         return Matrix{Float64}(projected_data)
 end
 
