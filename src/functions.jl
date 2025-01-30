@@ -78,14 +78,18 @@ banana_vec = get_any2vec(wv, "banana")
 banana_vec = get_any2vec(wv, banana_vec)
 ```
 """
-function get_any2vec(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}})
-    # Check the type of the input
+function get_any2vec(wv::WordEmbedding, word_or_vec::Any)
     if word_or_vec isa String
+        # Delegate string input to get_word2vec
         return get_word2vec(wv, word_or_vec)
     elseif word_or_vec isa Vector{Float64}
+        # Check dimension match for vector input
+        if length(word_or_vec) != size(wv.embeddings, 1)
+            throw(DimensionMismatch("Input vector dimension $(length(word_or_vec)) does not match embedding dimension $(size(wv.embeddings, 1))"))
+        end
         return word_or_vec
     else
-        throw(ArgumentError("Input must be a String (word) or a Vector (embedding)"))
+        throw(ArgumentError("Input must be a String (word) or a Vector{Float64} (embedding)"))
     end
 end
 
