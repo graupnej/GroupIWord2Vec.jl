@@ -6,7 +6,7 @@ using GroupIWord2Vec
        include("test_functions.jl")
    end
    
-   #@testset "Models" begin
-       #include("test_model.jl")
-   #end
+   @testset "Model" begin
+       include("test_model.jl")
+   end
 end

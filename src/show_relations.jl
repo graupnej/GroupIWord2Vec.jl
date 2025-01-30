@@ -4,26 +4,33 @@ using Statistics, Plots, LinearAlgebra
 This function reduces the dimension of a matrix from NxM to Nx"number_of_pc" with a PCA. 
 It returns the projected data.
 """
-function reduce_to_2d(data::Matrix, number_of_pc=2::Int)::Matrix
+function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Center the data
         num = size(data)[1]
-        c_data = data .- sum(data, dims = 1) ./ num
+        c_data = data .- mean(data, dims=1)
+
+        # c_data = data .- sum(data, dims = 1) ./ num
+
+        # Compute SVD for stability instead of eigen decomposition        
+        U, S, Vt = svd(c_data)
 
         # Compute the covariance matrix
-        cov_matrix = cov(c_data)
+        #cov_matrix = cov(c_data)
 
         # Perform eigen decomposition
-        eigen_vals, eigen_vecs = eigen(cov_matrix)
+        #eigen_vals, eigen_vecs = eigen(cov_matrix)
 
         # Sort eigenvalues (and corresponding eigenvectors) in descending order
-        idx = sortperm(eigen_vals, rev=true)
-        eigen_vecs = eigen_vecs[:, idx]
+        #idx = sortperm(eigen_vals, rev=true)
+        #eigen_vecs = eigen_vecs[:, idx]
 
         # Select the top 2 principal components
-        pca_components = eigen_vecs[:, 1:number_of_pc]
+        pca_components = Vt[1:number_of_pc, :]
+        #pca_components = eigen_vecs[:, 1:number_of_pc]
 
         # Project the data onto the top 2 principal components
-        projected_data = pca_components' * c_data'  
+        projected_data = (pca_components * c_data')  # Ensures output is 2×N
+        # projected_data = pca_components' * c_data'  
         return projected_data
 end
 
@@ -48,10 +55,10 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
             throw(error("Word '$word' not found in embeddings"))
         end
     end
-    
-    # Get embeddings by looking up each word's index and getting its vector
+    # Get embeddings by looking up each word's index and getting its vector                
     embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
-    labels = text.([word for word in words], :bottom)
+
+    labels = text.([word for word in words], :bottom)    
     
     # reduce dimension
     projection = reduce_to_2d(embeddings)
@@ -62,10 +69,10 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
         
     p = scatter(projection[1, :], projection[2, :], 
-            title="PCA Projection to 2D",
-            xlabel="first principal component",
-            ylabel="second principal component",
-            legend=false, series_annotations = labels)
+            title="Word Embedding PCA Projection",
+            xlabel="First Principal Component",
+            ylabel="Second Principal Component",
+            legend=false, series_annotations=collect(labels))  # Ensure it's a vector
 
     # plot the arrows
     quiver!(p, projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
