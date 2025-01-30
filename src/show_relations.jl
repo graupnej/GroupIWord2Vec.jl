@@ -64,7 +64,9 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     end
     
     # Get embeddings by looking up each word's index and getting its vector     
-    embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
+    # old version: embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
+    embeddings = permutedims(hcat([wv.embeddings[:, indices[word]] for word in words]...))
+
 
     labels = text.([word for word in words], :bottom)    
     
@@ -86,9 +88,10 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
     quiver!(p, projection[1, :], projection[2, :], quiver=(arrows_x, arrows_y))
     
     # Save the plot
-    if !isempty(save_path)
+    if save_path !== nothing && !isempty(save_path)
         savefig(p, save_path)
     end
+
 
     return p  # Optionally return the plot object
 end
