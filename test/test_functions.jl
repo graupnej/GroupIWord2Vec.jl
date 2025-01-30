@@ -11,14 +11,14 @@ using GroupIWord2Vec
    wv = WordEmbedding(words, embeddings)  # Create embedding object
    
    # Test vector retrieval for first word "cat" (first column)
-   @test get_vector_from_word(wv, "cat") == [1.0, 5.0, 9.0]
+   @test get_word2vec(wv, "cat") == [1.0, 5.0, 9.0]
    
    # Test vector retrieval for last word "fish" (fourth column)
-   @test get_vector_from_word(wv, "fish") == [4.0, 8.0, 12.0]
+   @test get_word2vec(wv, "fish") == [4.0, 8.0, 12.0]
    
    # Test error handling for non-existent words
-   @test_throws KeyError get_vector_from_word(wv, "unknown")
-   @test_throws KeyError get_vector_from_word(wv, "")
+   @test_throws KeyError get_word2vec(wv, "unknown")
+   @test_throws KeyError get_word2vec(wv, "")
 end
 
 @testset "get_vec2word" begin
@@ -30,13 +30,13 @@ end
    wv = WordEmbedding(words, embeddings)
    
    # Test vector->word retrieval for all words
-   @test get_word_from_vector(wv, [1.0, 5.0, 9.0]) == "cat"    # First word
-   @test get_word_from_vector(wv, [2.0, 6.0, 10.0]) == "dog"   # Second word
-   @test get_word_from_vector(wv, [3.0, 7.0, 11.0]) == "bird"  # Third word
-   @test get_word_from_vector(wv, [4.0, 8.0, 12.0]) == "fish"  # Fourth word
+   @test get_vec2word(wv, [1.0, 5.0, 9.0]) == "cat"    # First word
+   @test get_vec2word(wv, [2.0, 6.0, 10.0]) == "dog"   # Second word
+   @test get_vec2word(wv, [3.0, 7.0, 11.0]) == "bird"  # Third word
+   @test get_vec2word(wv, [4.0, 8.0, 12.0]) == "fish"  # Fourth word
    
    # Test non-existent vector error
-   @test_throws ArgumentError get_word_from_vector(wv, [0.0, 0.0, 0.0])
+   @test_throws ArgumentError get_vec2word(wv, [0.0, 0.0, 0.0])
 end
 
 @testset "get_any2vec" begin
