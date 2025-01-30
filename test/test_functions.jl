@@ -122,3 +122,42 @@ end
         @test_throws DimensionMismatch get_any2vec(wv, [1.0, 2.0])  # Wrong size
     end
 end
+
+@testset "get_vector_operation" begin
+    # Test data setup with meaningful relationships
+    words = ["king", "queen", "man", "woman"]
+    embeddings = [1.0  2.0  3.0  4.0;    # First dimension
+                 2.0  3.0  1.0  2.0;    # Second dimension
+                 3.0  3.0  1.0  1.0]    # Third dimension - similar for royal pairs
+    wv = WordEmbedding(words, embeddings)
+    
+    @testset "basic operations" begin
+        # Test addition and subtraction with words and vectors
+        @test get_vector_operation(wv, "king", "queen", "+") == [3.0, 5.0, 6.0]
+        test_vec = [1.0, 1.0, 1.0]
+        @test get_vector_operation(wv, "king", test_vec, "+") == [2.0, 3.0, 4.0]
+        
+        # Test relationships (king - man ≈ queen - woman)
+        royal_diff = get_vector_operation(wv, "king", "man", "-")
+        gender_diff = get_vector_operation(wv, "queen", "woman", "-")
+        @test royal_diff ≈ gender_diff rtol=1e-5
+    end
+    
+    @testset "similarity measures" begin
+        # Test cosine similarity
+        king_queen = get_vector_operation(wv, "king", "queen", "cosine")
+        man_woman = get_vector_operation(wv, "man", "woman", "cosine")
+        @test king_queen > 0.9  # Related pairs have high similarity
+        @test isapprox(king_queen, man_woman, rtol=0.1)  # Similar relationships
+        
+        # Test euclidean distance
+        @test get_vector_operation(wv, "king", "queen", "euclid") < 
+              get_vector_operation(wv, "king", "woman", "euclid")  # Related pairs closer
+    end
+    
+    @testset "error cases" begin
+        @test_throws ArgumentError get_vector_operation(wv, "king", "queen", "invalid")
+        @test_throws ArgumentError get_vector_operation(wv, "invalid", "king", "+")
+        @test_throws DimensionMismatch get_vector_operation(wv, "king", [1.0], "+")
+    end
+end
