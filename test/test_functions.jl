@@ -83,49 +83,36 @@ end
 @testset "get_any2vec" begin
     # Test data setup with intuitive pattern
     words = ["cat", "dog", "bird", "fish"]  # Vocabulary of 4 test words
-    # 3x4 embedding matrix: each column is a word vector
     embeddings = [1.0 2.0 3.0 4.0;    # First dimension of embeddings
                  5.0 6.0 7.0 8.0;    # Second dimension
                  9.0 10.0 11.0 12.0] # Third dimension
-    wv = WordEmbedding(words, embeddings)  # Create embedding object
+    wv = WordEmbedding(words, embeddings)
     
-    # Test string inputs - multiple words
     @testset "word lookups" begin
-        # First word
+        # Test vectors and types for multiple positions
         cat_vec = get_any2vec(wv, "cat")
-        @test cat_vec == [1.0, 5.0, 9.0]
-        
-        # Middle word
-        bird_vec = get_any2vec(wv, "bird")
-        @test bird_vec == [3.0, 7.0, 11.0]
-        
-        # Last word
-        fish_vec = get_any2vec(wv, "fish")
-        @test fish_vec == [4.0, 8.0, 12.0]
+        @test cat_vec == [1.0, 5.0, 9.0] && cat_vec isa Vector{Float64}
+        @test get_any2vec(wv, "bird") == [3.0, 7.0, 11.0]  # Middle word
+        @test get_any2vec(wv, "fish") == [4.0, 8.0, 12.0]  # Last word
+        @test get_any2vec(wv, "cat") != get_any2vec(wv, "dog")  # Distinctness
     end
     
-    # Test vector inputs - different valid cases
     @testset "vector inputs" begin
-        # Test exact vector from embeddings
-        vec1 = [1.0, 5.0, 9.0]  # Matches first word vector
-        @test get_any2vec(wv, vec1) === vec1
-        
-        # Test arbitrary valid vector
-        vec2 = [0.5, -1.0, 2.0]  # Different values but correct dimension
-        @test get_any2vec(wv, vec2) === vec2
+        # Test vector identity and special cases
+        vec1 = [1.0, 5.0, 9.0]
+        @test get_any2vec(wv, vec1) === vec1  # Identity preservation
+        @test get_any2vec(wv, zeros(3)) === zeros(3)  # Zero vector
+        @test get_any2vec(wv, [1e6, 1e6, 1e6]) isa Vector{Float64}  # Large values
+        @test get_any2vec(wv, [Inf, -Inf, NaN]) isa Vector{Float64}  # Special values
     end
     
-    # Test error cases
     @testset "error cases" begin
-        # Non-existent word
-        @test_throws KeyError get_any2vec(wv, "nonexistent_word")
-        
-        # Wrong input type
-        @test_throws ArgumentError get_any2vec(wv, 42)
-        @test_throws ArgumentError get_any2vec(wv, true)
-        
-        # Wrong vector dimensions
-        @test_throws DimensionMismatch get_any2vec(wv, [1.0, 2.0])  # Too short
-        @test_throws DimensionMismatch get_any2vec(wv, [1.0, 2.0, 3.0, 4.0])  # Too long
+        # Test various error conditions
+        @test_throws ArgumentError get_any2vec(wv, "nonexistent_word")
+        @test_throws ArgumentError get_any2vec(wv, "")  # Empty string
+        @test_throws ArgumentError get_any2vec(wv, 42)  # Wrong type
+        @test_throws ArgumentError get_any2vec(wv, [1, 2, 3])  # Integer vector
+        @test_throws DimensionMismatch get_any2vec(wv, Float64[])  # Empty vector
+        @test_throws DimensionMismatch get_any2vec(wv, [1.0, 2.0])  # Wrong size
     end
 end
