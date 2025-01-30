@@ -162,10 +162,10 @@ Finds the top `n` most similar words to a given word or vector.
 - `inp2::Union{String, Vector{Float64}}`: Second word or vector.
 - `operator::String`: The operator string to define the calculation.
 operators can be:
-'+' -> sum,
-'-' -> subtraction,
-'*' -> dot product/ cosine similarity,
-'euclid' -> Euclidean distance
+"+" -> sum,
+"-" -> subtraction,
+"*" -> dot product/ cosine similarity,
+"euclid" -> Euclidean distance
 
 # Returns
 - `Vector{Float64}`: For operations with vecctorial result: '+' and '-'
