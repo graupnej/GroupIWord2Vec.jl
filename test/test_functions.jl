@@ -14,6 +14,12 @@ using GroupIWord2Vec
         cat_vec = get_word2vec(wv, "cat")
         @test cat_vec isa Vector{Float64}
         @test length(cat_vec) == 3
+
+        # Test with Float32 embeddings
+        wv32 = WordEmbedding(words, Float32.(embeddings))
+        cat_vec32 = get_word2vec(wv32, "cat")
+        @test cat_vec32 isa Vector{Float32}
+        @test length(cat_vec32) == 3
     end
     
     @testset "vector retrieval" begin
@@ -39,6 +45,10 @@ using GroupIWord2Vec
         @test_throws ArgumentError get_word2vec(wv, "unknown")
         @test_throws ArgumentError get_word2vec(wv, "")
         @test_throws ArgumentError get_word2vec(wv, " ")  # Added whitespace test
+        @test_throws ArgumentError get_word2vec(wv, "Cat")  # Case sensitivity check
+        @test_throws ArgumentError get_word2vec(wv, "birdd")  # Small typo test
+    end
+
     end
 end
 
