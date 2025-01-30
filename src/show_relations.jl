@@ -63,17 +63,9 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
         throw(ArgumentError("Words not found in embeddings: " * join(missing_words, ", ")))
     end
     
-    # Check if all words exist in the embedding
-    # maybe improve with commented lines above
-    #for word in words
-        #if !haskey(wv.word_indices, word)
-            #throw(error("Word '$word' not found in embeddings"))
-        #end
-    #end
-    
     # Get embeddings by looking up each word's index and getting its vector     
-    # maybe improve with: embeddings = permutedims(hcat([wv.embeddings[:, idx] for idx in values(indices)]...))
-    embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
+    embeddings = permutedims(hcat([wv.embeddings[:, idx] for idx in values(indices)]...))
+    # old version: embeddings = reduce(vcat, transpose.([wv.embeddings[:, wv.word_indices[word]] for word in words]))
 
     # maybe improve with labels = text.(words, :bottom)
     labels = text.([word for word in words], :bottom)    
