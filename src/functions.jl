@@ -176,21 +176,26 @@ operators can be:
 similar_words = get_similar_words(wv, "king", 5)
 ```
 """
-function get_vector_operation(wv::WordEmbedding, inp1::Union{String, Vector{64}}, inp2::Union{String, Vector{64}}, operator::String)
-    # Converts both inputs to corresponding vectors
-    inp1_vec = get_any2vec(wv, inp1)
-    inp2_vec = get_any2vec(wv, inp2)
+function get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, operator::String)
+    # # Converts both inputs to corresponding vectors using existing function
+    inp1_vec = get_any2vec(ww, inp1)
+    inp2_vec = get_any2vec(ww, inp2)
+    
+    # Validate operator
+    valid_operators = ["+", "-", "cosine", "euclid"]
+    if !(operator in valid_operators)
+        throw(ArgumentError("Invalid operator. Please use one of: " * join(valid_operators, ", ")))
+    end
+    
     # Distinguishes between operations and computes operation
-    if operator == '+'
+    if operator == "+"
         return inp1_vec + inp2_vec
-    elseif operator == '-'
+    elseif operator == "-"
         return inp1_vec - inp2_vec
-    elseif operator == '*'
-        return dot(inp1_vec, inp2_vec)
+    elseif operator == "cosine"
+        return dot(inp1_vec, inp2_vec) / (norm(inp1_vec) * norm(inp2_vec))
     elseif operator == "euclid"
         return norm(inp1_vec - inp2_vec)
-    else
-        throw(ArgumentError("wrong or missing operator, please use +, -, * or euclid"))
     end
 end
 
