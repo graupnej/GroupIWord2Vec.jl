@@ -29,29 +29,32 @@ using GroupIWord2Vec
 end
 
 @testset "get_vec2word" begin
-    # Test setup with clear pattern and sufficient vocabulary
+    # Test setup with clear pattern and normalized vectors
     words = ["cat", "dog", "bird", "fish"]
-    # Each column represents a word vector with clear numerical pattern
-    embeddings = [1.0 2.0 3.0 4.0;     # First dimension
-                 5.0 6.0 7.0 8.0;     # Second dimension
-                 9.0 10.0 11.0 12.0]  # Third dimension
+    # Each column is a normalized vector 
+    embeddings = [
+        1/√2  0.0   0.0   1/√2;    # First dimension
+        1/√2  1.0   0.0   -1/√2;   # Second dimension
+        0.0   0.0   1.0   0.0      # Third dimension
+    ]
     wv = WordEmbedding(words, embeddings)
     
-    # Test exact vector matches for all words
-    @test get_vec2word(wv, [1.0, 5.0, 9.0]) == "cat"    # First word
-    @test get_vec2word(wv, [2.0, 6.0, 10.0]) == "dog"   # Second word
-    @test get_vec2word(wv, [3.0, 7.0, 11.0]) == "bird"  # Third word
-    @test get_vec2word(wv, [4.0, 8.0, 12.0]) == "fish"  # Fourth word
+    # Test with normalized vectors
+    @test get_vec2word(wv, [1/√2, 1/√2, 0.0]) == "cat"     # Matches first vector
+    @test get_vec2word(wv, [0.0, 1.0, 0.0]) == "dog"       # Matches second vector
+    @test get_vec2word(wv, [0.0, 0.0, 1.0]) == "bird"      # Matches third vector
+    @test get_vec2word(wv, [1/√2, -1/√2, 0.0]) == "fish"   # Matches fourth vector
     
-    # Test scale invariance (cosine similarity property)
-    @test get_vec2word(wv, 2 .* [1.0, 5.0, 9.0]) == "cat"    # Scaled first vector
-    @test get_vec2word(wv, 0.5 .* [4.0, 8.0, 12.0]) == "fish" # Scaled last vector
+    # Test with unnormalized vectors (same directions, different magnitudes)
+    @test get_vec2word(wv, [2.0, 2.0, 0.0]) == "cat"       # Scaled first vector
+    @test get_vec2word(wv, [0.0, 0.5, 0.0]) == "dog"       # Scaled second vector
+    @test get_vec2word(wv, [0.0, 0.0, 3.0]) == "bird"      # Scaled third vector
     
-    # Test similar but not exact vectors (nearest neighbor)
-    @test get_vec2word(wv, [1.1, 5.1, 9.1]) == "cat"    # Close to first word
-    @test get_vec2word(wv, [3.9, 7.9, 11.9]) == "fish"  # Close to last word
+    # Test similar but not exact vectors
+    @test get_vec2word(wv, [0.7, 0.7, 0.1]) == "cat"       # Closer to first vector
+    @test get_vec2word(wv, [0.1, 0.9, 0.0]) == "dog"       # Closer to second vector
     
     # Test dimension mismatch errors
-    @test_throws DimensionMismatch get_vec2word(wv, [1.0, 5.0])  # Too short
-    @test_throws DimensionMismatch get_vec2word(wv, [1.0, 5.0, 9.0, 13.0])  # Too long
+    @test_throws DimensionMismatch get_vec2word(wv, [1.0, 0.0])              # Too short
+    @test_throws DimensionMismatch get_vec2word(wv, [1.0, 0.0, 0.0, 0.0])    # Too long
 end
