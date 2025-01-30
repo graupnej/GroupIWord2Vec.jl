@@ -24,6 +24,6 @@ using GroupIWord2Vec
     @test get_word2vec(wv, "cat") != get_word2vec(wv, "dog")
     
     # Test error handling
-    @test_throws KeyError get_word2vec(wv, "unknown")
-    @test_throws KeyError get_word2vec(wv, "")
+    @test_throws ArgumentError get_word2vec(wv, "unknown")
+    @test_throws ArgumentError get_word2vec(wv, "")
 end
