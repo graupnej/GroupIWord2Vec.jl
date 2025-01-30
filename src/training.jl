@@ -51,21 +51,23 @@ end
 
 function train_model(epochs::Int, model::Chain, window_size::Int, sequences, opt=Descent())
     word_count = size(model[1].weight)[2]
-    loss(model, input, target) = Flux.Losses.crossentropy(target, reshape(model(input), size(target)))
+    loss(model, input, target) = Flux.Losses.crossentropy(target, model(input))
 
     @showprogress dt=1 desc="Train embedding" for epoch in 1:epochs
         
-        context = Array{Int}(undef, window_size*2, 0)
-        target = Array{Float32}(undef, word_count, 0)
+        data = Vector{Tuple{Vector{Int64}, OneHotVector{UInt32}}}()
         for sequence in sequences
             length(sequence)<=2*window_size ? continue : 
-            for i in window_size+1:length(sequence)-window_size
-                context = hcat(context, vcat(sequence[i-window_size:i-1], sequence[i+1:i+window_size]))
-                target = hcat(target, onehot(sequence[i], 1:word_count))
+            for i in (1+window_size):(length(sequence)-window_size)
+                context = vcat(sequence[i-window_size:i-1], sequence[i+1:i+window_size])
+                
+                target = onehot(sequence[i], 1:word_count)
+                data = push!(data, (context, target))
             end
 
         end
-        data=[(context, target)]
+        
+    
         train!(loss, model, data, opt)            
 
     
@@ -74,8 +76,51 @@ function train_model(epochs::Int, model::Chain, window_size::Int, sequences, opt
 end
 
 ####basic examples
+
+#lods the text and returns a cleaned up vec(string) each sentence is a element in vector
+#eg: ["the quick brown fox jumps over " ⋯ 40 bytes ⋯ "ly under a tree in the sunshine",
+#    "the quick brown rabbit hops ove" ⋯ 50 bytes ⋯ "ly under a tree in the sunshine",
+#    "a swift grey rabbit leaps past " ⋯ 40 bytes ⋯ "y beneath the shade of the tree"]
 text = load_corpus("data/example.txt")
+
+
+#creates a vocabulary of all words that are contained in the cleaned up text and 
+#transforms the text into a sequence of indeces eg:"The quick brown fox jumps over..." -> [25, 16, 30, 28, 24, 2,...]
 vocab, sequence = create_vocab_and_index_text(text)
-my_model = create_model(10, vocab)
-my_model = train_model(1000, my_model, 2, sequence)
-trained_embeddning = my_model[1]
+
+#creates a model using flux 
+#Chain(
+#   Embedding(35 => 30),                  # 1_050 parameters
+#   var"#19#21"(),
+#   Dense(30 => 35; bias=false),          # 1_050 parameters
+#   var"#20#22"(),
+# ) 
+# used like this my_model([3, 5, 6]) -> output softmax distribution over all words (wordcount x 1 Matrix)  
+my_model = create_model(30, vocab)
+
+#trains the model with with teh sequences from "create_vocab_and_index_text" returns trained model
+my_model = train_model(3, my_model, 1, sequence)
+
+
+#Proof traing works:
+quick_index = findfirst(x-> x=="quick", vocab)  #16
+the_index = findfirst(x-> x=="the", vocab)      #25
+brown_index = findfirst(x-> x=="brown", vocab)  #30
+
+embedding_dim = 10
+model = create_model(embedding_dim, vocab)
+
+
+output_the_brown = model([the_index, brown_index])
+println("output before training for quick:   ", output_the_brown[quick_index])
+
+epochs = 10
+window_size = 1
+model = my_model = train_model(epochs, my_model, window_size, sequence)
+
+
+output_the_brown = model([the_index, brown_index])
+println("output After training for quick:   ", output_the_brown[quick_index])
+
+
+#after training we get a 99.99% chance that the word between the and brown is quick The quick brown fox
