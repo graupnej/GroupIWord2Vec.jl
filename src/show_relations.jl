@@ -68,7 +68,7 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
 
 
     # old version: labels = text.([word for word in words], :bottom)    
-    labels = text.(words, :bottom)
+    labels = text.(words, :bottom)[:] 
 
     
     # reduce dimension
