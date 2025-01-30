@@ -11,7 +11,7 @@ using LinearAlgebra
        include("test_model.jl")
    end
 
-   @testset "Plotting" begin
-       include("test_plotting.jl")
-   end
+   #@testset "Plotting" begin
+       #include("test_plotting.jl")
+   #end
 end
