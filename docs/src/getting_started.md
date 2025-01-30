@@ -124,7 +124,7 @@ As an alternative (larger) example use a text corpus from e.g. [FastText](https:
 
 In this example first word embedding vectors are created by loading the text8 text corpus into a model and training it:
 ```@example
-using GroupIWord2Vec #hide
+using GroupIWord2Vec # hide
 train_model("text8", "text8.txt", verbose = true)
 model = load_embeddings("./text8.txt")
 ```
