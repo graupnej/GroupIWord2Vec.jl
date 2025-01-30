@@ -43,6 +43,11 @@ word = get_vec2word(wv, some_vector)
 ```
 """
 function get_vec2word(wv::WordEmbedding, vec::Vector{Float64})
+    # Check if normalization is needed
+    if !(norm(vec) ≈ 1.0)
+        vec = vec / norm(vec)
+    end
+
     # Computes cosine similarity score between all embedding vectors and input vector
     similarities = wv.embeddings' * vec
     # Finds embedding vecotr with highest score, saves its index and returns word for corresponding index
