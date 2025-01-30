@@ -9,4 +9,8 @@ using GroupIWord2Vec
    @testset "Model" begin
        include("test_model.jl")
    end
+
+   @testset "Plotting" begin
+       include("test_plotting.jl")
+   end
 end
