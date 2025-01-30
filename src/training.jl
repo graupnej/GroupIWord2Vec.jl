@@ -3,124 +3,89 @@ using Flux: train!
 using Random
 using OneHotArrays
 using Statistics
+using BenchmarkTools
 
-#load corpus
-    #lower case
-    #clean up
-#->returns text
-function load_corpus(path::String)::Vector
-    full_text = join(readlines(path), "")
-    #remove case sensitivity
-    lowercase_text = lowercase(full_text)
-    #remove "non-words"
-    lowercase_clean_text = replace(lowercase_text, "," => "", ";" => "")    #, "\"" => "", "'" => "")
-    
-    texts = [String(word) for word in split(lowercase_clean_text, ['.', '!', '?'], keepempty=false)]
-    
-    #use set datastructure to create vocabulary
-    #vocabulary = Set(split(lowercase_clean_text, " "; keepempty=true))
-
-    return texts
+function create_vocabulary(path::String)::Dict{String, Int}
+    text = lowercase(join(readlines(path), ""))
+    set = Set(split(text, r"\W+", keepempty=false))
+    vocabulary = Dict(word => i for (i, word) in enumerate(set))
+    return vocabulary
 end
 
-#tokenize 
-#->vocabulary(word::index), text as vector with index eg: [1, 3, 2, 8, 69, 21, 3] (sequences)
-
-function create_vocab_and_index_text(text_lines::Vector)
-    vocabulary = Set([String(word) for word in split(join(text_lines, " "), " "; keepempty=false)])
-    words = [vocabulary...]
-    sequences = [[findfirst(==(String(word)), words) for word in split(line, " ")] for line in text_lines]
+function sequence_text(path::String, vocabulary::Dict{String, Int})
+    text = lowercase(join(readlines(path), ""))
+    words = split(text, r"\W+", keepempty=false)
+    sequence = Vector{Int}()
     
-    return words, sequences
+    for word in words
+        haskey(vocabulary, word) ? sequence = push!(sequence, vocabulary[word]) : error("The word \"$word\" is not in vocabulary. Make sure the vocabulary was created with create_vocabulary(\"path\") or add \"$word\" by hand")
+    end
+
+    return sequence
 end
 
-
-#create model(embedding size, vocabulary)
-#->embedding Matrixlength(words)
-
-function create_model(embedding_dim, words)
-    vocab_size = length(words)
-    embeddings = Flux.Embedding(vocab_size => embedding_dim)
+function create_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
+    
+    embeddings = Flux.Embedding(vocabulary_lenght => embedding_dim)
     lambda = x -> mean(x , dims=2)
-    decode = Dense(embedding_dim => vocab_size, bias=false)
+    decode = Dense(embedding_dim => vocabulary_lenght, bias=false)
     output = x-> softmax(x)
     
     return  Chain(embeddings, lambda, decode, output)
 end
 
-
-function train_model(epochs::Int, model::Chain, window_size::Int, sequences, opt=Descent())
-    word_count = size(model[1].weight)[2]
-    loss(model, input, target) = Flux.Losses.crossentropy(target, model(input))
-
-    @showprogress dt=1 desc="Train embedding" for epoch in 1:epochs
-        
-        data = Vector{Tuple{Vector{Int64}, OneHotVector{UInt32}}}()
-        for sequence in sequences
-            length(sequence)<=2*window_size ? continue : 
-            for i in (1+window_size):(length(sequence)-window_size)
-                context = vcat(sequence[i-window_size:i-1], sequence[i+1:i+window_size])
-                
-                target = onehot(sequence[i], 1:word_count)
-                data = push!(data, (context, target))
-            end
-
-        end
-        
+function train_model(model::Chain, dataset::String, vocabulary::Dict ,epochs::Int, window_size::Int, optimizer=Descent())::Chain
+    #prepare data
+    data = Vector{Tuple{Vector{Int64}, OneHotVector{UInt32}}}()
+    print("\nData gets sequenced. ")
+    sequence = sequence_text(dataset, vocabulary)
+    print("Finished!")
     
-        train!(loss, model, data, opt)            
-
-    
+    length(sequence)<=2*window_size ? error("window_size of $window_size is to big for dataset. Keep in mind that the window size is covering 2*window_size+1, because it is used before AND after the word.") : 
+    vocab_length = length(vocabulary)
+    @showprogress 1 "\n Prepare inputs and targets from sequence" for i in (1+window_size):(length(sequence)-window_size)
+        context = vcat(sequence[i-window_size:i-1], sequence[i+1:i+window_size])
+        target = onehot(sequence[i], 1:vocab_length)
+        data = push!(data, (context, target))
     end
-    return model    
+
+    loss(model, input, target) = Flux.Losses.crossentropy(target, model(input))
+    @showprogress 1 "Training embeddings" for epoch in 1:epochs
+        train!(loss, model, data, optimizer)
+    end  
+
+    return model
 end
 
-####basic examples
+#test
+task = "easy"
 
-#lods the text and returns a cleaned up vec(string) each sentence is a element in vector
-#eg: ["the quick brown fox jumps over " ⋯ 40 bytes ⋯ "ly under a tree in the sunshine",
-#    "the quick brown rabbit hops ove" ⋯ 50 bytes ⋯ "ly under a tree in the sunshine",
-#    "a swift grey rabbit leaps past " ⋯ 40 bytes ⋯ "y beneath the shade of the tree"]
-text = load_corpus("data/example.txt")
+task=="easy" ? data = "data/example.txt" : data = "data/text8"
+vocab = create_vocabulary("$data")
+model = create_model(50, length(vocab))
 
-
-#creates a vocabulary of all words that are contained in the cleaned up text and 
-#transforms the text into a sequence of indeces eg:"The quick brown fox jumps over..." -> [25, 16, 30, 28, 24, 2,...]
-vocab, sequence = create_vocab_and_index_text(text)
-
-#creates a model using flux 
-#Chain(
-#   Embedding(35 => 30),                  # 1_050 parameters
-#   var"#19#21"(),
-#   Dense(30 => 35; bias=false),          # 1_050 parameters
-#   var"#20#22"(),
-# ) 
-# used like this my_model([3, 5, 6]) -> output softmax distribution over all words (wordcount x 1 Matrix)  
-my_model = create_model(30, vocab)
-
-#trains the model with with teh sequences from "create_vocab_and_index_text" returns trained model
-my_model = train_model(3, my_model, 1, sequence)
+new_model = train_model(model, "$data", vocab, 10, 10)
 
 
-#Proof traing works:
-quick_index = findfirst(x-> x=="quick", vocab)  #16
-the_index = findfirst(x-> x=="the", vocab)      #25
-brown_index = findfirst(x-> x=="brown", vocab)  #30
+# #Proof traing works:
+# quick_index = findfirst(x-> x=="quick", vocab)  #16
+# the_index = findfirst(x-> x=="the", vocab)      #25
+# brown_index = findfirst(x-> x=="brown", vocab)  #30
 
-embedding_dim = 10
-model = create_model(embedding_dim, vocab)
-
-
-output_the_brown = model([the_index, brown_index])
-println("output before training for quick:   ", output_the_brown[quick_index])
-
-epochs = 10
-window_size = 1
-model = my_model = train_model(epochs, my_model, window_size, sequence)
+# embedding_dim = 10
+# model = create_model(embedding_dim, vocab)
 
 
-output_the_brown = model([the_index, brown_index])
-println("output After training for quick:   ", output_the_brown[quick_index])
+# output_the_brown = model([the_index, brown_index])
+# println("output before training for quick:   ", output_the_brown[quick_index])
+
+# epochs = 10
+# window_size = 1
+# model = my_model = train_model(epochs, my_model, window_size, sequence)
 
 
-#after training we get a 99.99% chance that the word between the and brown is quick The quick brown fox
+# output_the_brown = model([the_index, brown_index])
+# println("output After training for quick:   ", output_the_brown[quick_index])
+
+
+# #after training we get a 99.99% chance that the word between the and brown is quick The quick brown fox
