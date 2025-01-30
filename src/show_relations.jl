@@ -20,11 +20,10 @@ function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         idx = sortperm(eigen_vals, rev=true)
         pca_components = eigen_vecs[:, idx[1:number_of_pc]]
 
-        # old version: idx = sortperm(eigen_vals, rev=true)
         # old version: eigen_vecs = eigen_vecs[:, idx]
 
         # Select the top "number_of_pc" principal components
-        pca_components = eigen_vecs[:, 1:number_of_pc]
+        # pca_components = eigen_vecs[:, 1:number_of_pc]
 
         # Project the data onto the top 2 principal components
         projected_data = pca_components' * c_data'  
