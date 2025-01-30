@@ -84,38 +84,66 @@ function train_model(train::AbstractString, output::AbstractString;
 end
 
 """
-# WordEmbedding is a structure that holds three related pieces of information
-# 1) A list of all words
-# 2) The corresponding vectors
-# 3) A lookup dictionary
-# to keep words and their vectors organized and linked together
-# It is mutable (can be modified after creation) and works with any string and number types
+    WordEmbedding{S<:AbstractString, T<:Real}
+
+A structure for storing and managing word embeddings, where each word is associated with a vector representation.
+
+# Fields
+- `words::Vector{S}`: List of all words in the vocabulary
+- `embeddings::Matrix{T}`: Matrix where each column is a word's vector representation
+- `word_indices::Dict{S, Int}`: Dictionary mapping words to their positions in the vocabulary
+
+# Type Parameters
+- `S`: Type of strings used (defaults to String)
+- `T`: Type of numbers in the embedding vectors (defaults to Float64)
+
+# Constructor
+    WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
+
+Creates a WordEmbedding with the given vocabulary and corresponding vectors.
+
+# Arguments
+- `words::Vector{S}`: Vector of words in the vocabulary
+- `matrix::Matrix{T}`: Matrix where each column corresponds to one word's vector
+
+# Throws
+- `ArgumentError`: If the number of words doesn't match the number of vectors (matrix columns)
+
+# Example
+```julia
+# Create a simple word embedding with 2D vectors
+words = ["cat", "dog", "house"]
+vectors = [0.5 0.1 0.8;
+          0.2 0.9 0.3]
+embedding = WordEmbedding(words, vectors)
 """
-
-mutable struct WordEmbedding{S<:AbstractString, T<:Real}
-     # List of all words in the vocabulary
+struct WordEmbedding{S<:AbstractString, T<:Real}
+    # List of all words in the vocabulary
+    # Example: ["cat", "dog", "house"]
     words::Vector{S}
-
-     # Matrix containing all word vectors
-     # - Each column represents one word's vector
-     # - If we have 3 words and vectors of length 4 we have a 4×3 matrix
+    
+    # Matrix containing all word vectors
+    # Each column is one word's vector of numbers
+    # Size is (vector_dimension × vocabulary_size)
+    # For 3 words and vectors of length 4 we have a 4×3 matrix
     embeddings::Matrix{T}
-
-     # Dictionary for quick word lookup
-     # Maps each word to its position in the words vector and embeddings matrix
+    
+    # Dictionary for fast word lookup
+    # Maps each word to its position in the words vector and embeddings matrix
+    # Example: "cat" => 1 means first word in vocabulary
     word_indices::Dict{S, Int}
     
-     # It makes sure the data is valid and sets everything up correctly
+    # Makes sure the data is valid and sets everything up correctly
     function WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
-          # Check if the number of words matches the number of vectors (3 words need 3 vectors)
+        # Validate that number of words matches number of vectors
         if length(words) != size(matrix, 2)
             throw(ArgumentError("Number of words ($(length(words))) must match matrix columns ($(size(matrix, 2)))"))
         end
-          
-          # This makes a dictionary where each word points to its position
+        
+        # Create dictionary mapping each word to its position
         indices = Dict(word => idx for (idx, word) in enumerate(words))
-
-          # Create the new WordEmbedding with all its parts
+        
+        # Create new WordEmbedding
         new{S,T}(words, matrix, indices)
     end
 end
