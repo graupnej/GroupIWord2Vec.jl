@@ -6,7 +6,7 @@ It returns the projected data.
 """
 function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Center the data
-        num = size(data, 1)
+        # num = size(data, 1)
 
         c_data = data .- mean(data, dims=1)
 
@@ -16,11 +16,11 @@ function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Perform eigen decomposition
         eigen_vals, eigen_vecs = eigen(Symmetric(cov_matrix))
         
-        # Sort eigenvalues (and corresponding eigenvectors) in descending order and elect the top "number_of_pc" principal components
+        # Sort eigenvalues (and corresponding eigenvectors) in descending order and select the top "number_of_pc" principal components
         idx = sortperm(eigen_vals, rev=true)
         pca_components = eigen_vecs[:, idx[1:number_of_pc]]
 
-        # Project the data onto the top 2 principal components
+        # Project the data onto the top principal components
         projected_data = pca_components' * c_data'  
         
         return Matrix{Float64}(projected_data)
