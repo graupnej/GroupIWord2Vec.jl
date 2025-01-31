@@ -239,10 +239,12 @@ end
 
     @testset "exclusion of input words" begin
         result = get_word_analogy(wv, "king", "man", "woman", 3)
+
+        # Ensure excluded words are not in the result
         exclude_set = Set(["king", "man", "woman"])
-        
-        # Ensure that excluded words appear at most once (handling edge cases where n > valid candidates)
-        @test count(word -> word in exclude_set, result) == 0
+        filtered_result = filter(word -> word ∉ exclude_set, result)  # Manually filter to compare
+
+        @test result == filtered_result  # Check if function already filters properly
     end
 
     @testset "error cases" begin
