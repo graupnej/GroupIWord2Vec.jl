@@ -39,3 +39,56 @@ using GroupIWord2Vec
         @test eltype(wv_substr.words) <: AbstractString
     end
 end
+
+using Test
+
+@testset "load_embeddings" begin
+    words = ["apple", "banana", "cherry"]
+    embeddings = [0.1 0.2 0.3;
+                  0.4 0.5 0.6;
+                  0.7 0.8 0.9]
+
+    function normalize(v) v ./ norm(v) end
+    normalized_embeddings = hcat([normalize(embeddings[:, i]) for i in 1:3]...)
+
+    mktemp() do path, io
+        write(io, "3 3\n" * join([words[i] * " " * join(embeddings[:, i], " ") for i in 1:3], "\n") * "\n")
+        close(io)
+
+        wv = load_embeddings(path, format=:text, normalize_vectors=false)
+        @test wv.words == words
+        @test wv.embeddings ≈ embeddings
+        @test load_embeddings(path, format=:text, normalize_vectors=true).embeddings ≈ normalized_embeddings
+    end
+
+    mktemp() do path, io
+        write(io, "3 3\n")
+        for i in 1:3
+            write(io, words[i] * " ")
+            write(io, reinterpret(UInt8, Float32.(embeddings[:, i])))
+            write(io, "\n")
+        end
+        close(io)
+
+        wv = load_embeddings(path, format=:binary, data_type=Float32, normalize_vectors=false, skip_bytes=1)
+        @test wv.words == words
+        @test wv.embeddings ≈ embeddings
+        @test load_embeddings(path, format=:binary, data_type=Float32, normalize_vectors=true, skip_bytes=1).embeddings ≈ normalized_embeddings
+    end
+
+    mktemp() do path, io
+        write(io, "3 3\n" * join([words[i] * " " * join(embeddings[:, i], " ") for i in 1:3], "\n") * "\n")
+        close(io)
+
+        @test eltype(load_embeddings(path, format=:text, data_type=Float64).embeddings) == Float64
+        @test eltype(load_embeddings(path, format=:text, data_type=Float32).embeddings) == Float32
+    end
+
+    @test_throws ArgumentError load_embeddings("fake_path", format=:csv)
+    @test_throws SystemError load_embeddings("non_existent_file.txt", format=:text)
+
+    mktemp() do path, io
+        close(io)
+        @test_throws ArgumentError load_embeddings(path, format=:text)
+    end
+end
