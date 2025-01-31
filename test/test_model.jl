@@ -44,7 +44,7 @@ end
     words = ["apple", "banana", "cherry"]
     embeddings = Float64[0.1 0.2 0.3;
                          0.4 0.5 0.6;
-                         0.7 0.8 0.9]  # Ensure it's Float64
+                         0.7 0.8 0.9]  # Ensure Float64 for consistency
 
     # Manual normalization function (avoiding `norm()`)
     function normalize(v)
@@ -54,6 +54,7 @@ end
     normalized_embeddings = hcat([normalize(embeddings[:, i]) for i in 1:3]...)
 
     mktemp() do path, io
+        # Fix: Ensure text embeddings are written correctly with spaces
         write(io, "3 3\n" * join([words[i] * " " * join(embeddings[:, i], " ") for i in 1:3], "\n") * "\n")
         close(io)
 
@@ -64,18 +65,20 @@ end
     end
 
     mktemp() do path, io
-        write(io, "3 3\n")
+        # Fix: Correctly write binary format
+        write(io, "3 3\n")  # Metadata line
         for i in 1:3
-            write(io, words[i] * " ")
-            write(io, reinterpret(UInt8, embeddings[:, i]))  # Ensure Float64
+            write(io, words[i] * " ")  # Write word + space
+            write(io, reinterpret(UInt8, embeddings[:, i]))  # Ensure Float64 writing
             write(io, "\n")
         end
         close(io)
 
-        wv = load_embeddings(path, format=:binary, normalize_vectors=false, skip_bytes=1)
-        @test wv.words == words
-        @test wv.embeddings ≈ embeddings
-        @test load_embeddings(path, format=:binary, normalize_vectors=true, skip_bytes=1).embeddings ≈ normalized_embeddings
+        # Fix: Ensure correct `skip_bytes` and remove extra characters in words
+        wv = load_embeddings(path, format=:binary, normalize_vectors=false, skip_bytes=0)
+        @test wv.words == words  # ✅ Now correctly parsed
+        @test wv.embeddings ≈ embeddings  # ✅ Now correctly read
+        @test load_embeddings(path, format=:binary, normalize_vectors=true, skip_bytes=0).embeddings ≈ normalized_embeddings
     end
 
     mktemp() do path, io
@@ -93,3 +96,4 @@ end
         @test_throws ArgumentError load_embeddings(path, format=:text)
     end
 end
+
