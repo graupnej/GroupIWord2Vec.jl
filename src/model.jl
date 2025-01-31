@@ -84,27 +84,19 @@ function train_model(train::AbstractString, output::AbstractString;
 end
 
 """
-    WordEmbedding{S<:AbstractString, T<:Real}
+    WordEmbedding
 
 A structure for storing and managing word embeddings, where each word is associated with a vector representation.
 
 # Fields
-- `words::Vector{S}`: List of all words in the vocabulary
-- `embeddings::Matrix{T}`: Matrix where each column is a word's vector representation
-- `word_indices::Dict{S, Int}`: Dictionary mapping words to their positions in the vocabulary
-
-# Type Parameters
-- `S`: Type of strings used (defaults to String)
-- `T`: Type of numbers in the embedding vectors (defaults to Float64)
+- `words::Vector{String}`: List of all words in the vocabulary
+- `embeddings::Matrix{Float64}`: Matrix where each column is a word's vector representation
+- `word_indices::Dict{String, Int}`: Dictionary mapping words to their positions in the vocabulary
 
 # Constructor
-    WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
+    WordEmbedding(words::Vector{String}, matrix::Matrix{Float64})
 
 Creates a WordEmbedding with the given vocabulary and corresponding vectors.
-
-# Arguments
-- `words::Vector{S}`: Vector of words in the vocabulary
-- `matrix::Matrix{T}`: Matrix where each column corresponds to one word's vector
 
 # Throws
 - `ArgumentError`: If the number of words doesn't match the number of vectors (matrix columns)
@@ -118,22 +110,17 @@ vectors = [0.5 0.1 0.8;
 embedding = WordEmbedding(words, vectors)
 """
 struct WordEmbedding
-    # List of all words in the vocabulary
-    # Example: ["cat", "dog", "house"]
+    # List of all words in the vocabulary. e.g. ["cat", "dog", "house"]
     words::Vector{String}
     
-    # Matrix containing all word vectors
-    # Each column is one word's vector of numbers
-    # Size is (vector_dimension × vocabulary_size)
-    # For 3 words and vectors of length 4 we have a 4×3 matrix
+    # Matrix containing all word vectors where each column is one word's vector of numbers
+    # Size is (vector_dimension × vocabulary_size). For e.g. 3 words and vectors of length 4 we get a 4×3 matrix
     embeddings::Matrix{Float64}
     
-    # Dictionary for fast word lookup
-    # Maps each word to its position in the words vector and embeddings matrix
-    # Example: "cat" => 1 means first word in vocabulary
+    # Dictionary for fast word lookup. Maps each word to its position in the words vector and embeddings matrix
     word_indices::Dict{String, Int}
     
-    # Makes sure the data is valid and sets everything up correctly
+    # Makes sure the data is valid
     function WordEmbedding(words::Vector{String}, matrix::Matrix{Float64})
         # Validate that number of words matches number of vectors
         if length(words) != size(matrix, 2)
@@ -145,31 +132,29 @@ struct WordEmbedding
 end
 
 """
-    load_embeddings(path::AbstractString; format::Union{:text, :binary}=:text, 
-                    data_type::Type{T}=Float64, normalize_vectors::Bool=true, 
-                    separator::Char=' ', skip_bytes::Int=0) -> WordEmbedding
+    load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
 
 Loads word embeddings from a text or binary file.
 
 # Arguments
-- `path::AbstractString`: Path to the embedding file.
-- `format::Union{:text, :binary}=:text`: File format (`:text` or `:binary`).
-- `data_type::Type{T}=Float64`: Type of word vectors (`Float32`, `Float64`, etc.).
-- `normalize_vectors::Bool=true`: Normalize vectors to unit length.
-- `separator::Char=' '`: Word-vector separator in text files.
-- `skip_bytes::Int=0`: Bytes to skip after each word-vector pair in binary files.
+- `path::String`: Path to the embedding file
+- `format::Union{:text, :binary}=:text`: File format (`:text` or `:binary`)
+- `data_type::Type{Float64}=Float64`: Type of word vectors
+- `normalize_vectors::Bool=true`: Normalize vectors to unit length
+- `separator::Char=' '`: Word-vector separator in text files
+- `skip_bytes::Int=0`: Bytes to skip after each word-vector pair in binary files
 
 # Throws
-- `ArgumentError`: If `format` is not `:text` or `:binary`.
+- `ArgumentError`: If `format` is not `:text` or `:binary`
 
 # Returns
-- `WordEmbedding{S, T}`: The loaded word embeddings.
+- `WordEmbedding`: The loaded word embeddings structure
 
 # Example
 
 ```julia
 embedding = load_embeddings("vectors.txt")  # Load text format
-embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float32, skip_bytes=1)  # Load binary format
+embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float64, skip_bytes=1)  # Load binary format
 """
 function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
      # For a text file use the read_text_format function
