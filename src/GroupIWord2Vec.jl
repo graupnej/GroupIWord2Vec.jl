@@ -37,7 +37,6 @@ using Plots                 # For visualization functions
 using Flux 
 using ProgressMeter
 using Flux: train!
-using Random
 using OneHotArrays
 using Statistics
 import Word2Vec_jll         # Links to the underlying Word2Vec implementation (C code)
