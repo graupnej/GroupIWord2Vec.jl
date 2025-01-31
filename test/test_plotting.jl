@@ -68,7 +68,7 @@ end
     end
 
     @testset "basic plot generation" begin
-        p = show_relations("king", "queen", "man", "woman"; wv=wv, save_path=nothing)
+        p = show_relations("king", "queen", "man", "woman"; wv=wv, save_path="")
         @test isa(p, Plots.Plot)  # Ensure it returns a plot
     end
 
