@@ -1,6 +1,7 @@
-using Flux, ProgressMeter
+using Flux
+using ProgressMeter
 using Flux: train!
-using Random
+#using Random
 using OneHotArrays
 using Statistics
 

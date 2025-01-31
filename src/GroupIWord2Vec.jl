@@ -27,18 +27,19 @@ This is the main module file that organizes all the word embedding functionality
 include("model.jl")
 include("functions.jl")
 include("show_relations.jl")
+include("training.jl")
 
 # Importing modules from Julia's standard libraries
 using LinearAlgebra         # Provides functions for vector/matrix operations (e.g. multiplication and normalization)
 using DelimitedFiles        # Helps read/write files with separators (like binary files)
 using Statistics            # For basic statistical operations (mean, std, var, etc.)
 using Plots                 # For visualization functions
-using Flux, ProgressMeter
+using Flux 
+using ProgressMeter
 using Flux: train!
 using Random
 using OneHotArrays
 using Statistics
-using BenchmarkTools
 import Word2Vec_jll         # Links to the underlying Word2Vec implementation (C code)
 
 # Make these functions and types available to anyone using this module. Other programs can use these functions after importing GroupIWord2Vec
