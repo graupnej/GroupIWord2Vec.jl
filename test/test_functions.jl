@@ -206,26 +206,22 @@ end
     wv = WordEmbedding(words, embeddings)
 
     @testset "basic functionality" begin
-        # Test return type
         similar_words = get_similar_words(wv, "cat", 3)
         @test similar_words isa Vector{String}
         @test length(similar_words) == 3
     end
 
     @testset "top-n similarity results" begin
-        # Test that "dog" is most similar to "cat"
         similar_to_cat = get_similar_words(wv, "cat", 2)
-        @test similar_to_cat[1] == "dog"  # Should return "dog" as most similar
-        @test "cat" ∉ similar_to_cat  # Should not return itself
+        @test similar_to_cat[1] == "dog"  # "dog" should be most similar to "cat"
+        @test "cat" ∉ similar_to_cat  # "cat" should not appear in its own results
 
-        # Test that "bird" is more similar to "dog" than "fish"
         similar_to_dog = get_similar_words(wv, "dog", 3)
-        @test similar_to_dog[1] == "cat"
-        @test "fish" ∉ similar_to_dog  # "fish" is too different
+        @test similar_to_dog[1] == "cat"  # "cat" should be most similar to "dog"
+        @test "dog" ∉ similar_to_dog  # "dog" should not appear in its own results
     end
 
     @testset "custom vectors" begin
-        # Use a manual vector to check similarity
         vec = [1.0, 0.8, 0.6]  # Close to "cat"
         similar_to_vec = get_similar_words(wv, vec, 2)
         @test similar_to_vec[1] == "cat"
@@ -233,8 +229,8 @@ end
     end
 
     @testset "edge cases" begin
-        # Requesting more words than available
-        @test length(get_similar_words(wv, "cat", 10)) == 3  # Should return max possible
+        # Requesting more words than available (excluding query word)
+        @test length(get_similar_words(wv, "cat", 10)) == 3  # Should return max possible excluding "cat"
         
         # Requesting 0 words should return an empty list
         @test get_similar_words(wv, "cat", 0) == []
