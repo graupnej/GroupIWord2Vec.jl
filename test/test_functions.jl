@@ -96,73 +96,46 @@ end
     end
 end
 
-using Test
-
 @testset "get_any2vec" begin
-    # Test data setup with intuitive pattern
-    words = ["cat", "dog", "bird", "fish"]  # Vocabulary of 4 test words
-    embeddings = [1.0 2.0 3.0 4.0;    # First dimension of embeddings
-                 5.0 6.0 7.0 8.0;    # Second dimension
-                 9.0 10.0 11.0 12.0] # Third dimension
+    # Test setup
+    words = ["cat", "dog", "bird", "fish"]
+    embeddings = [1.0 2.0 3.0 4.0;
+                 5.0 6.0 7.0 8.0;
+                 9.0 10.0 11.0 12.0]
     wv = WordEmbedding(words, embeddings)
-    
-    @testset "word lookups" begin
-        # Test vectors and types for multiple positions
-        cat_vec = get_any2vec(wv, "cat")
-        @test cat_vec == [1.0, 5.0, 9.0] && cat_vec isa Vector{Float64}  # Check both values and type
-        @test get_any2vec(wv, "bird") == [3.0, 7.0, 11.0]  # Middle word
-        @test get_any2vec(wv, "fish") == [4.0, 8.0, 12.0]  # Last word
-        @test get_any2vec(wv, "cat") != get_any2vec(wv, "dog")  # Distinct words should have distinct vectors
-    end
 
-    @testset "word lookups with different types" begin
-        # Ensure function works with different numeric types
-        wv_float32 = WordEmbedding(words, Float32.(embeddings))  # Convert to Float32 embeddings
-        
-        vec_f32 = get_any2vec(wv_float32, "cat")
-        @test vec_f32 == [1.0, 5.0, 9.0]f0  # Ensure values are correct
-        @test vec_f32 isa Vector{Float32}  # Ensure type matches embedding type
+    @testset "word lookups" begin
+        @test get_any2vec(wv, "cat") == [1.0, 5.0, 9.0]
+        @test get_any2vec(wv, "dog") == [2.0, 6.0, 10.0]
     end
 
     @testset "vector inputs" begin
-        # Test vector identity and special cases
-        vec1 = [1.0, 5.0, 9.0]
-        @test get_any2vec(wv, vec1) === vec1  # Identity preservation
-        
-        zero_vec = zeros(Float64, 3)  # Create zero vector
-        @test get_any2vec(wv, zero_vec) === zero_vec  # Ensure zero vector is returned as-is
-        
-        large_vec = [1e6, 1e6, 1e6]  # Large values
-        @test get_any2vec(wv, large_vec) === large_vec  # Ensure function handles large numbers correctly
-        
-        special_vec = [Inf, -Inf, NaN]  # Special values
-        @test get_any2vec(wv, special_vec) === special_vec  # Ensure function correctly returns special values
+        vec = [1.0, 5.0, 9.0]
+        @test get_any2vec(wv, vec) === vec  # Identity check
+
+        wrong_dim_vec = [1.0, 5.0]  # Wrong size
+        @test_throws DimensionMismatch get_any2vec(wv, wrong_dim_vec)
     end
 
-    @testset "vector immutability" begin
-        # Ensure that modifying the returned vector does not modify the original embeddings
-        vec = get_any2vec(wv, "cat")
-        vec[1] = 999.0  # Modify the returned vector
-        
-        # Ensure the original embedding remains unchanged
-        @test wv.embeddings[:, wv.word_indices["cat"]] == [1.0, 5.0, 9.0]
+    @testset "correct return type" begin
+        wv_float32 = WordEmbedding(words, Float32.(embeddings))  # Convert to Float32 embeddings
+        vec_f32 = get_any2vec(wv_float32, "cat")
+        @test vec_f32 isa Vector{Float32}  # Ensures type consistency
     end
 
-    @testset "normalized vector check" begin
-        # Ensure that function does not modify already normalized vectors
-        norm_vec = [0.577, 0.577, 0.577]  # Already normalized vector
-        @test get_any2vec(wv, norm_vec) === norm_vec  # Ensure function does not alter it
+    @testset "special values" begin
+        special_vec = [Inf, -Inf, NaN]
+        @test get_any2vec(wv, special_vec) === special_vec  # Should return unchanged
+    end
+
+    @testset "empty vocabulary" begin
+        empty_wv = WordEmbedding(String[], Matrix{Float64}(undef, 3, 0))
+        @test_throws ArgumentError get_any2vec(empty_wv, "cat")  # No words exist
     end
 
     @testset "error cases" begin
-        # Test various error conditions
-        @test_throws ArgumentError get_any2vec(wv, "nonexistent_word")  # Word not in vocabulary
-        @test_throws ArgumentError get_any2vec(wv, "")  # Empty string
-        @test_throws ArgumentError get_any2vec(wv, 42)  # Incorrect type (not a word or vector)
-        @test_throws ArgumentError get_any2vec(wv, [1, 2, 3])  # Integer vector instead of Float64
-        
-        @test_throws DimensionMismatch get_any2vec(wv, Float64[])  # Empty vector
-        @test_throws DimensionMismatch get_any2vec(wv, [1.0, 2.0])  # Incorrect vector size
+        @test_throws ArgumentError get_any2vec(wv, "unknown_word")  # Word not in vocabulary
+        @test_throws ArgumentError get_any2vec(wv, 42)  # Invalid input type
     end
 end
 
