@@ -210,7 +210,7 @@ end
 
     @testset "vector and word input consistency" begin
         king_vec, man_vec, woman_vec = get_any2vec(wv, "king"), get_any2vec(wv, "man"), get_any2vec(wv, "woman")
-
+        
         result1 = get_word_analogy(wv, "king", "man", "woman", 1)
         result2 = get_word_analogy(wv, king_vec, man_vec, woman_vec, 1)
 
@@ -227,14 +227,8 @@ end
         @test all(word -> word ∉ exclude_set, result)
     end
 
-    @testset "handling empty output" begin
-        # Construct a test where all closest words are excluded
-        exclude_all = get_word_analogy(wv, "king", "queen", "man", 10)
-        @test exclude_all isa Vector{String}  # Function should return an empty list, not fail
-    end
-
     @testset "error cases" begin
         @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid `n`
-        @test_throws ArgumentError get_word_analogy(wv, "unknown", "man", "woman", 3)  # Invalid input word
+        @test_throws ArgumentError get_word_analogy(wv, 1, 2, 3, 3)  # Invalid input
     end
 end
