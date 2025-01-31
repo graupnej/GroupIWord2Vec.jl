@@ -1,3 +1,6 @@
+# Main file containing all the available tests
+# User can also only run specific tests
+
 using Test
 using GroupIWord2Vec
 
