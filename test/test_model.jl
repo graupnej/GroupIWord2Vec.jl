@@ -40,15 +40,17 @@ using GroupIWord2Vec
     end
 end
 
-using Test
-
 @testset "load_embeddings" begin
     words = ["apple", "banana", "cherry"]
     embeddings = [0.1 0.2 0.3;
                   0.4 0.5 0.6;
                   0.7 0.8 0.9]
 
-    function normalize(v) v ./ norm(v) end
+    # Manual normalization function (avoiding `norm()`)
+    function normalize(v)
+        magnitude = sqrt(sum(v .^ 2))  # Compute vector magnitude
+        return magnitude > 0 ? v ./ magnitude : v  # Avoid division by zero
+    end
     normalized_embeddings = hcat([normalize(embeddings[:, i]) for i in 1:3]...)
 
     mktemp() do path, io
