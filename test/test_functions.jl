@@ -188,7 +188,6 @@ end
         @test_throws ArgumentError get_similar_words(wv, "Banana", 3)
     end
 end
-using Test
 
 @testset "get_word_analogy" begin
     # Test data setup
@@ -203,34 +202,39 @@ using Test
 
     @testset "basic functionality" begin
         result = get_word_analogy(wv, "king", "man", "woman", 1)
-        @test result isa Vector{String}
-        @test length(result) ≥ 0  # Ensure it returns an array (possibly empty)
+
+        @test result isa Vector{String}  # Ensure correct return type
+        @test length(result) ≥ 0  # Avoid indexing errors
     end
 
     @testset "vector and word input consistency" begin
         king_vec, man_vec, woman_vec = get_any2vec(wv, "king"), get_any2vec(wv, "man"), get_any2vec(wv, "woman")
+
         result1 = get_word_analogy(wv, "king", "man", "woman", 1)
         result2 = get_word_analogy(wv, king_vec, man_vec, woman_vec, 1)
-        @test result1 == result2
+
+        @test result1 == result2  # Ensuring word vs vector inputs behave the same
     end
 
     @testset "exclusion of input words" begin
         result = get_word_analogy(wv, "king", "man", "woman", 3)
 
-        # Ensure it is a valid array
-        @test result isa Vector{String}
-        @test length(result) ≤ 3  # Ensure the function returns at most n words
+        @test result isa Vector{String}  # Ensure it's a valid array
+        @test length(result) ≤ 3  # Should return at most `n` words
 
-        # Exclude input words from result
+        # Check exclusion
         exclude_set = Set(["king", "man", "woman"])
-        filtered_result = filter(word -> word ∉ exclude_set, result)
+        @test all(word -> word ∉ exclude_set, result)
+    end
 
-        # Check if function already filters properly
-        @test result == filtered_result
+    @testset "handling empty output" begin
+        # Construct a test where all closest words are excluded
+        exclude_all = get_word_analogy(wv, "king", "queen", "man", 10)
+        @test exclude_all isa Vector{String}  # Function should return an empty list, not fail
     end
 
     @testset "error cases" begin
-        @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid n
+        @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid `n`
         @test_throws ArgumentError get_word_analogy(wv, "unknown", "man", "woman", 3)  # Invalid input word
     end
 end
