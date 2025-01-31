@@ -168,13 +168,8 @@ end
 end
 
 @testset "get_similar_words" begin
-    # Test data setup
     words = ["apple", "banana", "cherry", "date", "elderberry"]
-    embeddings = Float64[
-        1.0  2.0  3.0  4.0  5.0;
-        2.0  3.0  4.0  5.0  6.0;
-        3.0  4.0  5.0  6.0  7.0
-    ]  # 3D vectors for each word
+    embeddings = Float64[1.0  2.0  3.0  4.0  5.0; 2.0  3.0  4.0  5.0  6.0;3.0  4.0  5.0  6.0  7.0]
 
     wv = WordEmbedding(words, embeddings)
 
@@ -210,7 +205,6 @@ end
     end
 
     @testset "error cases" begin
-        # Unknown word should throw an error
         @test_throws ArgumentError get_similar_words(wv, "mango", 3)
         
         # Empty string or whitespace should throw an error
@@ -245,7 +239,10 @@ end
 
     @testset "exclusion of input words" begin
         result = get_word_analogy(wv, "king", "man", "woman", 3)
-        @test "king" ∉ result && "man" ∉ result && "woman" ∉ result
+        exclude_set = Set(["king", "man", "woman"])
+        
+        # Ensure that excluded words appear at most once (handling edge cases where n > valid candidates)
+        @test count(word -> word in exclude_set, result) == 0
     end
 
     @testset "error cases" begin
