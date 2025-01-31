@@ -28,36 +28,49 @@ function get_word2vec(wv::WordEmbedding, word::String)
     return Vector(wv.embeddings[:, idx])
 end
 
-
 """
-    get_vec2word(wv::WordEmbedding, vec::Vector{Float64}) -> String
+    get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real}
 
-Retrieves the closest word in the embedding space to a given vector.
+Retrieves the closest word in the embedding space to a given vector based on cosine similarity.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `vec::Vector{Float64}`: The embedding vector.
+- `wv::WordEmbedding{S, T}`: A word embedding structure with words and their corresponding vector representations.
+- `vec::Vector{T}`: A vector representation of a word.
 
 # Returns
-- `String`: The word closest to the given vector.
+- `S`: The word from the vocabulary closest to the given vector
+
+# Throws
+- `DimensionMismatch`: If the input vector's dimension does not match the word vector dimensions.
 
 # Example
 ```julia
-word = get_vec2word(wv, some_vector)
-```
+words = ["cat", "dog"]
+vectors = [0.5 0.1;
+          0.2 0.9]
+embedding = WordEmbedding(words, vectors)
+
+get_vec2word(embedding, [0.51, 0.19])  # Returns "cat"
+
 """
-function get_vec2word(wv::WordEmbedding, vec::Vector{Float64})
-    # Check if normalization is needed
-    if !(norm(vec) ≈ 1.0)
-        vec = vec / norm(vec)
+function get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real}
+    # Ensure input vector has correct dimension
+    if length(vec) != size(wv.embeddings, 1)
+        throw(DimensionMismatch("Input vector must have the same dimension as word vectors. Expected $(size(wv.embeddings, 1)), got $(length(vec))."))
     end
 
-    # Computes cosine similarity score between all embedding vectors and input vector
+    # Normalize the input vector
+    vec = vec / norm(vec)
+
+    # Compute cosine similarity with all word embeddings
     similarities = wv.embeddings' * vec
-    # Finds embedding vecotr with highest score, saves its index and returns word for corresponding index
+
+    # Get the index of the highest similarity
     idx = argmax(similarities)
+
     return wv.words[idx]
 end
+
 
 """
     get_any2vec(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}) -> Vector{Float64}
