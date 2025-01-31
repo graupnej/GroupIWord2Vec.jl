@@ -5,7 +5,6 @@ using OneHotArrays
 using Statistics
 using BenchmarkTools
 
-
 """
     create_vocabulary(path::String)::Dict{String, Int}
 
@@ -14,15 +13,12 @@ Creates a vocabulary from a textfile with all occuring words.
 # Arguments
 - `path::String`: Path to the textfile as string
 
-# Throws
-- `ArgumentError`: If the word is not found in the embedding model.
-
 # Returns
 - `Dict{String, Int}`: A dictionary with the words and coresponding indices
 
 # Example
 ```julia
-vocabulary = create_vocabulary("data/mydataset.txt")
+my_vocabulary = create_vocabulary("data/mydataset.txt")
 ```
 """
 function create_vocabulary(path::String)::Dict{String, Int}
@@ -35,21 +31,18 @@ end
 """
     sequence_text(path::String, vocabulary::Dict{String, Int})::Vector{Int64}
 
-Transforms a text to a vector of indices that match with the words in the vocabulary.
+Transforms a text to a vector of indices that match the words in the vocabulary.
 
 # Arguments
 - `path::String`: Path to the textfile as string
-- `vocabulary::Dict{String, Int}`: Path to the textfile as string
-
-# Throws
-- `ArgumentError`: If the word is not found in the embedding model.
+- `vocabulary::Dict{String, Int}`: Vocabulary as a look up table
 
 # Returns
-- `Dict{String, Int}`: A dictionary with the words and coresponding indices
+- `Vector{Int64}`: A vector of Integers that contains the text in index form eg: [1, 5, 23, 99, 69, ...]
 
 # Example
 ```julia
-vocabulary = create_vocabulary("data/mydataset.txt")
+sequence = sequence_text("data/mydataset.txt", my_vocabulary)
 ```
 """
 function sequence_text(path::String, vocabulary::Dict{String, Int})::Vector{Int64}
@@ -64,6 +57,27 @@ function sequence_text(path::String, vocabulary::Dict{String, Int})::Vector{Int6
     return sequence
 end
 
+
+"""
+    create_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
+
+Creates a Flux model for CBOW.
+
+# Arguments
+- `embedding_dim::Int`: The wanted dimensionality of the embedding. 10-300 is recommended depending on the complexity and resources.
+- `vocabulary_lenght::Int`: Number of words in the vocabulary
+
+# Returns
+- `Chain`: A Flux chain with softmax output
+
+# Notes
+- Chain can be used like this my model([2, 5, 18 12]) -> returns prediction of word with the context [2, 5, 18 12] as Softmax probability.  
+
+# Example
+```julia
+my_model = create_model(50, length(my_vocabulary)) 
+```
+"""
 function create_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
     
     embeddings = Flux.Embedding(vocabulary_lenght => embedding_dim)
@@ -74,7 +88,34 @@ function create_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
     return  Chain(embeddings, lambda, decode, output)
 end
 
-function train_model(model::Chain, dataset::String, vocabulary::Dict ,epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
+
+"""
+    train_model(model::Chain, dataset::String, vocabulary::Dict ,epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
+
+Trains a model on a given dataset. 
+
+# Arguments
+- `model::Chain`: The Flux chain from create_model.
+- `dataset::String`: Path to the dataset. 
+- `vocabulary::Dict`: The vocabulary from create_vocabulary()
+- `epochs::Int`: Number of desired epochs.
+- `window_size::Int`: Window size for the context window. The total window is 2*window size because preceding and following words are used as context.  
+- `optimizer=Descent()`: Optimizer from Flux used for training 
+- `batchsize=10`: Number of words trained per epoch. If batchsize = 0 all words in dataset get used once per epoch.
+
+
+# Returns
+- `Chain`: The updated Flux Chain after training.
+
+# Notes
+- Number of words Trained = epchs*batchsize.
+
+# Example
+```julia
+my_updated_model = train_model(my_model, "data/my_dataset.txt", my_vocabulary, 10, 1)
+```
+"""
+function train_model(model::Chain, dataset::String, vocabulary::Dict{String, Int}, epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
     #prepare data
     data = Vector{Tuple{Vector{Int64}, OneHotVector{UInt32}}}()
     
@@ -112,22 +153,61 @@ function train_model(model::Chain, dataset::String, vocabulary::Dict ,epochs::In
     return model
 end
 
+"""
+    save_custom_model(model::Chain, vocabulary::Dict{String, Int}, path::String)
+
+Saves the model as a txt in the format for `load_embeddings()`.
+
+# Arguments
+- `model::Chain`: The Flux chain from create_model.
+- `vocabulary::Dict`: The vocabulary from create_vocabulary()
+- `path::String`: Path to the file for saving. 
+
+# Notes
+- Make sure to choose a file with a .txt ending if you plan to use it with `load_embeddings()`. 
+ 
+# Example
+```julia
+save_custom_model(my_model, my_vocabulary, "data/saved_embedd.txt")
+```
+"""
+function save_custom_model(model::Chain, vocabulary::Dict{String, Int}, path::String) 
+    open(path, "w") do f
+        write(f, "$(length(vocabulary)) $(size(model[1].weight)[1])\n")
+    end
+
+    f = open(path, "a")
+    words = [k for (k, v) in sort(collect(vocab), by=x -> x[2])]   
+    for (i, word) in enumerate(words)
+        write(f, "$word $(join(model[1].weight[:,i], " "))\n")
+    end
+    close(f)
+
+end
+
+# save_custom_model(model, vocab, "data/saved_embedd.txt")
+
+# #test
+# task = "hard"
+
+# task=="easy" ? data = "data/example.txt" : data = "data/text8"
+# vocab = create_vocabulary(data)
+# collect(vocab)[1']
+# model = create_model(10, length(vocab))
+
+# model[1].weight[:,1]
+
+# data
+# new_model = train_model(model, data, vocab, 10, 1, batchsize=10)
+# typeof(sequence_text("data/example.txt", vocab))
 
 
-#test
-task = "easy"
+# collect(vocab)
 
-task=="easy" ? data = "data/example.txt" : data = "data/text8"
-vocab = create_vocabulary(data)
-model = create_model(10, length(vocab))
-data
-new_model = train_model(model, data, vocab, 10, 1, batchsize=10)
-typeof(sequence_text("data/example.txt", vocab))
-
-vocab["the"]
-vocab["brown"]
-vocab["quick"]
-new_model([25, 30])[16]
+# vocab["the"]
+# vocab["brown"]
+# vocab["quick"]
+# new_model([25, 30])[16]
 
 # #Proof traing works:
 # quick_index = findfirst(x-> x=="quick", vocab)  #16
