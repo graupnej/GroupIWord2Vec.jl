@@ -249,34 +249,32 @@ end
 end
 
 @testset "get_word_analogy" begin
-    # Define a small, intuitive test vocabulary
+    # Define a small, *intuitive* test vocabulary
     words = ["king", "queen", "man", "woman", "prince", "princess", "duke", "duchess"]
-    embeddings = [  # Example word vectors with meaningful patterns
-        1.0  0.9  0.5  0.4  0.8  0.7  0.3  0.2;  # Dimension 1
-        2.0  1.9  1.5  1.4  1.8  1.7  1.3  1.2;  # Dimension 2
-        3.0  2.9  2.5  2.4  2.8  2.7  2.3  2.2   # Dimension 3
+    embeddings = [
+        0.8  0.9  0.4  0.5  0.7  0.8  0.3  0.4;  # Simulating gender-based analogy relations
+        0.6  0.7  0.2  0.3  0.5  0.6  0.1  0.2;
+        0.2  0.3  0.1  0.2  0.3  0.4  0.0  0.1
     ]
     wv = WordEmbedding(words, embeddings)
 
     @testset "basic functionality" begin
-        # Test output type and size
         result = get_word_analogy(wv, "king", "man", "woman", 3)
         @test result isa Vector{String}
         @test length(result) == 3
     end
 
     @testset "analogy correctness" begin
-        # Test king - man + woman → queen
+        # "king" - "man" + "woman" → "queen"
         result = get_word_analogy(wv, "king", "man", "woman", 1)
         @test result[1] == "queen"
 
-        # Test prince - man + woman → princess
+        # "prince" - "man" + "woman" → "princess"
         result = get_word_analogy(wv, "prince", "man", "woman", 1)
         @test result[1] == "princess"
     end
 
     @testset "exclusion functionality" begin
-        # Ensure input words are excluded from the results
         result = get_word_analogy(wv, "king", "man", "woman", 5)
         @test "king" ∉ result
         @test "man" ∉ result
@@ -284,26 +282,23 @@ end
     end
 
     @testset "vector input support" begin
-        # Retrieve vectors for analogy
         king_vec = get_word2vec(wv, "king")
         man_vec = get_word2vec(wv, "man")
         woman_vec = get_word2vec(wv, "woman")
 
-        # Ensure function supports direct vector input
+        # Normalize vectors to avoid minor numerical errors
+        king_vec /= norm(king_vec)
+        man_vec /= norm(man_vec)
+        woman_vec /= norm(woman_vec)
+
         result_vec = get_word_analogy(wv, king_vec, man_vec, woman_vec, 1)
         result_str = get_word_analogy(wv, "king", "man", "woman", 1)
-        @test result_vec == result_str  # Should give the same result as string-based input
+        @test result_vec == result_str
     end
 
     @testset "error cases" begin
-        # Test handling of out-of-vocabulary words
         @test_throws ArgumentError get_word_analogy(wv, "unknown", "man", "woman", 3)
-
-        # Test dimension mismatch for input vectors
         @test_throws DimensionMismatch get_word_analogy(wv, [1.0, 2.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], 3)
-
-        # Test invalid n value
         @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)
     end
 end
-
