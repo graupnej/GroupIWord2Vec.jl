@@ -16,7 +16,6 @@ Retrieves the embedding vector corresponding to a given word.
 # Example
 ```julia
 vec = get_word2vec(model, "dog")
-
 """
 function get_word2vec(wv::WordEmbedding, word::String)
     # Retrieve word index but return nothing if word is not found for ArgumentError
@@ -29,7 +28,7 @@ function get_word2vec(wv::WordEmbedding, word::String)
 end
 
 """
-    get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real}
+    get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real} -> String
 
 Retrieves the closest word in the embedding space to a given vector based on cosine similarity.
 
@@ -51,7 +50,6 @@ vectors = [0.5 0.1;
 embedding = WordEmbedding(words, vectors)
 
 get_vec2word(embedding, [0.51, 0.19])  # Returns "cat"
-
 """
 function get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real}
     # Ensure input vector has correct dimension
@@ -71,71 +69,47 @@ function get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:Abstrac
     return wv.words[idx]
 end
 
-
 """
-    get_any2vec(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}) -> Vector{Float64}
+    get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Real}}) -> Vector{T} 
+    where {S<:AbstractString, T<:Real}
 
-Converts a word into its corresponding vector or returns the vector unchanged if already provided.
-This allows other functions to take both words and vectors as input.
+Converts a word into its corresponding vector representation or returns the vector unchanged if already provided.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `word_or_vec::Union{String, Vector{Float64}}`: A word or an embedding vector.
+- `wv::WordEmbedding{S, T}`: A word embedding structure with words and their corresponding vector representations.
+- `word_or_vec::Union{S, Vector{<:Real}}`: A word to be converted into a vector, or a numerical vector to be validated.
 
 # Returns
-- `Vector{Float64}`: The corresponding embedding vector.
+- `Vector{T}`: The vector representation of the word if input is a `String`, or the validated vector (converted to `T` if necessary).
 
-# Example 1
-```julia
-banana_vec = get_any2vec(wv, "banana")
-```
+# Throws
+- `DimensionMismatch`: If the input vector does not match the embedding dimension.
+- `ArgumentError`: If the input is neither a word nor a valid numeric vector.
 
-#Example 2
+# Example
 ```julia
-banana_vec = get_any2vec(wv, banana_vec)
-```
+words = ["cat", "dog"]
+vectors = [0.5 0.1;
+          0.2 0.9]
+wv = WordEmbedding(words, vectors)
+
+get_any2vec(wv, "cat")  # Returns [0.5, 0.2]
+get_any2vec(wv, [0.5, 0.2])  # Returns [0.5, 0.2]
 """
-function get_any2vec(wv::WordEmbedding, word_or_vec::Any)
-    if word_or_vec isa String
+function get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Real}}) where {S<:AbstractString, T<:Real}
+    if word_or_vec isa S
         # Delegate string input to get_word2vec
         return get_word2vec(wv, word_or_vec)
-    elseif word_or_vec isa Vector{Float64}
+    elseif word_or_vec isa Vector{<:Real}
         # Check dimension match for vector input
         if length(word_or_vec) != size(wv.embeddings, 1)
             throw(DimensionMismatch("Input vector dimension $(length(word_or_vec)) does not match embedding dimension $(size(wv.embeddings, 1))"))
         end
-        return word_or_vec
+        # Ensure vector matches the embedding type
+        return convert(Vector{T}, word_or_vec)
     else
-        throw(ArgumentError("Input must be a String (word) or a Vector{Float64} (embedding)"))
+        throw(ArgumentError("Input must be a String (word) or a Vector of real numbers matching the embedding dimension."))
     end
-end
-
-"""
-    get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
-
-Finds the top `n` most similar words to a given word or vector.
-
-# Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `word_or_vec::Union{String, Vector{Float64}}`: A word or an embedding vector.
-- `n::Int`: Number of similar words to return (default: 10).
-
-# Returns
-- `Vector{String}`: List of most similar words.
-
-# Example
-```julia
-similar_words = get_similar_words(wv, "king", 5)
-```
-"""
-function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
-    # Make sure input is a vector or convert it into a vector
-    vec = get_any2vec(wv, word_or_vec)
-    # Computes cosine similarity score between all embedding vectors and input vector
-    similarities = wv.embeddings' * vec
-    # Sort similarities for highest n cosine similarity scores
-    top_indices = sortperm(similarities[:], rev=true)[1:n]
-    return wv.words[top_indices]
 end
 
 """
@@ -184,6 +158,34 @@ function get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Floa
     elseif operator == "euclid"
         return norm(inp1_vec - inp2_vec)
     end
+end
+
+"""
+    get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
+
+Finds the top `n` most similar words to a given word or vector.
+
+# Arguments
+- `wv::WordEmbedding`: The word embedding model.
+- `word_or_vec::Union{String, Vector{Float64}}`: A word or an embedding vector.
+- `n::Int`: Number of similar words to return (default: 10).
+
+# Returns
+- `Vector{String}`: List of most similar words.
+
+# Example
+```julia
+similar_words = get_similar_words(wv, "king", 5)
+```
+"""
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
+    # Make sure input is a vector or convert it into a vector
+    vec = get_any2vec(wv, word_or_vec)
+    # Computes cosine similarity score between all embedding vectors and input vector
+    similarities = wv.embeddings' * vec
+    # Sort similarities for highest n cosine similarity scores
+    top_indices = sortperm(similarities[:], rev=true)[1:n]
+    return wv.words[top_indices]
 end
 
 """
