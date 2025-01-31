@@ -176,32 +176,55 @@ end
 
 
 """
-    get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
+    get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, Vector{<:Real}}, n::Int=10) -> Vector{String}
 
-Finds the top `n` most similar words to a given word or vector.
+Finds the top `n` most similar words to a given word or vector based on cosine similarity.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `word_or_vec::Union{String, Vector{Float64}}`: A word or an embedding vector.
-- `n::Int`: Number of similar words to return (default: 10).
+- `wv::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
+- `word_or_vec::Union{AbstractString, Vector{<:Real}}`: The input word (from the vocabulary) or a vector of the same dimension as the embeddings.
+- `n::Int=10`: The number of most similar words to return. Defaults to `10`.
+
+# Throws
+- `ArgumentError`: If the word is not in the vocabulary and the input is not a valid vector.
+- `DimensionMismatch`: If the provided vector does not match the embedding dimension.
 
 # Returns
-- `Vector{String}`: List of most similar words.
+- `Vector{String}`: A list of the top `n` most similar words from the vocabulary.
 
 # Example
 ```julia
-similar_words = get_similar_words(wv, "king", 5)
-```
+similar_words = get_similar_words(model, "cat", 5)
+similar_vectors = get_similar_words(model, [0.2, -0.5, 0.1, 0.8], 5)
 """
-function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
-    # Make sure input is a vector or convert it into a vector
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, Vector{<:Real}}, n::Int=10)
+    # Ensure input vector is valid
     vec = get_any2vec(wv, word_or_vec)
-    # Computes cosine similarity score between all embedding vectors and input vector
-    similarities = wv.embeddings' * vec
-    # Sort similarities for highest n cosine similarity scores
-    top_indices = sortperm(similarities[:], rev=true)[1:n]
+    if vec === nothing
+        throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
+    end
+
+    # Ensure input vector has correct dimension
+    if length(vec) != size(wv.embeddings, 1)
+        throw(DimensionMismatch("Input vector length ($(length(vec))) does not match word embedding dimension ($(size(wv.embeddings, 1)))"))
+    end
+
+    # Normalize the input vector for cosine similarity
+    vec = vec / norm(vec)
+
+    # Normalize all embeddings for cosine similarity
+    embeddings_normed = wv.embeddings ./ norm.(eachcol(wv.embeddings))
+
+    # Compute cosine similarity
+    similarities = embeddings_normed' * vec
+
+    # Efficiently get the top `n` most similar words
+    n = min(n, length(wv.words))  # Avoid requesting more than available words
+    top_indices = partialsortperm(similarities, 1:n, rev=true)
+
     return wv.words[top_indices]
 end
+
 
 """
     get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=5) -> Vector{String}
