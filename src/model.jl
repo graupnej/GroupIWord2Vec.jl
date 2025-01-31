@@ -117,34 +117,30 @@ vectors = [0.5 0.1 0.8;
           0.2 0.9 0.3]
 embedding = WordEmbedding(words, vectors)
 """
-struct WordEmbedding{S<:AbstractString, T<:Real}
+struct WordEmbedding
     # List of all words in the vocabulary
     # Example: ["cat", "dog", "house"]
-    words::Vector{S}
+    words::Vector{String}
     
     # Matrix containing all word vectors
     # Each column is one word's vector of numbers
     # Size is (vector_dimension × vocabulary_size)
     # For 3 words and vectors of length 4 we have a 4×3 matrix
-    embeddings::Matrix{T}
+    embeddings::Matrix{Float64}
     
     # Dictionary for fast word lookup
     # Maps each word to its position in the words vector and embeddings matrix
     # Example: "cat" => 1 means first word in vocabulary
-    word_indices::Dict{S, Int}
+    word_indices::Dict{String, Int}
     
     # Makes sure the data is valid and sets everything up correctly
-    function WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
+    function WordEmbedding(words::Vector{String}, matrix::Matrix{Float64})
         # Validate that number of words matches number of vectors
         if length(words) != size(matrix, 2)
             throw(ArgumentError("Number of words ($(length(words))) must match matrix columns ($(size(matrix, 2)))"))
         end
         
-        # Create dictionary mapping each word to its position
-        indices = Dict(word => idx for (idx, word) in enumerate(words))
-        
-        # Create new WordEmbedding
-        new{S,T}(words, matrix, indices)
+        new(copy(words), copy(matrix), Dict{String, Int}(word => idx for (idx, word) in enumerate(words)))
     end
 end
 
