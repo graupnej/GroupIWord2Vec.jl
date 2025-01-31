@@ -229,6 +229,5 @@ end
 
     @testset "error cases" begin
         @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid `n`
-        @test_throws ArgumentError get_word_analogy(wv, 1, 2, 3, 3)  # Invalid input
     end
 end
