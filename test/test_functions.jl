@@ -90,7 +90,7 @@ end
     end
 
     @testset "empty vocabulary" begin
-        empty_wv = WordEmbedding([], Matrix{Float64}(undef, 3, 0))  
+        empty_wv = WordEmbedding(String[], Matrix{Float64}(undef, 3, 0))  
         @test_throws BoundsError get_vec2word(empty_wv, [1.0, 0.0, 0.0])
     end
     
