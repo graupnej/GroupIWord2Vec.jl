@@ -5,28 +5,19 @@
 <div align="center">
   <img src="assets/WordEmbeddings.png" alt="Logo" width="250" height="250" />
   <h1>Word2Vec</h1>
-  A Julia package that implements some tools for running and testing word-embedding algorithms
+  A Julia package that provides tools for running and testing word embedding algorithms.
   <br/>
   <a href="https://julialang.org/downloads/">
     <img src="https://img.shields.io/badge/Julia-v1.10-blue" alt="Julia Version"/>
   </a>
 </div>
 
-## What's it about
-[Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks.
+## Word Embeddings
+[Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks. This package allows training an ML model to create word embeddings based on a source text and provides functionality to work with the generated word embedding vectors.
 
 ## Getting Started
-### 1) Download
-We can't use Pluto's environments but have to create our own
 
-```julia
-julia> using Pkg
-julia> Pkg.activate("MyEnv")
-julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
-julia> using GroupIWord2Vec
-```
-
-Below is an overview of the project's main components
+This is an overview of the project's main file structure:
 
 ```
 GroupIWord2Vec.jl               
@@ -44,8 +35,20 @@ GroupIWord2Vec.jl
 └── README.md                   # Main documentation file containing getting started
 ```
 
-### 2) Running a simple example
-Download [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
+### Download
+Pluto's built-in environments cannot be used, so to start a custom environment must be created and managed manually.
+
+```julia
+julia> using Pkg
+julia> Pkg.activate("MyEnv")
+julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
+julia> using GroupIWord2Vec
+```
+
+## Examples
+### Train Model and Create Word Embeddings - Text8
+
+Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
@@ -58,7 +61,10 @@ Import the obtained word vectors from _text8.txt_ into Julia using ``load_embedd
 julia> model = load_embeddings("./text8.txt")
 ```
 
-#### Some functionalities
+### Example Functions
+
+Now that a model is loaded the functions of this package can be used to work wih the embedding vectors.
+
 
 - ``get_word2vec()``: Retrieves the embedding vector corresponding to a given word.
 
@@ -70,30 +76,6 @@ julia> get_word2vec(model, "king")
 
 ```julia
 julia> get_vec2word(model, king_vec)
-```
-
-- ``get_any2vec()``: Converts a word into its corresponding vector or returns the vector unchanged if already provided. This allows other functions to take both words and vectors as input.
-
-```julia
-julia> get_any2vec(model, "king")
-```
-or
-```julia
-julia> get_any2vec(model, king_vec)
-```
-
-- ``get_cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
-
-```julia
-julia> get_cosine_similarity(model, "king", "prince")
-```
-
-It ranges from -1 to 1, where 1 indicates high similarity, 0 indicates no similarity and -1 indicates opposite directions.
- 
-- ``get_similar_words()``: Find the n most similar words to a given word or embedding vector and return the matching strings
-
-```julia
-julia> get_similar_words(model, "king", 5)
 ```
 
 - ``get_vector_operation()``: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
@@ -123,8 +105,9 @@ julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", w
   <img src="assets/PCAProjection.png" alt="Logo" width="400" height="250" />
 </div>
 
-### 3) Running a large example
-As an alternative (larger) example use a text corpus from e.g. [FastText](https://fasttext.cc/docs/en/pretrained-vectors.html) (.bin & .vec file) with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
+### Train Model and Create Word Embeddings - fasttext
+As an alternative use a (larger) text corpus from e.g. [FastText](https://fasttext.cc/docs/en/pretrained-vectors.html) (.bin & .vec file) with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
+
 
 ## For Developers
 ### 1) Download the code
