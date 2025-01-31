@@ -51,7 +51,7 @@ Note: Use an even number of inputs!
 # Arguments
 - `words::String...`: A list of words to visualize. The number of words must be a multiple of 2.
 - `wv::WordEmbedding`: The word embedding structure containing the word vectors.
-- `save_path::String="word_relations.png"`: The file path for the generated plot. Not saved if empty or nothing
+- `save_path::Union{String, nothing}="word_relations.png"`: The file path for the generated plot. Not saved if empty or nothing
 
 # Throws
 - `ArgumentError`: If the number of words is not a multiple of 2.
@@ -65,7 +65,7 @@ Note: Use an even number of inputs!
 p = show_relations("king", "queen", "man", "woman"; wv=model, save_path="relations.png")
 ```
 """
-function show_relations(words::String...; wv::WordEmbedding, save_path::String="word_relations.png")
+function show_relations(words::String...; wv::WordEmbedding, save_path::Union{String,nothing}="word_relations.png")
     # Check input
     word_count = length(words)
     if word_count % 2 != 0
