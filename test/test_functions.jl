@@ -144,37 +144,55 @@ end
     # Test data setup with meaningful relationships
     words = ["king", "queen", "man", "woman"]
     embeddings = [1.0  2.0  3.0  4.0;    # First dimension
-                 2.0  3.0  1.0  2.0;    # Second dimension
-                 3.0  3.0  1.0  1.0]    # Third dimension - similar for royal pairs
+                  2.0  3.0  1.0  2.0;    # Second dimension
+                  3.0  3.0  1.0  1.0]    # Third dimension - similar for royal pairs
     wv = WordEmbedding(words, embeddings)
     
     @testset "basic operations" begin
         # Test addition and subtraction with words and vectors
-        @test get_vector_operation(wv, "king", "queen", "+") == [3.0, 5.0, 6.0]
+        @test isapprox(get_vector_operation(wv, "king", "queen", :+), [3.0, 5.0, 6.0], rtol=1e-5)
         test_vec = [1.0, 1.0, 1.0]
-        @test get_vector_operation(wv, "king", test_vec, "+") == [2.0, 3.0, 4.0]
+        @test isapprox(get_vector_operation(wv, "king", test_vec, :+), [2.0, 3.0, 4.0], rtol=1e-5)
         
         # Test relationships (king - man ≈ queen - woman)
-        royal_diff = get_vector_operation(wv, "king", "man", "-")
-        gender_diff = get_vector_operation(wv, "queen", "woman", "-")
-        @test royal_diff ≈ gender_diff rtol=1e-5
+        royal_diff = get_vector_operation(wv, "king", "man", :-)
+        gender_diff = get_vector_operation(wv, "queen", "woman", :-)
+        @test isapprox(royal_diff, gender_diff, rtol=1e-5)
     end
     
     @testset "similarity measures" begin
         # Test cosine similarity
-        king_queen = get_vector_operation(wv, "king", "queen", "cosine")
-        man_woman = get_vector_operation(wv, "man", "woman", "cosine")
-        @test king_queen > 0.9  # Related pairs have high similarity
-        @test isapprox(king_queen, man_woman, rtol=0.1)  # Similar relationships
+        king_queen = get_vector_operation(wv, "king", "queen", :cosine)
+        man_woman = get_vector_operation(wv, "man", "woman", :cosine)
         
-        # Test euclidean distance
-        @test get_vector_operation(wv, "king", "queen", "euclid") < 
-              get_vector_operation(wv, "king", "woman", "euclid")  # Related pairs closer
+        @test king_queen > 0.9  # Related pairs should have high similarity
+        @test isapprox(king_queen, man_woman, rtol=0.1)  # Similar relationships should have similar cosine values
+
+        # Check for unrelated words having lower similarity
+        king_man = get_vector_operation(wv, "king", "man", :cosine)
+        @test king_man < king_queen  # Less related words should have lower similarity
+
+        # Test cosine similarity on zero vector
+        zero_vec = [0.0, 0.0, 0.0]
+        @test_throws ArgumentError get_vector_operation(wv, zero_vec, "queen", :cosine)
+
+        # Test Euclidean distance
+        @test get_vector_operation(wv, "king", "queen", :euclid) < 
+              get_vector_operation(wv, "king", "woman", :euclid)  # Related pairs should be closer
     end
     
     @testset "error cases" begin
-        @test_throws ArgumentError get_vector_operation(wv, "king", "queen", "invalid")
-        @test_throws ArgumentError get_vector_operation(wv, "invalid", "king", "+")
-        @test_throws DimensionMismatch get_vector_operation(wv, "king", [1.0], "+")
+        # Invalid operator
+        @test_throws ArgumentError get_vector_operation(wv, "king", "queen", :invalid)
+        
+        # Non-existent word
+        @test_throws ArgumentError get_vector_operation(wv, "invalid", "king", :+)
+        
+        # Mismatched dimensions
+        @test_throws DimensionMismatch get_vector_operation(wv, "king", [1.0], :+)
+
+        # Cosine similarity on zero vectors
+        zero_vec = [0.0, 0.0, 0.0]
+        @test_throws ArgumentError get_vector_operation(wv, zero_vec, zero_vec, :cosine)
     end
 end
