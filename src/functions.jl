@@ -230,11 +230,12 @@ function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}
     # Get vectors for all inputs for vector calculations
     vec1, vec2, vec3 = get_any2vec(wv, inp1), get_any2vec(wv, inp2), get_any2vec(wv, inp3)
     # Get words for all inputs for excluding in result
-    word1, word2, word3 = get_vec2word(wv,vec1), get_vec2word(wv,vec1), get_vec2word(wv,vec1)
+    word1, word2, word3 = get_vec2word(wv, vec1), get_vec2word(wv, vec2), get_vec2word(wv, vec3)
     # Make a list of all input words
     all_words = [word1, word2, word3]
     # Compute analogy vector
-    analogy_vec = norm(vec1 - vec2 + vec3)
+    analogy_vec = vec1 - vec2 + vec3
+    analogy_vec /= norm(analogy_vec)  # Normalize to unit length
     # Compute the cosine similarity score for each embedding vector with the analogy vector
     similarities = wv.embeddings' * analogy_vec
     # Make a set including all input words
