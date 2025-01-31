@@ -52,6 +52,7 @@ vectors = [0.5 0.1;
 embedding = WordEmbedding(words, vectors)
 
 get_vec2word(embedding, [0.51, 0.19])  # Returns "cat"
+```
 """
 function get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real}
     # Ensure input vector has correct dimension
@@ -97,6 +98,7 @@ wv = WordEmbedding(words, vectors)
 
 get_any2vec(wv, "cat")  # Returns [0.5, 0.2]
 get_any2vec(wv, [0.5, 0.2])  # Returns [0.5, 0.2]
+```
 """
 function get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Real}}) where {S<:AbstractString, T<:Real}
     if word_or_vec isa S
@@ -140,6 +142,7 @@ Performs a mathematical operation between two word embedding vectors.
 vec = get_vector_operation(model, "king", "man", :-)
 similarity = get_vector_operation(model, "cat", "dog", :cosine)
 distance = get_vector_operation(model, "car", "bicycle", :euclid)
+```
 """
 function get_vector_operation(ww::WordEmbedding, inp1::Union{String, AbstractVector{<:Real}}, 
                               inp2::Union{String, AbstractVector{<:Real}}, operator::Symbol)
@@ -198,6 +201,7 @@ A list of `n` most similar words, sorted by similarity.
 ```julia
 get_similar_words(model, "cat", 5)  # ["dog", "kitten", "feline", "puppy", "pet"]
 get_similar_words(model, get_word2vec(model, "ocean"), 3)  # ["sea", "water", "wave"]
+```
 """
 function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
     if n <= 0
@@ -262,6 +266,7 @@ Finds the top `n` words that best complete the analogy: `inp1 - inp2 + inp3 = ?`
 ```julia
 get_word_analogy(model, "king", "man", "woman", 3) 
 # → ["queen", "princess", "duchess"]
+```
 """
 function get_word_analogy(
     wv::WordEmbedding, 
