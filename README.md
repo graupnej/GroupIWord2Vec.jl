@@ -24,7 +24,9 @@ GroupIWord2Vec.jl
 ├── src/                        # Contains core modules for the package
 │   ├── GroupIWord2Vec.jl       # Main entry point for the project
 │   ├── functions.jl            # Word/vector functions
-│   └── model.jl                # Model functions
+│   ├── model.jl                # Model functions
+│   └── show_relations.jl       # Plotting and dimension reduction functions
+│   └── training.jl             # Custom model training functions
 ├── test/                       # Unit tests to validate functionalities
 │   ├── runtests.jl             # Combination of every testing routine
 │   ├── test_functions.jl       # Testing routine for word/vector functions 
@@ -51,14 +53,14 @@ julia> using GroupIWord2Vec
 ## Examples
 ### Train Model and Create Word Embeddings - Text8
 
-Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
+Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use `train_model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
 ```
 
 The resulting word vectors are saved in a text format file (here) named _text8.txt_.
-Import the obtained word vectors from _text8.txt_ into Julia using ``load_embeddings()``
+Import the obtained word vectors from _text8.txt_ into Julia using `load_embeddings()``
 
 ```julia
 julia> model = load_embeddings("./text8.txt")
@@ -89,7 +91,7 @@ Save your model as txt file.
 julia> save_custom_model(trained_model, my_vocabulary, "data/saved_model.txt") 
 ```
 
-You can now load your custom model with ``load_embeddings()``
+You can now load your custom model with `load_embeddings()``
 
 ```julia
 julia> WordEmbedding = load_embeddings("data/saved_model.txt")
@@ -101,19 +103,19 @@ julia> WordEmbedding = load_embeddings("data/saved_model.txt")
 Now that a model is loaded the functions of this package can be used to work with the embedding vectors.
 
 
-- ``get_word2vec()``: Retrieves the embedding vector corresponding to a given word.
+- `get_word2vec()`: Retrieves the embedding vector corresponding to a given word.
 
 ```julia
 julia> get_word2vec(model, "king")
 ```
 
-- ``get_vec2word()``: Retrieves the closest word in the embedding space to a given vector.
+- `get_vec2word()`: Retrieves the closest word in the embedding space to a given vector.
 
 ```julia
 julia> get_vec2word(model, king_vec)
 ```
 
-- ``get_vector_operation()``: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
+- `get_vector_operation()`: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
 
 ```julia
 julia> get_vector_operation(model, "king", "queen", :+)
@@ -123,14 +125,14 @@ or
 julia> get_vector_operation(model, king_vec, "queen", :euclid)
 ```
 
-- ``get_word_analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
+- `get_word_analogy()`: Performs word analogy calculations (e.g. king - man + woman = queen)
   
 ```julia
 julia> get_word_analogy(model, "king", "man", "woman")
 ```
 
 #### Display Data Functions
-- ``show_relations()``: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
+- `show_relations()`: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
 
 ```julia
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
