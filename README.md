@@ -61,7 +61,8 @@ Import the obtained word vectors from _text8.txt_ into Julia using ``load_embedd
 julia> model = load_embeddings("./text8.txt")
 ```
 
-### Example Functions
+### Examples
+#### Functions
 
 Now that a model is loaded the functions of this package can be used to work with the embedding vectors.
 
@@ -94,7 +95,7 @@ julia> get_vector_operation(model, king_vec, "queen","euclid")
 julia> word_analogy(model, "king", "man", "woman")
 ```
 
-#### Display Data
+#### Display Data Functions
 - ``show``_``relations()``: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
 
 ```julia
