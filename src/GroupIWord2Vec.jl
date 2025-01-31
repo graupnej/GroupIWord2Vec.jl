@@ -43,6 +43,7 @@ export      train_model,            # Function to train new word embeddings
             get_similar_words,      # Function to find top n similar words as strings
             get_vector_operation,   # Function to find perform operation on 2 input words/vectors: sum, subtract, dot-product, euclidean distance
             get_word_analogy,       # Function to use vector math to compute analogous words
+            reduce_to_2d,
             show_relations          # Function to visualise vectors and vector distances in 2D
 
 end
