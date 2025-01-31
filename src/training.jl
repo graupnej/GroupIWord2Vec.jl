@@ -59,7 +59,7 @@ end
 
 
 """
-    create_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
+    create_custom_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
 
 Creates a Flux model for CBOW.
 
@@ -75,10 +75,10 @@ Creates a Flux model for CBOW.
 
 # Example
 ```julia
-my_model = create_model(50, length(my_vocabulary)) 
+my_model = create_custom_model(50, length(my_vocabulary)) 
 ```
 """
-function create_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
+function create_custom_model(embedding_dim::Int, vocabulary_lenght::Int)::Chain
     
     embeddings = Flux.Embedding(vocabulary_lenght => embedding_dim)
     lambda = x -> mean(x , dims=2)
@@ -90,7 +90,7 @@ end
 
 
 """
-    train_model(model::Chain, dataset::String, vocabulary::Dict ,epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
+    train_custom_model(model::Chain, dataset::String, vocabulary::Dict ,epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
 
 Trains a model on a given dataset. 
 
@@ -112,10 +112,10 @@ Trains a model on a given dataset.
 
 # Example
 ```julia
-my_updated_model = train_model(my_model, "data/my_dataset.txt", my_vocabulary, 10, 1)
+my_updated_model = train_custom_model(my_model, "data/my_dataset.txt", my_vocabulary, 10, 1)
 ```
 """
-function train_model(model::Chain, dataset::String, vocabulary::Dict{String, Int}, epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
+function train_custom_model(model::Chain, dataset::String, vocabulary::Dict{String, Int}, epochs::Int, window_size::Int; optimizer=Descent(), batchsize=10)::Chain
     #prepare data
     data = Vector{Tuple{Vector{Int64}, OneHotVector{UInt32}}}()
     
