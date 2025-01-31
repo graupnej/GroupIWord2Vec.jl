@@ -149,32 +149,33 @@ struct WordEmbedding{S<:AbstractString, T<:Real}
 end
 
 """
-# This is the main function that loads word embeddings from a file. It supports different formats
-# and allows customization of how the data should be loaded. It requires the following parameters:
-#
-# 1) path: Where to find the file
-# 2) format: What format the file is in (:text or :binary) with default text
-# 3) data_type: What type of numbers to use (defaults to Float64)
-# 4) normalize_vectors: Whether to normalize the vectors (defaults to true)
-# 5) separator: What character separates values (defaults to space)
-# 6) skip_bytes: How many bytes to skip in binary format (defaults to 1)
-#
-# We use two types of formats because
-# Text Format
-# - is easy to inspect because human readable
-# - can be edited manually
-# - but takes more storage space and is slower to read
-#
-# Binary Format
-# - not human readable because stored as raw bytes
-# - way smaller file size and fast to read
-# - complexer to debug
-#
-# Word2Vec models often come in both formats because the text format is for inspection and modifcation
-# and binary format is for efficient application usage
+    load_embeddings(path::AbstractString; format::Union{:text, :binary}=:text, 
+                    data_type::Type{T}=Float64, normalize_vectors::Bool=true, 
+                    separator::Char=' ', skip_bytes::Int=0) -> WordEmbedding
+
+Loads word embeddings from a text or binary file.
+
+# Arguments
+- `path::AbstractString`: Path to the embedding file.
+- `format::Union{:text, :binary}=:text`: File format (`:text` or `:binary`).
+- `data_type::Type{T}=Float64`: Type of word vectors (`Float32`, `Float64`, etc.).
+- `normalize_vectors::Bool=true`: Normalize vectors to unit length.
+- `separator::Char=' '`: Word-vector separator in text files.
+- `skip_bytes::Int=0`: Bytes to skip after each word-vector pair in binary files.
+
+# Throws
+- `ArgumentError`: If `format` is not `:text` or `:binary`.
+
+# Returns
+- `WordEmbedding{S, T}`: The loaded word embeddings.
+
+# Example
+
+```julia
+embedding = load_embeddings("vectors.txt")  # Load text format
+embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float32, skip_bytes=1)  # Load binary format
 """
-# Main loading function
-function load_embeddings(path::AbstractString; format::Symbol=:text,data_type::Type{T}=Float64,normalize_vectors::Bool=true,separator::Char=' ',skip_bytes::Int=1) where T<:Real
+function load_embeddings(path::AbstractString; format::Union{:text, :binary}=:text, data_type::Type{T}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1) where T<:Real
      # For a text file use the read_text_format function
     if format == :text
         return read_text_format(path, data_type, normalize_vectors, separator)
@@ -182,7 +183,7 @@ function load_embeddings(path::AbstractString; format::Symbol=:text,data_type::T
     elseif format == :binary
         return read_binary_format(path, data_type, normalize_vectors, separator, skip_bytes)
     else
-        throw(ArgumentError("Unsupported format: $format"))
+        throw(ArgumentError("Unsupported format: $format. Supported formats are :text and :binary."))
     end
 end
 
