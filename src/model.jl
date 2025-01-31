@@ -155,13 +155,13 @@ Loads word embeddings from a text or binary file.
 embedding = load_embeddings("vectors.txt")  # Load text format
 embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float64, skip_bytes=1)  # Load binary format
 """
-function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, separator::Char=' ', skip_bytes::Int=1)
+function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64,normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
      # For a text file use the read_text_format function
     if format == :text
-        return read_text_format(path, data_type, separator)
+        return read_text_format(path, data_type, normalize_vectors, separator)
      # For a binary file use the read_binary_format function
     elseif format == :binary
-        return read_binary_format(path, data_type, separator, skip_bytes)
+        return read_binary_format(path, data_type, normalize_vectors, separator, skip_bytes)
     else
         throw(ArgumentError("Unsupported format: $format. Supported formats are :text and :binary."))
     end
@@ -177,7 +177,7 @@ end
 #                    matter, only its direction
 #   separator: what character separates the values in the file (like space or comma)
 """
-function read_text_format(filepath::AbstractString, ::Type{T},separator::Char) where T<:Real
+function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool, separator::Char) where T<:Real
     open(filepath) do file
           # Read header with vocabulary size and vector dimension
           header = split(strip(readline(file)), separator)
@@ -197,6 +197,11 @@ function read_text_format(filepath::AbstractString, ::Type{T},separator::Char) w
           
             # The rest are numbers that make up the vector
             vector = parse.(T, parts[2:end])
+
+            # If normalize is true, make the vector length 1
+            if normalize
+                vector = vector ./ norm(vector)
+            end
           
             # Store the vector in our matrix
             vectors[:, idx] = vector
@@ -220,7 +225,7 @@ end
 # Instead of reading lines of text and parsing numbers it reads words until it hits a separator
 # Reads raw bytes and converts them directly to numbers
 """
-function read_binary_format(filepath::AbstractString,::Type{T},separator::Char,skip_bytes::Int) where T<:Real
+function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool ,separator::Char,skip_bytes::Int) where T<:Real
 
     open(filepath, "r") do file
         # Read header with vocabulary size and vector dimension
@@ -241,8 +246,14 @@ function read_binary_format(filepath::AbstractString,::Type{T},separator::Char,s
             # Read the raw bytes for the vector and interpret them as Float32 numbers (faster than parsing text numbers)
             vector = reinterpret(Float32, read(file, vector_bytes))
 
+            # Normalize if requested
+            if normalize
+                vector = vector ./ norm(vector)
+            end
+
             # Convert to desired number type and store
             vectors[:, i] = T.(vector)
+               
                     
             # Skip extra bytes (like newlines) after each word-vector pair
             read(file, skip_bytes)
