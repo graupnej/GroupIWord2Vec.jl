@@ -253,6 +253,6 @@ function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}
     # Make a set including all input words
     exclude_set = exclude_set = Set(get(wv.word_indices, word, nothing)
     # Search for n vectors with highest similarity score excluding input words
-    filtered_indices = filter(i -> !(i in exclude_set), sortperm(similarities[:], rev=true))[1:min(n, end)]
-    return wv.words[filtered_indices]
+    filtered_indices = filter(i -> !(i in exclude_set), sortperm(similarities[:], rev=true))
+    return wv.words[filtered_indices[1:min(n, length(filtered_indices))]]
 end
