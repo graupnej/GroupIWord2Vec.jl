@@ -112,54 +112,68 @@ function get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Rea
     end
 end
 
-
 """
-    get_vector_operation(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, operator::String} -> Vector{Float64}, Float64
+    get_vector_operation(ww::WordEmbedding, inp1::Union{String, AbstractVector{<:Real}}, 
+                         inp2::Union{String, AbstractVector{<:Real}}, operator::Symbol) -> Union{Vector{<:Real}, Float64}
 
-Finds the top `n` most similar words to a given word or vector.
+Performs a mathematical operation between two word embedding vectors.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model.
-- `inp1::Union{String, Vector{Float64}}`: First word or vector.
-- `inp2::Union{String, Vector{Float64}}`: Second word or vector.
-- `operator::String`: The operator string to define the calculation.
-operators can be:
-"+" -> sum,
-"-" -> subtraction,
-"*" -> dot product/ cosine similarity,
-"euclid" -> Euclidean distance
+- `ww::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
+- `inp1::Union{String, AbstractVector{<:Real}}`: The first input, which can be a word (String) or a precomputed embedding vector.
+- `inp2::Union{String, AbstractVector{<:Real}}`: The second input, which can be a word (String) or a precomputed embedding vector.
+- `operator::Symbol`: The operation to perform. Must be one of `:+`, `:-`, `:cosine`, or `:euclid`.
+
+# Throws
+- `ArgumentError`: If the operator is invalid.
+- `ArgumentError`: If cosine similarity is attempted on a zero vector.
+- `DimensionMismatch`: If the input vectors do not have the same length.
 
 # Returns
-- `Vector{Float64}`: For operations with vecctorial result: '+' and '-'
-- `Float64`: For operations with scalar result: '*' and 'euclid'
+- `Vector{<:Real}`: If the operation is `:+` (addition) or `:-` (subtraction), returns the resulting word vector.
+- `Float64`: If the operation is `:cosine` (cosine similarity) or `:euclid` (Euclidean distance), returns a scalar value.
 
 # Example
 ```julia
-similar_words = get_similar_words(wv, "king", 5)
-```
+vec = get_vector_operation(model, "king", "man", :-)
+similarity = get_vector_operation(model, "cat", "dog", :cosine)
+distance = get_vector_operation(model, "car", "bicycle", :euclid)
 """
-function get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, operator::String)
-    # # Converts both inputs to corresponding vectors using existing function
+function get_vector_operation(ww::WordEmbedding, inp1::Union{String, AbstractVector{<:Real}}, 
+                              inp2::Union{String, AbstractVector{<:Real}}, operator::Symbol)
+    # Convert inputs to vectors
     inp1_vec = get_any2vec(ww, inp1)
     inp2_vec = get_any2vec(ww, inp2)
-    
-    # Validate operator
-    valid_operators = ["+", "-", "cosine", "euclid"]
-    if !(operator in valid_operators)
-        throw(ArgumentError("Invalid operator. Please use one of: " * join(valid_operators, ", ")))
+
+    # Validate dimensions
+    if length(inp1_vec) != length(inp2_vec)
+        throw(DimensionMismatch("Vectors must have the same length, but got $(length(inp1_vec)) and $(length(inp2_vec))"))
     end
+
+    # Define valid operators as a Set for efficiency
+    valid_operators = Set([:cosine, :euclid, :+, :-])
     
-    # Distinguishes between operations and computes operation
-    if operator == "+"
-        return inp1_vec + inp2_vec
-    elseif operator == "-"
-        return inp1_vec - inp2_vec
-    elseif operator == "cosine"
-        return dot(inp1_vec, inp2_vec) / (norm(inp1_vec) * norm(inp2_vec))
-    elseif operator == "euclid"
-        return norm(inp1_vec - inp2_vec)
+    if operator ∉ valid_operators
+        throw(ArgumentError("Invalid operator. Use one of: " * join(string.(collect(valid_operators)), ", ")))
+    end
+
+    # Perform the operation
+    return if operator == :+
+        inp1_vec + inp2_vec
+    elseif operator == :-
+        inp1_vec - inp2_vec
+    elseif operator == :cosine
+        norm1 = norm(inp1_vec)
+        norm2 = norm(inp2_vec)
+        if norm1 ≈ 0 || norm2 ≈ 0
+            throw(ArgumentError("Cannot compute cosine similarity for zero vectors"))
+        end
+        dot(inp1_vec, inp2_vec) / (norm1 * norm2)
+    elseif operator == :euclid
+        norm(inp1_vec - inp2_vec)
     end
 end
+
 
 """
     get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10) -> Vector{String}
