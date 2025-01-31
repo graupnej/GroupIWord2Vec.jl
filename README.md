@@ -85,17 +85,17 @@ julia> get_vec2word(model, king_vec)
 - ``get_vector_operation()``: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
 
 ```julia
-julia> get_vector_operation(model, "king", "queen",:+)
+julia> get_vector_operation(model, "king", "queen", :+)
 ```
 or
 ```julia
-julia> get_vector_operation(model, king_vec, "queen","euclid")
+julia> get_vector_operation(model, king_vec, "queen", :euclid)
 ```
 
 - ``get_word_analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
   
 ```julia
-julia> word_analogy(model, "king", "man", "woman")
+julia> get_word_analogy(model, "king", "man", "woman")
 ```
 
 #### Display Data Functions
