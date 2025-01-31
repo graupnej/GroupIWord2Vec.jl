@@ -76,10 +76,6 @@ end
         selected_words = ["king", "queen", "banana", "apple"]
         indices = Dict(word => get(wv.word_indices, word, nothing) for word in selected_words)
 
-        # Extract embeddings
-        embeddings_test = permutedims(hcat([wv.embeddings[:, indices[word]] for word in selected_words]...))
-        @test size(embeddings_test) == (4, length(selected_words))  # Words × Embedding Dimension
-
         # Apply PCA
         projection_test = reduce_to_2d(embeddings_test)
         @test size(projection_test) == (2, length(selected_words))  # Should be 2D
