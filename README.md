@@ -64,6 +64,37 @@ Import the obtained word vectors from _text8.txt_ into Julia using ``load_embedd
 julia> model = load_embeddings("./text8.txt")
 ```
 
+### Train custom Model from own text file
+
+Create a data directory and add your personal text file.  
+
+Create a vocabulary from text
+```julia
+julia> my_vocabulary = create_vocabulary("data/<your_textfile>")
+```
+
+Create a matching Flux model with disired dimensions
+```julia
+julia> my_model = create_custom_model(10, length(my_vocabulary))
+```
+
+Train the model on your text dataset. 
+```julia
+julia> trained_model = train_custom_model(my_model, "data/<your_textfile>", my_vocabulary, 10, 2)
+```
+
+Save your model as txt file.
+
+```julia
+julia> save_custom_model(trained_model, my_vocabulary, "data/saved_model.txt") 
+```
+
+You can now load your custom model with ``load_embeddings()``
+
+```julia
+julia> WordEmbedding = load_embeddings("data/saved_model.txt")
+```
+
 ### Examples
 #### Functions
 
