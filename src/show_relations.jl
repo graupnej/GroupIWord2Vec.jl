@@ -1,12 +1,12 @@
 using Statistics, Plots, LinearAlgebra
 
 """
-    reduce_to_2d(data::Matrix, number_of_pc::Int=2) -> Matrix{Float64}
+    reduce_to_2d(data::Matrix{Float64}, number_of_pc::Int=2) -> Matrix{Float64}
 
-Performs Principal Component Analysis (PCA) to reduce the dimensionality of a given dataset NxM to Nx"number_of_pc" and returns a projected data
+Performs Principal Component Analysis (PCA) to reduce the dimensionality of a given dataset and returns a projected data
 
 # Arguments
-- `data::Matrix`: The input data matrix where rows represent samples and columns represent features.
+- `data::Matrix{Float64}`: The input data matrix where rows represent samples and columns represent features.
 - `number_of_pc::Int=2`: The number of principal components to retain (default: 2).
 
 # Returns
@@ -50,8 +50,8 @@ Note: Use an even number of inputs!
 
 # Arguments
 - `words::String...`: A list of words to visualize. The number of words must be a multiple of 2.
-- `wv::WordEmbedding`: The word embedding model containing the word vectors.
-- `save_path::String="word_relations.png"`: The file path where the generated plot will be saved. If empty or `nothing`, the plot is not saved.
+- `wv::WordEmbedding`: The word embedding structure containing the word vectors.
+- `save_path::String="word_relations.png"`: The file path for the generated plot. Not saved if empty or nothing
 
 # Throws
 - `ArgumentError`: If the number of words is not a multiple of 2.
@@ -66,13 +66,13 @@ p = show_relations("king", "queen", "man", "woman"; wv=model, save_path="relatio
 ```
 """
 function show_relations(words::String...; wv::WordEmbedding, save_path::String="word_relations.png")
-    # Check input - word_count should only be used inside the function
+    # Check input
     word_count = length(words)
     if word_count % 2 != 0
         throw(ArgumentError("Need words in multiples of 2, but $word_count were given"))
     end
     
-    # Create a dictionary mapping words to their indices (or `nothing` if missing)
+    # Create a dictionary mapping words to their indices
     indices = Dict(word => get(wv.word_indices, word, nothing) for word in words)
 
     # Find missing words
@@ -110,5 +110,5 @@ function show_relations(words::String...; wv::WordEmbedding, save_path::String="
         savefig(p, save_path)
     end
     
-    return p  # Optionally return the plot object
+    return p
 end
