@@ -2,6 +2,16 @@
 [![Build Status](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://graupnej.github.io/GroupIWord2Vec.jl/dev/)
 
+<div align="center">
+  <img src="assets/WordEmbeddings.png" alt="Logo" width="250" height="250" />
+  <h1>Word2Vec</h1>
+  A Julia package that provides tools for running word embedding algorithms.
+  <br/>
+  <a href="https://julialang.org/downloads/">
+    <img src="https://img.shields.io/badge/Julia-v1.10-blue" alt="Julia Version"/>
+  </a>
+</div>
+
 ## Word Embeddings
 [Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks. This package allows training an ML model to create word embeddings based on a source text and provides functionality to work with the generated word embedding vectors.
 
@@ -14,7 +24,9 @@ GroupIWord2Vec.jl
 ├── src/                        # Contains core modules for the package
 │   ├── GroupIWord2Vec.jl       # Main entry point for the project
 │   ├── functions.jl            # Word/vector functions
-│   └── model.jl                # Model functions
+│   ├── model.jl                # Model functions
+│   └── show_relations.jl       # Plotting and dimension reduction functions
+│   └── training.jl             # Custom model training functions
 ├── test/                       # Unit tests to validate functionalities
 │   ├── runtests.jl             # Combination of every testing routine
 │   ├── test_functions.jl       # Testing routine for word/vector functions 
@@ -34,18 +46,55 @@ julia> Pkg.activate("MyEnv")
 julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
 julia> using GroupIWord2Vec
 ```
+> [!NOTE]  
+> The latest release of GR.jl (v0.73.11) leads to segmentation faults in the precompilation process of Plots.jl. Because of this it might not be possible to run the package until the problem is resolved with the next release. In case this problem occurs please resort to cloning the package to your machine using the guide below at "For Developers". Then locally enforce the prior version GR.jl (v0.73.10) by exchanging the version with "=0.73.10" in the Manifest.toml file.
+
 
 ## Examples
-### Train Model and Create Word Embeddings - Text8
 
-Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
+### Train custom Model from own text file
+
+Create a data directory and add your personal text file.  
+
+Create a vocabulary from text
+```julia
+julia> my_vocabulary = create_vocabulary("data/<your_textfile>")
+```
+
+Create a matching Flux model with disired dimensions
+```julia
+julia> my_model = create_custom_model(10, length(my_vocabulary))
+```
+
+Train the model on your text dataset. 
+```julia
+julia> trained_model = train_custom_model(my_model, "data/<your_textfile>", my_vocabulary, 10, 2)
+```
+
+Save your model as txt file.
+
+```julia
+julia> save_custom_model(trained_model, my_vocabulary, "data/saved_model.txt") 
+```
+
+You can now load your custom model with `load_embeddings()``
+
+```julia
+julia> WordEmbedding = load_embeddings("data/saved_model.txt")
+```
+
+### Train Model and Create Word Embeddings with Word2Vec package (Only Linux and MacOS systems!) - Text8
+> [!IMPORTANT]
+> As this approach uses the external C-code based package it is only compatible with Linux operating systems and MacOS running with an Intel processor. M1 or M2 chips for Apple Mac are not supported.
+
+Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use `train_model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
 ```
 
 The resulting word vectors are saved in a text format file (here) named _text8.txt_.
-Import the obtained word vectors from _text8.txt_ into Julia using ``load_embeddings()``
+Import the obtained word vectors from _text8.txt_ into Julia using `load_embeddings()``
 
 ```julia
 julia> model = load_embeddings("./text8.txt")
@@ -63,26 +112,26 @@ Now that a model is loaded the functions of this package can be used to work wit
 julia> get_word2vec(model, "king")
 ```
 
-- ``get_vec2word()``: Retrieves the closest word in the embedding space to a given vector.
+- `get_vec2word()`: Retrieves the closest word in the embedding space to a given vector.
 
 ```julia
 julia> get_vec2word(model, king_vec)
 ```
 
-- ``get_vector_operation()``: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
+- `get_vector_operation()`: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
 
 ```julia
-julia> get_vector_operation(model, "king", "queen",:+)
+julia> get_vector_operation(model, "king", "queen", :+)
 ```
 or
 ```julia
-julia> get_vector_operation(model, king_vec, "queen","euclid")
+julia> get_vector_operation(model, king_vec, "queen", :euclid)
 ```
 
 - `get_word_analogy()`: Performs word analogy calculations (e.g. king - man + woman = queen)
   
 ```julia
-julia> word_analogy(model, "king", "man", "woman")
+julia> get_word_analogy(model, "king", "man", "woman")
 ```
 
 #### Display Data Functions
