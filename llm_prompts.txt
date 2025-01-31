@@ -1,1 +1,440 @@
-# Coming soon
+
+
+
+
+I am programming a julia package for word embeddings using github reository and CI workflow. One principal structure of this package is shown here:
+
+struct WordEmbedding{S<:AbstractString, T<:Real}
+    # List of all words in the vocabulary
+    # Example: ["cat", "dog", "house"]
+    words::Vector{S}
+    
+    # Matrix containing all word vectors
+    # Each column is one word's vector of numbers
+    # Size is (vector_dimension × vocabulary_size)
+    # For 3 words and vectors of length 4 we have a 4×3 matrix
+    embeddings::Matrix{T}
+    
+    # Dictionary for fast word lookup
+    # Maps each word to its position in the words vector and embeddings matrix
+    # Example: "cat" => 1 means first word in vocabulary
+    word_indices::Dict{S, Int}
+    
+    # Makes sure the data is valid and sets everything up correctly
+    function WordEmbedding(words::Vector{S}, matrix::Matrix{T}) where {S<:AbstractString, T<:Real}
+        # Validate that number of words matches number of vectors
+        if length(words) != size(matrix, 2)
+            throw(ArgumentError("Number of words ($(length(words))) must match matrix columns ($(size(matrix, 2)))"))
+        end
+        
+        # Create dictionary mapping each word to its position
+        indices = Dict(word => idx for (idx, word) in enumerate(words))
+        
+        # Create new WordEmbedding
+        new{S,T}(words, matrix, indices)
+    end
+end
+
+Below, you find one of the main functions of this package which finds the top n most similar words to a given word or vector based on cosine similarity: 
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
+    # Make sure input is a vector or convert it into a vector
+    vec = get_any2vec(wv, word_or_vec)
+    # Computes cosine similarity score between all embedding vectors and input vector
+    similarities = wv.embeddings' * vec
+    # Sort similarities for highest n cosine similarity scores
+    top_indices = sortperm(similarities[:], rev=true)[1:n]
+    return wv.words[top_indices]
+end
+
+Take an explicit look at this function. Is there anything you would improve. If yes, let me know in detail what and provide your recommendation for a better solution
+ChatGPT said:
+ChatGPT
+
+Your function is well-structured and achieves its goal effectively, but there are some areas for improvement:
+Issues and Improvements:
+
+    Numerical Stability with Cosine Similarity
+        The cosine similarity formula is:
+        cos⁡(θ)=A⋅B∥A∥∥B∥
+        cos(θ)=∥A∥∥B∥A⋅B​
+        Your implementation skips normalizing wv.embeddings and vec, which may result in incorrect similarity rankings.
+        Solution: Normalize the embeddings and input vector before computing the dot product.
+
+    Handling Edge Cases
+        What if word_or_vec is an unknown word? The function should provide a helpful error message.
+        What if n is larger than the vocabulary size? The function should return as many words as possible.
+
+    Better Sorting Approach
+        sortperm(similarities[:], rev=true)[1:n] sorts the entire array, which is inefficient when only the top n values are needed.
+        Solution: Use partial sorting with partialsortperm to efficiently get the top n indices.
+
+    General Type Flexibility
+        The function currently assumes Float64 vectors, which might not be ideal for embeddings with other numeric types.
+        Solution: Generalize Vector{Float64} to AbstractVector{<:Real}.
+
+Improved Version:
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, AbstractVector{<:Real}}, n::Int=10)
+    # Convert input to vector (throws error if word is unknown)
+    vec = get_any2vec(wv, word_or_vec)
+
+    # Normalize embeddings and input vector to ensure cosine similarity correctness
+    norm_embeddings = wv.embeddings ./ sqrt.(sum(wv.embeddings .^ 2, dims=1))  # Column-wise normalization
+    norm_vec = vec / norm(vec)
+
+    # Compute cosine similarities
+    similarities = norm_embeddings' * norm_vec  # Transpose for correct dot product
+
+    # Ensure n is within valid bounds
+    n = min(n, length(wv.words))
+
+    # Use partial sorting to efficiently get top `n` indices
+    top_indices = partialsortperm(similarities[:], 1:n, rev=true)
+
+    return wv.words[top_indices]
+end
+
+Improvements Explained:
+
+    Proper Cosine Similarity Calculation
+        Normalizing both embeddings and the input vector ensures that the similarity metric is mathematically correct.
+        Without normalization, raw dot products can give misleading results.
+
+    Error Handling for Unknown Words
+        get_any2vec should already handle unknown words, but ensuring that it throws a clear error if needed is good practice.
+
+    Efficient Sorting with partialsortperm
+        sortperm(similarities[:], rev=true)[1:n] sorts everything, which is unnecessary.
+        partialsortperm(similarities[:], 1:n, rev=true) is much more efficient, as it finds only the n largest values.
+
+    Increased Type Flexibility
+        Allowing AbstractVector{<:Real} instead of Vector{Float64} enables the function to work with different numeric types.
+
+Performance Gain Summary:
+
+    Before: Full sorting (O(m log m), where m is vocabulary size)
+    After: Partial sorting (O(m + n log n), which is much faster for small n)
+
+Would you like me to review get_any2vec to ensure it’s robust for this function? 🚀
+You said:
+I've had another version of this function which looks like this:
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, Vector{<:Real}}, n::Int=10)
+    # Ensure input vector is valid
+    vec = get_any2vec(wv, word_or_vec)
+    if vec === nothing
+        throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
+    end
+
+    # Ensure input vector has correct dimension
+    if length(vec) != size(wv.embeddings, 1)
+        throw(DimensionMismatch("Input vector length ($(length(vec))) does not match word embedding dimension ($(size(wv.embeddings, 1)))"))
+    end
+
+    # Normalize the input vector for cosine similarity
+    vec = vec / norm(vec)
+
+    # Normalize all embeddings for cosine similarity
+    embeddings_normed = wv.embeddings ./ norm.(eachcol(wv.embeddings))
+
+    # Compute cosine similarity
+    similarities = embeddings_normed' * vec
+
+    # Efficiently get the top n most similar words
+    n = min(n, length(wv.words))  # Avoid requesting more than available words
+    top_indices = partialsortperm(similarities, 1:n, rev=true)
+
+    return wv.words[top_indices]
+end
+
+Is there a possibility to take the best of both worlds and have a really solid function?
+ChatGPT said:
+ChatGPT
+
+Yes! Your second version already improves on the first, but we can refine it further by integrating the best parts of both. Below is an optimized and robust version of get_similar_words that combines:
+
+✅ Correct Cosine Similarity Calculation
+✅ Efficient Sorting (partialsortperm)
+✅ Error Handling (Unknown Words, Dimension Mismatch)
+✅ Improved Numerical Stability (Handling Edge Cases)
+✅ Increased Type Flexibility
+🔥 Final Optimized Version
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
+    # Convert input into a vector (or throw an error if word is unknown)
+    vec = get_any2vec(wv, word_or_vec)
+    
+    if vec === nothing
+        throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
+    end
+
+    # Ensure vector has the correct dimension
+    embedding_dim = size(wv.embeddings, 1)
+    if length(vec) != embedding_dim
+        throw(DimensionMismatch("Input vector length ($(length(vec))) does not match word embedding dimension ($embedding_dim)"))
+    end
+
+    # Normalize input vector
+    vec_norm = norm(vec)
+    if vec_norm == 0
+        throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
+    end
+    vec = vec / vec_norm  # Safe normalization
+
+    # Normalize all embeddings (column-wise)
+    embedding_norms = sqrt.(sum(wv.embeddings .^ 2, dims=1))  # Compute norms for each word vector
+    embedding_norms[embedding_norms .== 0] .= eps()  # Avoid division by zero
+    embeddings_normed = wv.embeddings ./ embedding_norms  # Normalize each word vector
+
+    # Compute cosine similarities
+    similarities = embeddings_normed' * vec  # Dot product of normalized vectors
+
+    # Ensure we don't request more words than available
+    n = min(n, length(wv.words))
+
+    # Get top `n` most similar words using efficient sorting
+    top_indices = partialsortperm(similarities, 1:n, rev=true)
+
+    return wv.words[top_indices]
+end
+
+🚀 Why is this the best version?
+
+    Handles Unknown Words
+        If the word isn’t in the vocabulary, an informative error is thrown.
+
+    Ensures Proper Dimension Matching
+        Checks if the input vector has the correct length before proceeding.
+
+    Improves Numerical Stability
+        Adds a safeguard against zero-norm vectors (both input and stored embeddings).
+        Uses eps() to prevent division by zero.
+
+    Optimized for Performance
+        Computes norms once instead of applying norm.(eachcol(...)), which avoids redundant calculations.
+        Uses partialsortperm for efficient retrieval of the top n words.
+
+    Flexible with Different Numeric Types
+        Works with any AbstractVector{<:Real} instead of being restricted to Vector{Float64}.
+
+🔍 Key Performance Gain
+
+Instead of O(m log m) for full sorting, this version runs in O(m + n log n), making it significantly faster for large vocabularies.
+
+This should be production-ready and highly efficient. 🚀 Let me know if you want additional tweaks!
+2/2
+You said:
+Now provide a docstring for this which resembles the one below:
+
+"""
+    get_word2vec(wv::WordEmbedding, word::String) -> Vector{T}
+
+Retrieves the embedding vector corresponding to a given word.
+
+# Arguments
+- wv::WordEmbedding: The word embedding model containing the vocabulary and embeddings.
+- word::String: The word to look up
+
+# Throws
+- ArgumentError: If the word is not found in the embedding model.
+
+# Returns
+- Vector{T}: The embedding vector of the requested word, where T is the numerical type of the embeddings.
+
+# Example
+
+julia
+vec = get_word2vec(model, "dog")
+"""
+
+ChatGPT said:
+ChatGPT
+
+Here is the docstring for get_similar_words, following the format you provided:
+
+"""
+    get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10) -> Vector{String}
+
+Finds the top `n` most similar words to a given word or vector based on cosine similarity.
+
+# Arguments
+- `wv::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
+- `word_or_vec::Union{AbstractString, AbstractVector{<:Real}}`: The target word or embedding vector.
+- `n::Int=10`: The number of most similar words to retrieve (default is 10).
+
+# Throws
+- `ArgumentError`: If the input word is not found in the vocabulary and is not a valid vector.
+- `DimensionMismatch`: If the input vector does not match the embedding dimension.
+- `ArgumentError`: If the input vector has zero norm, making similarity computation invalid.
+
+# Returns
+- `Vector{String}`: A list of the `n` most similar words ordered by similarity score.
+
+# Example
+```julia
+similar_words = get_similar_words(model, "cat", 5)
+# Example output: ["dog", "kitten", "feline", "puppy", "pet"]
+
+vec = get_word2vec(model, "ocean")
+similar_words = get_similar_words(model, vec, 3)
+# Example output: ["sea", "water", "wave"]
+
+"""
+
+
+### 🔥 **Why is this a great docstring?**
+✔ **Clear and Concise** – Explains purpose, inputs, and outputs.  
+✔ **Covers Edge Cases** – Lists possible exceptions.  
+✔ **Includes Examples** – Helps users understand usage and expected results.  
+✔ **Formatted for Julia** – Uses `# Arguments`, `# Throws`, and `# Returns` correctly.  
+
+This makes the function **easy to understand and use** in practice. 🚀
+
+You said:
+So this seems to be your version of the function:
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
+    # Convert input into a vector (or throw an error if word is unknown)
+    vec = get_any2vec(wv, word_or_vec)
+    
+    if vec === nothing
+        throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
+    end
+
+    # Ensure vector has the correct dimension
+    embedding_dim = size(wv.embeddings, 1)
+    if length(vec) != embedding_dim
+        throw(DimensionMismatch("Input vector length ($(length(vec))) does not match word embedding dimension ($embedding_dim)"))
+    end
+
+    # Normalize input vector
+    vec_norm = norm(vec)
+    if vec_norm == 0
+        throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
+    end
+    vec = vec / vec_norm  # Safe normalization
+
+    # Normalize all embeddings (column-wise)
+    embedding_norms = sqrt.(sum(wv.embeddings .^ 2, dims=1))  # Compute norms for each word vector
+    embedding_norms[embedding_norms .== 0] .= eps()  # Avoid division by zero
+    embeddings_normed = wv.embeddings ./ embedding_norms  # Normalize each word vector
+
+    # Compute cosine similarities
+    similarities = embeddings_normed' * vec  # Dot product of normalized vectors
+
+    # Ensure we don't request more words than available
+    n = min(n, length(wv.words))
+
+    # Get top n most similar words using efficient sorting
+    top_indices = partialsortperm(similarities, 1:n, rev=true)
+
+    return wv.words[top_indices]
+end
+
+Can you make it a little "smaller"?
+ChatGPT said:
+ChatGPT
+
+Yes! Here’s a more concise version while keeping all the important functionality intact:
+🔥 Optimized Compact Version
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
+    vec = get_any2vec(wv, word_or_vec) 
+    vec === nothing && throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
+
+    embedding_dim = size(wv.embeddings, 1)
+    length(vec) != embedding_dim && throw(DimensionMismatch("Vector length ($(length(vec))) ≠ embedding dimension ($embedding_dim)"))
+
+    vec_norm = norm(vec)
+    vec_norm == 0 && throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
+    vec /= vec_norm  # Normalize input
+
+    embedding_norms = sqrt.(sum(wv.embeddings .^ 2, dims=1))
+    embeddings_normed = wv.embeddings ./ max.(embedding_norms, eps())  # Avoid division by zero
+
+    similarities = embeddings_normed' * vec
+    return wv.words[partialsortperm(similarities, 1:min(n, length(wv.words)), rev=true)]
+end
+
+🚀 What's Improved?
+
+✔ Fewer lines → Uses inline conditionals (&& for compact error checks).
+✔ No redundant variables → Directly modifies vec for normalization.
+✔ Avoids unnecessary n reassignment → Uses min(n, length(wv.words)) inline.
+✔ Preserves efficiency & robustness → Maintains partial sorting & numerical stability.
+
+This version keeps the same performance & correctness but is shorter and cleaner. 🚀 Let me know if you need further refinements!
+You said:
+Is this a typical way of writing a julia function?
+ChatGPT said:
+ChatGPT
+
+Yes, this is a typical and idiomatic way of writing a Julia function, especially when optimizing for brevity and performance. Here’s why:
+✅ Idiomatic Julia Style Used in the Function
+
+    Concise Error Handling with &&
+        Using && for inline conditionals (e.g., vec === nothing && throw(...)) is common in Julia for short error checks.
+        However, for complex conditions or multiple lines, explicit if statements are preferred for readability.
+
+    In-Place Operations for Efficiency
+        vec /= vec_norm modifies vec directly, avoiding unnecessary reallocation.
+        This aligns with Julia’s preference for in-place operations where possible.
+
+    Vectorized Computation
+        sqrt.(sum(wv.embeddings .^ 2, dims=1)) follows Julia’s broadcasting convention (.) to operate efficiently on arrays.
+
+    Use of max.(..., eps()) for Numerical Stability
+        Helps avoid division by zero when normalizing embeddings.
+        This is a good Julia practice for handling floating-point edge cases.
+
+    Efficient Sorting with partialsortperm
+        Instead of full sorting (sortperm), using partialsortperm for top n elements is a very Julian way to improve efficiency.
+
+⚠️ When to Avoid This Style?
+
+While this compact form is great for performance-critical code, it can reduce readability in longer or more complex functions. Here’s when you might want to expand it:
+
+    For beginner-friendly code → More explicit if statements improve readability.
+    For long or multi-step logic → Avoid chaining multiple inline conditions.
+    For debugging-heavy functions → Explicit intermediate variables make debugging easier.
+
+🔥 Alternative (More Readable) Version
+
+If you prefer a more explicit style while keeping things efficient:
+
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
+    vec = get_any2vec(wv, word_or_vec)
+    if vec === nothing
+        throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
+    end
+
+    embedding_dim = size(wv.embeddings, 1)
+    if length(vec) != embedding_dim
+        throw(DimensionMismatch("Vector length ($(length(vec))) does not match embedding dimension ($embedding_dim)"))
+    end
+
+    vec_norm = norm(vec)
+    if vec_norm == 0
+        throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
+    end
+    vec /= vec_norm  # Normalize input
+
+    embedding_norms = sqrt.(sum(wv.embeddings .^ 2, dims=1))
+    embeddings_normed = wv.embeddings ./ max.(embedding_norms, eps())
+
+    similarities = embeddings_normed' * vec
+    top_indices = partialsortperm(similarities, 1:min(n, length(wv.words)), rev=true)
+
+    return wv.words[top_indices]
+end
+
+✔ Still efficient, but easier to read
+✔ Explicit error handling with if statements
+Summary
+
+    ✅ Compact form → Common in Julia, useful for high-performance functions.
+    ✅ Explicit form → More readable, better for maintainability.
+    🔥 Your choice depends on readability vs. brevity!
+
+Which style do you prefer for your package? 🚀
