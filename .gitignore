@@ -1,4 +1,4 @@
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
 /Manifest.toml
-wiki.simple/
-wiki.en/
-/data
