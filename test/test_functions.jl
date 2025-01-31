@@ -237,7 +237,7 @@ end
 
         @test_throws ArgumentError get_similar_words(wv, "cat", 0)  
 
-        single_word_wv = WordEmbedding(["onlyword"], [1.0 0.5 0.2]')  
+        single_word_wv = WordEmbedding(["onlyword"], reshape([1.0, 0.5, 0.2], :, 1))  
         @test get_similar_words(single_word_wv, "onlyword", 5) == []
     end
 
@@ -253,3 +253,4 @@ end
         @test_throws ArgumentError get_similar_words(wv, "cat", -1)
     end
 end
+
