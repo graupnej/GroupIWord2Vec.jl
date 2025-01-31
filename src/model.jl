@@ -132,7 +132,7 @@ struct WordEmbedding
 end
 
 """
-    load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
+    load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, separator::Char=' ', skip_bytes::Int=1)
 
 Loads word embeddings from a text or binary file.
 
@@ -140,7 +140,6 @@ Loads word embeddings from a text or binary file.
 - `path::String`: Path to the embedding file
 - `format::Union{:text, :binary}=:text`: File format (`:text` or `:binary`)
 - `data_type::Type{Float64}=Float64`: Type of word vectors
-- `normalize_vectors::Bool=true`: Normalize vectors to unit length
 - `separator::Char=' '`: Word-vector separator in text files
 - `skip_bytes::Int=0`: Bytes to skip after each word-vector pair in binary files
 
@@ -156,13 +155,13 @@ Loads word embeddings from a text or binary file.
 embedding = load_embeddings("vectors.txt")  # Load text format
 embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float64, skip_bytes=1)  # Load binary format
 """
-function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
+function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, separator::Char=' ', skip_bytes::Int=1)
      # For a text file use the read_text_format function
     if format == :text
-        return read_text_format(path, data_type, normalize_vectors, separator)
+        return read_text_format(path, data_type, separator)
      # For a binary file use the read_binary_format function
     elseif format == :binary
-        return read_binary_format(path, data_type, normalize_vectors, separator, skip_bytes)
+        return read_binary_format(path, data_type, separator, skip_bytes)
     else
         throw(ArgumentError("Unsupported format: $format. Supported formats are :text and :binary."))
     end
