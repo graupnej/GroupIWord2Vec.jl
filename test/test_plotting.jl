@@ -51,7 +51,6 @@ end
 @testset "show_relations" begin
     words = ["king", "queen", "man", "woman", "apple", "banana", "car", "bus"]
     embeddings = [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0; 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0; 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0]
-    
     wv = WordEmbedding(words, embeddings)
     
     @testset "even word count enforcement" begin
@@ -67,4 +66,65 @@ end
         reduced = reduce_to_2d(permutedims(hcat(embeddings_subset...)))
         @test size(reduced) == (2, 4)  # Should reduce to 2D space for given words
     end
+
+    @testset "basic plot generation" begin
+        p = show_relations("king", "queen", "man", "woman"; wv=wv, save_path=nothing)
+        @test isa(p, Plots.Plot)  # Ensure it returns a plot
+    end
+
+    @testset "embedding extraction and projection" begin
+        selected_words = ["king", "queen", "dog", "cat"]
+        indices = Dict(word => get(wv.word_indices, word, nothing) for word in selected_words)
+
+        # Extract embeddings
+        embeddings_test = permutedims(hcat([wv.embeddings[:, indices[word]] for word in selected_words]...))
+        @test size(embeddings_test) == (length(selected_words), 5)  # Words × Embedding Dimension
+
+        # Apply PCA
+        projection_test = reduce_to_2d(embeddings_test)
+        @test size(projection_test) == (2, length(selected_words))  # Should be 2D
+        @test rank(projection_test) <= 2  # Ensuring PCA properly reduces dimensions
+    end
+
+    @testset "arrow computation" begin
+        selected_words = ["king", "queen", "man", "woman"]
+        projection_test = reduce_to_2d(permutedims(hcat([wv.embeddings[:, wv.word_indices[word]] for word in selected_words]...)))
+
+        word_count = length(selected_words)
+        arrows = [projection_test[:, 2*i] - projection_test[:, 2*i-1] for i in 1:Int(word_count/2)]
+        arrows_x = [Bool(i%2) ? arrows[Int(i/2+0.5)][1] : 0 for i in 1:length(arrows)*2]
+        arrows_y = [Bool(i%2) ? arrows[Int(i/2+0.5)][2] : 0 for i in 1:length(arrows)*2]
+
+        @test length(arrows_x) == length(arrows_y)  # Ensure x and y lists match in size
+        @test all(x -> isa(x, Number), arrows_x)  # Ensure numerical correctness
+        @test all(y -> isa(y, Number), arrows_y)
+    end
+
+    @testset "Label Generation" begin
+        selected_words = ["king", "queen", "dog", "cat"]
+        labels = text.([word for word in selected_words], :bottom)
+        @test length(labels) == length(selected_words)  # Ensure correct label count
+    end
+
+    @testset "Plot Generation and Quiver Arrows" begin
+        selected_words = ["king", "queen", "dog", "cat"]
+        projection_test = reduce_to_2d(permutedims(hcat([wv.embeddings[:, wv.word_indices[word]] for word in selected_words]...)))
+
+        p = scatter(projection_test[1, :], projection_test[2, :], 
+                title="Word Embedding PCA Projection",
+                xlabel="First Principal Component",
+                ylabel="Second Principal Component",
+                legend=false, series_annotations=text.([word for word in selected_words], :bottom))
+        @test isa(p, Plots.Plot)
+
+        quiver!(p, projection_test[1, :], projection_test[2, :], quiver=(arrows_x, arrows_y))
+        @test isa(p, Plots.Plot)
+    end
+
+    @testset "Saving Plot to File" begin
+        test_file = tempname() * ".png"
+        show_relations("king", "queen", "man", "woman"; wv=wv, save_path=test_file)
+        @test isfile(test_file)  # Ensure file was created
+    end
+end
 end
