@@ -180,58 +180,56 @@ end
 """
     get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10) -> Vector{String}
 
-Finds the top `n` most similar words to a given word or vector based on cosine similarity.
+Finds the `n` most similar words to a given word or vector based on cosine similarity.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
-- `word_or_vec::Union{AbstractString, AbstractVector{<:Real}}`: The target word or embedding vector.
-- `n::Int=10`: The number of most similar words to retrieve (default is 10).
+- `wv`: The word embedding model.
+- `word_or_vec`: The target word or embedding vector.
+- `n`: Number of similar words to return (default: 10).
 
 # Throws
-- `ArgumentError`: If the input word is not found in the vocabulary and is not a valid vector.
-- `DimensionMismatch`: If the input vector does not match the embedding dimension.
-- `ArgumentError`: If the input vector has zero norm, making similarity computation invalid.
+- `ArgumentError`: If `n` is not positive, the word is missing, or the vector has zero norm.
+- `DimensionMismatch`: If the vector size is incorrect.
 
 # Returns
-- `Vector{String}`: A list of the `n` most similar words ordered by similarity score.
+A list of `n` most similar words, sorted by similarity.
 
 # Example
 ```julia
-similar_words = get_similar_words(model, "cat", 5)
-# Example output: ["dog", "kitten", "feline", "puppy", "pet"]
-
-vec = get_word2vec(model, "ocean")
-similar_words = get_similar_words(model, vec, 3)
-# Example output: ["sea", "water", "wave"]
+get_similar_words(model, "cat", 5)  # ["dog", "kitten", "feline", "puppy", "pet"]
+get_similar_words(model, get_word2vec(model, "ocean"), 3)  # ["sea", "water", "wave"]
 """
 function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
+    if n <= 0
+        throw(ArgumentError("Number of similar words `n` must be positive, got $n"))
+    end
+
     vec = get_any2vec(wv, word_or_vec)
-    vec === nothing && throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
 
-    embedding_dim = size(wv.embeddings, 1)
-    length(vec) != embedding_dim && throw(DimensionMismatch("Vector length ($(length(vec))) ≠ embedding dimension ($embedding_dim)"))
-
+    # Normalize input vector for cosine similarity
     vec_norm = norm(vec)
-    vec_norm == 0 && throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
-    vec /= vec_norm  # Normalize input
+    iszero(vec_norm) && throw(ArgumentError("Cannot compute cosine similarity with a zero vector input."))
+    vec ./= vec_norm  # Normalize in-place
 
-    embedding_norms = sqrt.(sum(wv.embeddings .^ 2, dims=1))
-    embeddings_normed = wv.embeddings ./ max.(embedding_norms, eps())  # Avoid division by zero
+    # Normalize embeddings (without modifying `wv.embeddings`)
+    embedding_norms = norm.(eachcol(wv.embeddings))  # Compute norms column-wise
+    replace!(embedding_norms, 0 => one(eltype(embedding_norms)))  # Prevent division by zero
 
-    similarities = embeddings_normed' * vec
+    # Compute cosine similarity (dot product of normalized vectors)
+    similarities = (wv.embeddings' * vec) ./ embedding_norms[:]
 
-    # Get top `n+1` indices and exclude the query word if it's in the vocabulary
+    # Get top `n+1` indices (to remove query word later)
     top_indices = partialsortperm(similarities, 1:min(n + 1, length(wv.words)), rev=true)
     similar_words = wv.words[top_indices]
 
     # Exclude the query word itself (if it was in the vocabulary)
     if word_or_vec isa AbstractString
-        similar_words = filter(w -> w != word_or_vec, similar_words)
+        similar_words = setdiff(similar_words, (word_or_vec,))
     end
 
+    # Return the most similar words
     return similar_words[1:min(n, length(similar_words))]
 end
-
 #function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
     # Make sure input is a vector or convert it into a vector
     #vec = get_any2vec(wv, word_or_vec)
