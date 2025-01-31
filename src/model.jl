@@ -171,7 +171,7 @@ Loads word embeddings from a text or binary file.
 embedding = load_embeddings("vectors.txt")  # Load text format
 embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float32, skip_bytes=1)  # Load binary format
 """
-function load_embeddings(path::AbstractString; format::Symbol=:text, data_type::Type{T}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1) where T<:Real
+function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64, normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
      # For a text file use the read_text_format function
     if format == :text
         return read_text_format(path, data_type, normalize_vectors, separator)
