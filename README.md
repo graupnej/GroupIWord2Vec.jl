@@ -44,6 +44,9 @@ julia> Pkg.activate("MyEnv")
 julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
 julia> using GroupIWord2Vec
 ```
+> [!NOTE]  
+> The latest release of GR.jl (v0.73.11) leads to segmentation faults in the precompilation process of Plots.jl. Because of this it might not be possible to run the package until the problem is resolved with the next release. In case this problem occurs please resort to cloning the package to your machine using the guide below at "For Developers". Then locally enforce the prior version GR.jl (v0.73.10) by exchanging the version with "=0.73.10" in the Manifest.toml file.
+
 
 ## Examples
 ### Train Model and Create Word Embeddings - Text8
