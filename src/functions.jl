@@ -18,6 +18,7 @@ Retrieves the embedding vector corresponding to a given word.
 # Example
 ```julia
 vec = get_word2vec(model, "dog")
+```
 """
 function get_word2vec(wv::WordEmbedding, word::String)
     # Retrieve word index but return nothing if word is not found for ArgumentError
