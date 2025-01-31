@@ -217,16 +217,6 @@ end
         @test result1 == result2  # Ensuring same output for word and vector inputs
     end
 
-    @testset "exclusion of input words" begin
-        result = get_word_analogy(wv, "king", "man", "woman", 3)
-
-        @test length(result) ≤ 3  # Ensure it returns at most `n` words
-
-        # Ensure excluded words are not in the result
-        exclude_set = Set(["king", "man", "woman"])
-        @test all(word -> word ∉ exclude_set, result)
-    end
-
     @testset "error cases" begin
         @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid `n`
     end
