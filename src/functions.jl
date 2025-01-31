@@ -98,19 +98,20 @@ get_any2vec(wv, [0.5, 0.2])  # Returns [0.5, 0.2]
 """
 function get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Real}}) where {S<:AbstractString, T<:Real}
     if word_or_vec isa S
-        # Delegate string input to get_word2vec
+        # Convert word to vector
         return get_word2vec(wv, word_or_vec)
     elseif word_or_vec isa Vector{<:Real}
         # Check dimension match for vector input
         if length(word_or_vec) != size(wv.embeddings, 1)
             throw(DimensionMismatch("Input vector dimension $(length(word_or_vec)) does not match embedding dimension $(size(wv.embeddings, 1))"))
         end
-        # Ensure vector matches the embedding type
         return convert(Vector{T}, word_or_vec)
     else
+        # Explicitly handle invalid input types
         throw(ArgumentError("Input must be a String (word) or a Vector of real numbers matching the embedding dimension."))
     end
 end
+
 
 """
     get_vector_operation(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, operator::String} -> Vector{Float64}, Float64
