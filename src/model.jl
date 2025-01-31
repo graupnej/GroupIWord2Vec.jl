@@ -178,7 +178,7 @@ end
 #                    matter, only its direction
 #   separator: what character separates the values in the file (like space or comma)
 """
-function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,separator::Char) where T<:Real
+function read_text_format(filepath::AbstractString, ::Type{T},separator::Char) where T<:Real
     open(filepath) do file
           # Read header with vocabulary size and vector dimension
           header = split(strip(readline(file)), separator)
@@ -198,11 +198,6 @@ function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool,se
           
             # The rest are numbers that make up the vector
             vector = parse.(T, parts[2:end])
-          
-            # If normalize is true, make the vector length 1
-            if normalize
-                vector = vector ./ norm(vector)
-            end
           
             # Store the vector in our matrix
             vectors[:, idx] = vector
@@ -226,7 +221,7 @@ end
 # Instead of reading lines of text and parsing numbers it reads words until it hits a separator
 # Reads raw bytes and converts them directly to numbers
 """
-function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,separator::Char,skip_bytes::Int) where T<:Real
+function read_binary_format(filepath::AbstractString,::Type{T},separator::Char,skip_bytes::Int) where T<:Real
 
     open(filepath, "r") do file
         # Read header with vocabulary size and vector dimension
@@ -246,11 +241,6 @@ function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool,s
 
             # Read the raw bytes for the vector and interpret them as Float32 numbers (faster than parsing text numbers)
             vector = reinterpret(Float32, read(file, vector_bytes))
-
-            # Normalize if requested
-            if normalize
-                vector = vector ./ norm(vector)
-            end
 
             # Convert to desired number type and store
             vectors[:, i] = T.(vector)
