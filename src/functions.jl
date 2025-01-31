@@ -1,19 +1,19 @@
 using LinearAlgebra
 
 """
-    get_word2vec(wv::WordEmbedding, word::String) -> Vector{T}
+    get_word2vec(wv::WordEmbedding, word::String) -> Vector{Float64}
 
 Retrieves the embedding vector corresponding to a given word.
 
 # Arguments
-- `wv::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
+- `wv::WordEmbedding`: The word embedding structure containing the vocabulary and embeddings
 - `word::String`: The word to look up
 
 # Throws
-- `ArgumentError`: If the word is not found in the embedding model.
+- `ArgumentError`: If the word is not found in the embedding model
 
 # Returns
-- `Vector{T}`: The embedding vector of the requested word, where `T` is the numerical type of the embeddings.
+- `Vector{Float64}`: The embedding vector of the requested word of type Float64
 
 # Example
 ```julia
@@ -21,29 +21,29 @@ vec = get_word2vec(model, "dog")
 ```
 """
 function get_word2vec(wv::WordEmbedding, word::String)
-    # Retrieve word index but return nothing if word is not found for ArgumentError
+    # Retrieve word index
     idx = get(wv.word_indices, word, nothing)
     if idx === nothing
         throw(ArgumentError("Word not found in the embeddings vocabulary"))
     end
-    # Returns (and ensures) vector for given word at index location
+    # Returns vector for given word at index location
     return Vector(wv.embeddings[:, idx])
 end
 
 """
-    get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real} -> String
+    get_vec2word(wv::WordEmbedding,vec::Vector{Float64}) -> String
 
 Retrieves the closest word in the embedding space to a given vector based on cosine similarity.
 
 # Arguments
-- `wv::WordEmbedding{S, T}`: A word embedding structure with words and their corresponding vector representations.
-- `vec::Vector{T}`: A vector representation of a word.
+- `wv::WordEmbedding`: The word embedding structure containing the vocabulary and embeddings
+- `vec::Vector{Float64}`: A vector representation of a word
 
 # Returns
-- `S`: The word from the vocabulary closest to the given vector
+- `String`: The word from the vocabulary closest to the given vector
 
 # Throws
-- `DimensionMismatch`: If the input vector's dimension does not match the word vector dimensions.
+- `DimensionMismatch`: If the input vector's dimension does not match the word vector dimensions
 
 # Example
 ```julia
@@ -61,30 +61,29 @@ function get_vec2word(wv::WordEmbedding, vec::Vector{Float64})
         throw(DimensionMismatch("Input vector must have the same dimension as word vectors. Expected $(size(wv.embeddings, 1)), got $(length(vec))."))
     end
 
-    # Normalize the input vector
+    # Normalize input vector
     vec = vec / norm(vec)
 
     # Compute cosine similarity with all word embeddings
     similarities = wv.embeddings' * vec
 
-    # Get the index of the highest similarity
+    # Get index of the highest similarity
     idx = argmax(similarities)
 
     return wv.words[idx]
 end
 
 """
-    get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Real}}) -> Vector{T} 
-    where {S<:AbstractString, T<:Real}
+    get_any2vec(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}) -> Vector{Float64} 
 
-Converts a word into its corresponding vector representation or returns the vector unchanged if already provided.
+Converts a word into its corresponding vector representation or returns the vector unchanged if already provided
 
 # Arguments
-- `wv::WordEmbedding{S, T}`: A word embedding structure with words and their corresponding vector representations.
-- `word_or_vec::Union{S, Vector{<:Real}}`: A word to be converted into a vector, or a numerical vector to be validated.
+- `wv::WordEmbedding`: The word embedding structure containing the vocabulary and embeddings
+- `word_or_vec::Union{String, Vector{Float64}}`: A word to be converted into a vector, or a numerical vector to be validated
 
 # Returns
-- `Vector{T}`: The vector representation of the word if input is a `String`, or the validated vector (converted to `T` if necessary).
+- `Vector{Float64}`: The vector representation of the word if input is a `String`, or the validated vector
 
 # Throws
 - `DimensionMismatch`: If the input vector does not match the embedding dimension.
@@ -118,25 +117,24 @@ function get_any2vec(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float6
 end
 
 """
-    get_vector_operation(ww::WordEmbedding, inp1::Union{String, AbstractVector{<:Real}}, 
-                         inp2::Union{String, AbstractVector{<:Real}}, operator::Symbol) -> Union{Vector{<:Real}, Float64}
+    get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, operator::Symbol) -> Union{Vector{Float64}, Float64}
 
-Performs a mathematical operation between two word embedding vectors.
+Performs a mathematical operation between two word embedding vectors
 
 # Arguments
-- `ww::WordEmbedding`: The word embedding model containing the vocabulary and embeddings.
-- `inp1::Union{String, AbstractVector{<:Real}}`: The first input, which can be a word (String) or a precomputed embedding vector.
-- `inp2::Union{String, AbstractVector{<:Real}}`: The second input, which can be a word (String) or a precomputed embedding vector.
-- `operator::Symbol`: The operation to perform. Must be one of `:+`, `:-`, `:cosine`, or `:euclid`.
+- `ww::WordEmbedding`: The word embedding structure containing the vocabulary and embeddings
+- `inp1::Union{String, Vector{Float64}}`: The first input, which can be a word (String) or a precomputed embedding vector
+- `inp2::Union{String, Vector{Float64}}`: The second input, which can be a word (String) or a precomputed embedding vector
+- `operator::Symbol`: The operation to perform. Must be one of `:+`, `:-`, `:cosine`, or `:euclid`
 
 # Throws
 - `ArgumentError`: If the operator is invalid.
-- `ArgumentError`: If cosine similarity is attempted on a zero vector.
-- `DimensionMismatch`: If the input vectors do not have the same length.
+- `ArgumentError`: If cosine similarity is attempted on a zero vector
+- `DimensionMismatch`: If the input vectors do not have the same length
 
 # Returns
-- `Vector{<:Real}`: If the operation is `:+` (addition) or `:-` (subtraction), returns the resulting word vector.
-- `Float64`: If the operation is `:cosine` (cosine similarity) or `:euclid` (Euclidean distance), returns a scalar value.
+- `Vector{Float64}`: If the operation is `:+` or `:-`, returns the resulting word vector
+- `Float64`: If the operation is `:cosine` or `:euclid`, returns a scalar value
 
 # Example
 ```julia
@@ -178,7 +176,6 @@ function get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Floa
         norm(inp1_vec - inp2_vec)
     end
 end
-
 
 """
     get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10) -> Vector{String}
