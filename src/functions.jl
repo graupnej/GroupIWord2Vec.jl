@@ -61,9 +61,6 @@ function get_vec2word(wv::WordEmbedding, vec::Vector{Float64})
         throw(DimensionMismatch("Input vector must have the same dimension as word vectors. Expected $(size(wv.embeddings, 1)), got $(length(vec))."))
     end
 
-    # Normalize input vector
-    # vec = vec / norm(vec)
-
     # Compute cosine similarity with all word embeddings
     similarities = wv.embeddings' * vec
 
@@ -166,12 +163,7 @@ function get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Floa
     elseif operator == :-
         inp1_vec - inp2_vec
     elseif operator == :cosine
-        norm1 = norm(inp1_vec)
-        norm2 = norm(inp2_vec)
-        if norm1 ≈ 0 || norm2 ≈ 0
-            throw(ArgumentError("Cannot compute cosine similarity for zero vectors"))
-        end
-        dot(inp1_vec, inp2_vec) / (norm1 * norm2)
+        dot(inp1_vec, inp2_vec)
     elseif operator == :euclid
         norm(inp1_vec - inp2_vec)
     end
@@ -234,66 +226,20 @@ get_word_analogy(model, "king", "man", "woman", 3)
 # → ["queen", "princess", "duchess"]
 ```
 """
-function get_word_analogy(
-    wv::WordEmbedding, 
-    inp1::Union{AbstractString, AbstractVector{<:Real}}, 
-    inp2::Union{AbstractString, AbstractVector{<:Real}}, 
-    inp3::Union{AbstractString, AbstractVector{<:Real}}, 
-    n::Int=5; 
-    metric::Symbol=:cosine  # Choose similarity metric: :cosine (default) or :dot_product
-)
-    # Ensure valid n
-    if n ≤ 0
-        throw(ArgumentError("n must be greater than 0"))
-    end
-
-    # Convert inputs to vectors
+function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=5)
+    # Get vectors for all inputs for vector calculations
     vec1, vec2, vec3 = get_any2vec(wv, inp1), get_any2vec(wv, inp2), get_any2vec(wv, inp3)
-
+    # Get words for all inputs for excluding in result
+    word1, word2, word3 = get_vec2word(wv,vec1), get_vec2word(wv,vec1), get_vec2word(wv,vec1)
+    # Make a list of all input words
+    all_words = [word1, word2, word3]
     # Compute analogy vector
-    analogy_vec = vec1 - vec2 + vec3
-
-    # Apply normalization if using cosine similarity
-    if metric == :cosine
-        analogy_vec /= norm(analogy_vec)
-    elseif metric != :dot_product
-        throw(ArgumentError("Invalid metric: choose either :cosine or :dot_product"))
-    end
-
-    # Compute similarity scores using view to avoid unnecessary memory allocation
-    similarities = view(wv.embeddings, :, :)' * analogy_vec
-
-    # Get words for input vectors
-    word1, word2, word3 = get_vec2word(wv, vec1), get_vec2word(wv, vec2), get_vec2word(wv, vec3)
-
-    # Create exclusion set safely
-    exclude_set = Set(word for word in (word1, word2, word3) if word !== nothing && haskey(wv.word_indices, word))
-
-    # Get top n+exclusion_count most similar words
-    top_indices = partialsortperm(similarities, 1:n+length(exclude_set), rev=true)
-
-    # Filter out excluded words
-    filtered_indices = filter(idx -> wv.words[idx] ∉ exclude_set, top_indices)[1:min(n, end)]
-
-    # Return top n words
+    analogy_vec = norm(vec1 - vec2 + vec3)
+    # Compute the cosine similarity score for each embedding vector with the analogy vector
+    similarities = wv.embeddings' * analogy_vec
+    # Make a set including all input words
+    exclude_set = Set(wv.word_indices[word] for word in all_words)
+    # Search for n vectors with highest similarity score excluding input words
+    filtered_indices = first(filter(!in(exclude_set), sortperm(similarities[:], rev=true)))[1:min(n, end)]
     return wv.words[filtered_indices]
 end
-
-
-#function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=5)
-    # Get vectors for all inputs for vector calculations
-    #vec1, vec2, vec3 = get_any2vec(wv, inp1), get_any2vec(wv, inp2), get_any2vec(wv, inp3)
-    # Get words for all inputs for excluding in result
-    #word1, word2, word3 = get_vec2word(wv,vec1), get_vec2word(wv,vec1), get_vec2word(wv,vec1)
-    # Make a list of all input words
-    #all_words = [word1, word2, word3]
-    # Compute analogy vector
-    #analogy_vec = vec1 - vec2 + vec3
-    # Compute the cosine similarity score for each embedding vector with the analogy vector
-    #similarities = wv.embeddings' * analogy_vec
-    # Make a set including all input words
-    #exclude_set = Set(wv.word_indices[word] for word in all_words)
-    # Search for n vectors with highest similarity score excluding input words
-    #filtered_indices = first(filter(!in(exclude_set), sortperm(similarities[:], rev=true)))[1:min(n, end)]                   # Take top n
-#return wv.words[filtered_indices]
-#end
