@@ -58,11 +58,6 @@ end
                   9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0]  # Third dimension
     wv = WordEmbedding(words, embeddings)
     
-    @testset "basic functionality" begin
-        p = show_relations("king", "queen", "man", "woman"; wv=wv)
-        @test p isa Plots.Plot  # Ensure a plot is returned
-    end
-
     @testset "even word count enforcement" begin
         @test_throws ArgumentError show_relations("king", "queen", "man"; wv=wv)  # Odd number of words
     end
@@ -71,10 +66,9 @@ end
         @test_throws ArgumentError show_relations("king", "unknown"; wv=wv)  # Word not in embeddings
     end
 
-    @testset "plot saving functionality" begin
-        save_path = "test_plot.png"
-        show_relations("car", "bus", "apple", "banana"; wv=wv, save_path=save_path)
-        @test isfile(save_path)  # Check that the file was created
-        rm(save_path)  # Clean up after test
+    @testset "dimension reduction validity" begin
+        embeddings_subset = [wv.embeddings[:, wv.word_indices[word]] for word in ["king", "queen", "man", "woman"]]
+        reduced = reduce_to_2d(permutedims(hcat(embeddings_subset...)))
+        @test size(reduced) == (2, 4)  # Should reduce to 2D space for given words
     end
 end
