@@ -101,13 +101,13 @@ end
     end
 
     @testset "Label Generation" begin
-        selected_words = ["king", "queen", "dog", "cat"]
+        selected_words = ["king", "queen", "banana", "apple"]
         labels = text.([word for word in selected_words], :bottom)
         @test length(labels) == length(selected_words)  # Ensure correct label count
     end
 
     @testset "Plot Generation and Quiver Arrows" begin
-        selected_words = ["king", "queen", "dog", "cat"]
+        selected_words = ["king", "queen", "banana", "apple"]
         projection_test = reduce_to_2d(permutedims(hcat([wv.embeddings[:, wv.word_indices[word]] for word in selected_words]...)))
 
         p = scatter(projection_test[1, :], projection_test[2, :], 
