@@ -1,55 +1,46 @@
 export WordEmbedding
 
 """
-The load_text_model function takes a file in text format containing the pre-trained Word2Vec model as input 
-and gives an object of type Word2VecModel as output. This object includes a dictionary mapping words
-to their indices and a matrix of vectors where each column corresponds to a word's vector
-"""
+    train_model(train::AbstractString, output::AbstractString; 
+                size::Int=100, window::Int=5, sample::AbstractFloat=1e-3,
+                hs::Int=0, negative::Int=5, threads::Int=12, iter::Int=5, 
+                min_count::Int=5, alpha::AbstractFloat=0.025,
+                debug::Int=2, binary::Int=0, cbow::Int=1, 
+                save_vocab=Nothing(), read_vocab=Nothing(),
+                verbose::Bool=false) -> Nothing
 
-"""
-     word2vec(train, output; size=100, window=5, sample=1e-3, hs=0,  negative=5, threads=12, iter=5, min_count=5, alpha=0.025, debug=2, binary=1, cbow=1, save_vocal=Nothing(), read_vocab=Nothing(), verbose=false,)
+Trains a Word2Vec model using the specified parameters.
 
-    Parameters for training:
-        train <file>
-            Use text data from <file> to train the model
-        output <file>
-            Use <file> to save the resulting word vectors / word clusters
-        size <Int>
-            Set size of word vectors; default is 100
-        window <Int>
-            Set max skip length between words; default is 5
-        sample <AbstractFloat>
-            Set threshold for occurrence of words. Those that appear with
-            higher frequency in the training data will be randomly
-            down-sampled; default is 1e-5.
-        hs <Int>
-            Use Hierarchical Softmax; default is 1 (0 = not used)
-        negative <Int>
-            Number of negative examples; default is 0, common values are 
-            5 - 10 (0 = not used)
-        threads <Int>
-            Use <Int> threads (default 12)
-        iter <Int>
-            Run more training iterations (default 5)
-        min_count <Int>
-            This will discard words that appear less than <Int> times; default
-            is 5
-        alpha <AbstractFloat>
-            Set the starting learning rate; default is 0.025
-        debug <Int>
-            Set the debug mode (default = 2 = more info during training)
-        binary <Int>
-            Save the resulting vectors in binary moded; default is 0 (off)
-        cbow <Int>
-            Use the continuous back of words model; default is 1 (skip-gram
-            model)
-        save_vocab <file>
-            The vocabulary will be saved to <file>
-        read_vocab <file>
-            The vocabulary will be read from <file>, not constructed from the
-            training data
-        verbose <Bool>
-            Print output from training 
+# Arguments
+- `train::AbstractString`: Path to the input text file used for training.
+- `output::AbstractString`: Path to save the trained word vectors.
+- `size::Int`: Dimensionality of the word vectors (default: 100).
+- `window::Int`: Maximum skip length between words (default: 5).
+- `sample::AbstractFloat`: Threshold for word occurrence downsampling (default: 1e-3).
+- `hs::Int`: Use hierarchical softmax (1 = enabled, 0 = disabled, default: 0).
+- `negative::Int`: Number of negative samples (0 = disabled, common values: 5-10, default: 5).
+- `threads::Int`: Number of threads for training (default: 12).
+- `iter::Int`: Number of training iterations (default: 5).
+- `min_count::Int`: Minimum occurrences for a word to be included (default: 5).
+- `alpha::AbstractFloat`: Initial learning rate (default: 0.025).
+- `debug::Int`: Debugging verbosity level (default: 2).
+- `binary::Int`: Save the vectors in binary format (1 = enabled, 0 = disabled, default: 0).
+- `cbow::Int`: Use continuous bag-of-words model (1 = CBOW, 0 = Skip-gram, default: 1).
+- `save_vocab`: Path to save the vocabulary (default: `Nothing()`).
+- `read_vocab`: Path to read an existing vocabulary (default: `Nothing()`).
+- `verbose::Bool`: Print training progress (default: `false`).
+
+# Throws
+- `SystemError`: If the training process encounters an issue with file paths.
+- `ArgumentError`: If input parameters are invalid.
+
+# Returns
+- `Nothing`: The function trains the model and saves the output to a file.
+
+# Example
+```julia
+train_model("data.txt", "model.vec"; size=200, window=10, iter=10)
+```
 """
 function train_model(train::AbstractString, output::AbstractString; 
                   size::Int=100, window::Int=5, sample::AbstractFloat=1e-3,
@@ -108,6 +99,7 @@ words = ["cat", "dog", "house"]
 vectors = [0.5 0.1 0.8;
           0.2 0.9 0.3]
 embedding = WordEmbedding(words, vectors)
+```
 """
 struct WordEmbedding
     # List of all words in the vocabulary. e.g. ["cat", "dog", "house"]
@@ -154,6 +146,7 @@ Loads word embeddings from a text or binary file.
 ```julia
 embedding = load_embeddings("vectors.txt")  # Load text format
 embedding = load_embeddings("vectors.bin", format=:binary, data_type=Float64, skip_bytes=1)  # Load binary format
+```
 """
 function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Float64}=Float64,normalize_vectors::Bool=true, separator::Char=' ', skip_bytes::Int=1)
      # For a text file use the read_text_format function
@@ -168,14 +161,28 @@ function load_embeddings(path::String; format::Symbol=:text, data_type::Type{Flo
 end
 
 """
-# This function reads word embeddings (word->vector mappings) from a text file
-# It requires the following Parameters:
-#   filepath: where the file is located
-#   T: what kind of numbers we want (like decimal numbers)
-#   normalize: whether to make all vectors have length 1
-#               ---> This can be useful for comparison since the length of the vector does not
-#                    matter, only its direction
-#   separator: what character separates the values in the file (like space or comma)
+    read_text_format(filepath::AbstractString, ::Type{T}, normalize::Bool, 
+                     separator::Char) where T<:Real -> WordEmbedding
+
+Reads word embeddings from a text file and converts them into a `WordEmbedding` object.
+
+# Arguments
+- `filepath::AbstractString`: Path to the text file containing word embeddings.
+- `T<:Real`: Numeric type for storing embedding values (e.g., `Float32`, `Float64`).
+- `normalize::Bool`: Whether to normalize vectors to unit length for comparison.
+- `separator::Char`: Character used to separate words and vector values in the file.
+
+# Throws
+- `SystemError`: If the file cannot be opened or read.
+- `ArgumentError`: If the file format is incorrect or missing data.
+
+# Returns
+- `WordEmbedding`: A structure containing words and their corresponding embedding vectors.
+
+# Example
+```julia
+embeddings = read_text_format("vectors.txt", Float32, true, ' ')
+```
 """
 function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool, separator::Char) where T<:Real
     open(filepath) do file
@@ -212,18 +219,30 @@ function read_text_format(filepath::AbstractString, ::Type{T},normalize::Bool, s
     end
 end
 
-"""
-# This function reads word embeddings (word->vector mappings) from a binary file
-# It requires the following Parameters:
-#   filepath: where the file is located
-#   T: what kind of numbers we want (like decimal numbers)
-#   normalize: whether to make all vectors have length 1
-#               ---> This can be useful for comparison since the length of the vector does not
-#                    matter, only its direction
-#   separator: what character separates the values in the file (like space or comma)
-#   skip_bytes: how many bytes to skip after each word-vector pair (usually for handling separators)
-# Instead of reading lines of text and parsing numbers it reads words until it hits a separator
-# Reads raw bytes and converts them directly to numbers
+""""
+    read_binary_format(filepath::AbstractString, ::Type{T}, normalize::Bool, 
+                       separator::Char, skip_bytes::Int) where T<:Real -> WordEmbedding
+
+Reads word embeddings from a binary file and converts them into a `WordEmbedding` object.
+
+# Arguments
+- `filepath::AbstractString`: Path to the binary file containing word embeddings.
+- `T<:Real`: Numeric type for storing embedding values (e.g., `Float32`, `Float64`).
+- `normalize::Bool`: Whether to normalize vectors to unit length for comparison.
+- `separator::Char`: Character separating words and vector data in the file.
+- `skip_bytes::Int`: Number of bytes to skip after each word-vector pair (e.g., for handling separators).
+
+# Throws
+- `SystemError`: If the file cannot be opened or read.
+- `ArgumentError`: If the file format is incorrect or data is missing.
+
+# Returns
+- `WordEmbedding`: A structure containing words and their corresponding embedding vectors.
+
+# Example
+```julia
+embeddings = read_binary_format("vectors.bin", Float32, true, ' ', 1)
+```
 """
 function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool ,separator::Char,skip_bytes::Int) where T<:Real
 
@@ -250,10 +269,8 @@ function read_binary_format(filepath::AbstractString,::Type{T},normalize::Bool ,
             if normalize
                 vector = vector ./ norm(vector)
             end
-
             # Convert to desired number type and store
-            vectors[:, i] = T.(vector)
-               
+            vectors[:, i] = T.(vector)        
                     
             # Skip extra bytes (like newlines) after each word-vector pair
             read(file, skip_bytes)
