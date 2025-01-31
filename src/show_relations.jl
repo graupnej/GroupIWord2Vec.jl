@@ -65,7 +65,7 @@ Note: Use an even number of inputs!
 p = show_relations("king", "queen", "man", "woman"; wv=model, save_path="relations.png")
 ```
 """
-function show_relations(words::String...; wv::WordEmbedding, save_path::Union{String,nothing}="word_relations.png")
+function show_relations(words::String...; wv::WordEmbedding, save_path::Union{String,Nothing}="word_relations.png")
     # Check input
     word_count = length(words)
     if word_count % 2 != 0
