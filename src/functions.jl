@@ -227,20 +227,32 @@ get_word_analogy(model, "king", "man", "woman", 3)
 ```
 """
 function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=5)
+    # Check input for forbidden arguments:
+    if n == 0
+        throw(ArgumentError("n must be greater than 0"))
+    end
+    # Ensure inputs are valid words or vectors
+    if !all(x -> x isa String || x isa Vector{Float64}, (inp1, inp2, inp3))
+        throw(ArgumentError("All inputs must be a String or a Vector{Float64}"))
+    end
     # Get vectors for all inputs for vector calculations
     vec1, vec2, vec3 = get_any2vec(wv, inp1), get_any2vec(wv, inp2), get_any2vec(wv, inp3)
     # Get words for all inputs for excluding in result
     word1, word2, word3 = get_vec2word(wv, vec1), get_vec2word(wv, vec2), get_vec2word(wv, vec3)
     # Make a list of all input words
     all_words = [word1, word2, word3]
+    
     # Compute analogy vector
     analogy_vec = vec1 - vec2 + vec3
+    if norm(analogy_vec) < 1e-10
+        throw(ArgumentError("inp3 must be a String or a Vector{Float64}"))
+    end
     analogy_vec /= norm(analogy_vec)  # Normalize to unit length
     # Compute the cosine similarity score for each embedding vector with the analogy vector
     similarities = wv.embeddings' * analogy_vec
     # Make a set including all input words
-    exclude_set = Set(wv.word_indices[word] for word in all_words)
+    exclude_set = exclude_set = Set(get(wv.word_indices, word, nothing)
     # Search for n vectors with highest similarity score excluding input words
-    filtered_indices = first(filter(!in(exclude_set), sortperm(similarities[:], rev=true)))[1:min(n, end)]
+    filtered_indices = filter(i -> !(i in exclude_set), sortperm(similarities[:], rev=true))[1:min(n, end)]
     return wv.words[filtered_indices]
 end
