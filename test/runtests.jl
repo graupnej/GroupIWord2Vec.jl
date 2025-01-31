@@ -14,7 +14,11 @@ using GroupIWord2Vec
    end
 
    @testset "Plotting" begin
-       include("test_plotting.jl")
-   end
-   
+        include("test_plotting.jl")
+    end
+
+    @testset "Plotting" begin
+        include("test_training.jl")
+    end
+
 end
