@@ -225,6 +225,16 @@ function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString,
     return wv.words[top_indices]
 end
 
+function get_similar_words(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}}, n::Int=10)
+    # Make sure input is a vector or convert it into a vector
+    vec = get_any2vec(wv, word_or_vec)
+    # Computes cosine similarity score between all embedding vectors and input vector
+    similarities = wv.embeddings' * vec
+    # Sort similarities for highest n cosine similarity scores
+    top_indices = sortperm(similarities[:], rev=true)[1:n]
+    return wv.words[top_indices]
+end
+
 
 """
     get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=5) -> Vector{String}
