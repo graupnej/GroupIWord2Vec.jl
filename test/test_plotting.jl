@@ -1,12 +1,10 @@
 using Test
 using GroupIWord2Vec
 
+# INFO: We hade problems using the Statistics or LinearAlgebra package here which is why we computed e.g. the mean/variance manually instead of using a predefined funtion
+
 @testset "reduce_to_2d" begin
-    # Generate synthetic data with a clear pattern
-    data = [1.0 2.0 3.0;
-            4.0 5.0 6.0;
-            7.0 8.0 9.0;
-            10.0 11.0 12.0]
+    data = [1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0; 10.0 11.0 12.0]
     
     @testset "basic functionality" begin
         projected_data = reduce_to_2d(data, 2)
@@ -51,11 +49,9 @@ using GroupIWord2Vec
 end
 
 @testset "show_relations" begin
-    # Test data setup
     words = ["king", "queen", "man", "woman", "apple", "banana", "car", "bus"]
-    embeddings = [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0;  # First dimension
-                  5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0;  # Second dimension
-                  9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0]  # Third dimension
+    embeddings = [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0; 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0; 9.0 10.0 11.0 12.0 13.0 14.0 15.0 16.0]
+    
     wv = WordEmbedding(words, embeddings)
     
     @testset "even word count enforcement" begin
