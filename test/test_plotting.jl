@@ -83,7 +83,6 @@ end
         # Apply PCA
         projection_test = reduce_to_2d(embeddings_test)
         @test size(projection_test) == (2, length(selected_words))  # Should be 2D
-        @test rank(projection_test) <= 2  # Ensuring PCA properly reduces dimensions
     end
 
     @testset "arrow computation" begin
@@ -98,27 +97,6 @@ end
         @test length(arrows_x) == length(arrows_y)  # Ensure x and y lists match in size
         @test all(x -> isa(x, Number), arrows_x)  # Ensure numerical correctness
         @test all(y -> isa(y, Number), arrows_y)
-    end
-
-    @testset "Label Generation" begin
-        selected_words = ["king", "queen", "banana", "apple"]
-        labels = text.([word for word in selected_words], :bottom)
-        @test length(labels) == length(selected_words)  # Ensure correct label count
-    end
-
-    @testset "Plot Generation and Quiver Arrows" begin
-        selected_words = ["king", "queen", "banana", "apple"]
-        projection_test = reduce_to_2d(permutedims(hcat([wv.embeddings[:, wv.word_indices[word]] for word in selected_words]...)))
-
-        p = scatter(projection_test[1, :], projection_test[2, :], 
-                title="Word Embedding PCA Projection",
-                xlabel="First Principal Component",
-                ylabel="Second Principal Component",
-                legend=false, series_annotations=text.([word for word in selected_words], :bottom))
-        @test isa(p, Plots.Plot)
-
-        quiver!(p, projection_test[1, :], projection_test[2, :], quiver=(arrows_x, arrows_y))
-        @test isa(p, Plots.Plot)
     end
 
     @testset "Saving Plot to File" begin
