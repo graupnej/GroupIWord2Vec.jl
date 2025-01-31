@@ -177,7 +177,7 @@ function save_custom_model(model::Chain, vocabulary::Dict{String, Int}, path::St
     end
 
     f = open(path, "a")
-    words = [k for (k, v) in sort(collect(vocab), by=x -> x[2])]   
+    words = [k for (k, v) in sort(collect(vocabulary), by=x -> x[2])]   
     for (i, word) in enumerate(words)
         write(f, "$word $(join(model[1].weight[:,i], " "))\n")
     end
