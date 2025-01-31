@@ -57,7 +57,7 @@ julia> model = load_embeddings("./text8.txt")
 Now that a model is loaded the functions of this package can be used to work with the embedding vectors.
 
 
-- ``get_word2vec()``: Retrieves the embedding vector corresponding to a given word.
+- `get_word2vec()`: Retrieves the embedding vector corresponding to a given word.
 
 ```julia
 julia> get_word2vec(model, "king")
@@ -79,14 +79,14 @@ or
 julia> get_vector_operation(model, king_vec, "queen","euclid")
 ```
 
-- ``get_word_analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
+- `get_word_analogy()`: Performs word analogy calculations (e.g. king - man + woman = queen)
   
 ```julia
 julia> word_analogy(model, "king", "man", "woman")
 ```
 
 #### Display Data Functions
-- ``show``_``relations()``: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
+- `show_relations()`: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
 
 ```julia
 julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", wv=model, save_path="my_custom_plot.png")
