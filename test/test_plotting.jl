@@ -1,6 +1,8 @@
 using Test
 using GroupIWord2Vec
 
+using Test
+
 @testset "reduce_to_2d" begin
     # Generate synthetic data with a clear pattern
     data = [1.0 2.0 3.0;
@@ -22,12 +24,16 @@ using GroupIWord2Vec
     @testset "numerical properties" begin
         projected_data = reduce_to_2d(data, 2)
         
-        # Ensure the mean of projected data is approximately centered around zero
-        @test all(abs.(mean(projected_data, dims=2)) .< 1e-6)
+        # Compute means manually
+        mean_values = sum(projected_data, dims=2) / size(projected_data, 2)
         
-        # Ensure variance along principal components is decreasing
-        var1 = var(projected_data[1, :])
-        var2 = var(projected_data[2, :])
+        # Ensure the mean of projected data is approximately centered around zero
+        @test all(abs.(mean_values) .< 1e-6)
+        
+        # Compute variances manually
+        var1 = sum((projected_data[1, :] .- mean_values[1]) .^ 2) / (size(projected_data, 2) - 1)
+        var2 = sum((projected_data[2, :] .- mean_values[2]) .^ 2) / (size(projected_data, 2) - 1)
+
         @test var1 >= var2  # First principal component should have the highest variance
     end
     
@@ -43,3 +49,4 @@ using GroupIWord2Vec
         @test size(projected_column) == (1, 4)
     end
 end
+
