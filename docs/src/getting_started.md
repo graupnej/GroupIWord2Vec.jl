@@ -1,21 +1,13 @@
 [![Coverage](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/graupnej/GroupIWord2Vec.jl)
 [![Build Status](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/graupnej/GroupIWord2Vec.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://graupnej.github.io/GroupIWord2Vec.jl/dev/)
-## Word Embeddings:
-[Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks. This package allows to train a ML model to create word embeddings based on a source text, and provides functionality to work with the create word embedding vectors.
+
+## Word Embeddings
+[Word Embeddings](https://en.wikipedia.org/wiki/Word_embedding) are numerical representations of words in a high-dimensional vector space, where words with similar meanings are positioned closer together. These vectors capture semantic relationships between words, allowing machines to understand language context and meaning through mathematical operations. They serve as the foundation for many natural language processing tasks. This package allows training an ML model to create word embeddings based on a source text and provides functionality to work with the generated word embedding vectors.
 
 ## Getting Started
-### 1) Download
-We can't use Pluto's environments but have to create our own
 
-```julia
-julia> using Pkg
-julia> Pkg.activate("MyEnv")
-julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
-julia> using GroupIWord2Vec
-```
-
-Below is an overview of the project's main components
+This is an overview of the project's main file structure:
 
 ```
 GroupIWord2Vec.jl               
@@ -33,8 +25,20 @@ GroupIWord2Vec.jl
 └── README.md                   # Main documentation file containing getting started
 ```
 
-### 2) Running a simple example
-Download [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
+### Download
+Pluto's built-in environments cannot be used, so to start a custom environment must be created and managed manually.
+
+```julia
+julia> using Pkg
+julia> Pkg.activate("MyEnv")
+julia> Pkg.add(url="https://github.com/graupnej/GroupIWord2Vec.jl")
+julia> using GroupIWord2Vec
+```
+
+## Examples
+### Train Model and Create Word Embeddings - Text8
+
+Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use ``train_model()``
 
 ```julia
 julia> train_model("text8", "text8.txt", verbose = true)
@@ -47,7 +51,11 @@ Import the obtained word vectors from _text8.txt_ into Julia using ``load_embedd
 julia> model = load_embeddings("./text8.txt")
 ```
 
-#### Some functionalities
+### Examples
+#### Functions
+
+Now that a model is loaded the functions of this package can be used to work with the embedding vectors.
+
 
 - ``get_word2vec()``: Retrieves the embedding vector corresponding to a given word.
 
@@ -55,58 +63,29 @@ julia> model = load_embeddings("./text8.txt")
 julia> get_word2vec(model, "king")
 ```
 
-```julia
-julia> get_word2vec(model, "king")
-```
-
-
 - ``get_vec2word()``: Retrieves the closest word in the embedding space to a given vector.
 
 ```julia
 julia> get_vec2word(model, king_vec)
 ```
 
-- ``get_any2vec()``: Converts a word into its corresponding vector or returns the vector unchanged if already provided. This allows other functions to take both words and vectors as input.
-
-```julia
-julia> get_any2vec(model, "king")
-```
-or
-```julia
-julia> get_any2vec(model, king_vec)
-```
-
-- ``get_cosine_similarity()``: Returns cosine of the angle between two vectors in a word embedding space
-
-```julia
-julia> get_cosine_similarity(model, "king", "prince")
-```
-
-It ranges from -1 to 1, where 1 indicates high similarity, 0 indicates no similarity and -1 indicates opposite directions.
- 
-- ``get_similar_words()``: Find the n most similar words to a given word or embedding vector and return the matching strings
-
-```julia
-julia> get_similar_words(model, "king", 5)
-```
-
 - ``get_vector_operation()``: Computes 1 of 4 vector calculations on two input words or vectors depending on the input operator
 
 ```julia
-julia> get_vector_operation(model, "king", "queen","+")
+julia> get_vector_operation(model, "king", "queen",:+)
 ```
 or
 ```julia
 julia> get_vector_operation(model, king_vec, "queen","euclid")
 ```
 
-- ``get_word_analogy()``: Performs word analogy calculations (e.g. king - queen + woman = man)
+- ``get_word_analogy()``: Performs word analogy calculations (e.g. king - man + woman = queen)
   
 ```julia
-julia> word_analogy(model, "king", "queen", ["woman"])
+julia> word_analogy(model, "king", "man", "woman")
 ```
 
-#### Display Data
+#### Display Data Functions
 - ``show``_``relations()``: Creates a [PCA Projection](https://en.wikipedia.org/wiki/Principal_component_analysis) to 2D of words with connecting vectors 
 
 ```julia
@@ -117,8 +96,9 @@ julia> show_relations("berlin", "germany", "paris", "france", "rome", "apple", w
   <img src="assets/PCAProjection.png" alt="Logo" width="400" height="250" />
 </div>
 
-### 3) Running a large example
-As an alternative (larger) example use a text corpus from e.g. [FastText](https://fasttext.cc/docs/en/pretrained-vectors.html) (.bin & .vec file) with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
+### Train Model and Create Word Embeddings - fasttext
+As an alternative use a (larger) text corpus from e.g. [FastText](https://fasttext.cc/docs/en/pretrained-vectors.html) (.bin & .vec file) with about 33 million words. Store this file in the current working directory and apply the same functions as in the previous example.
+
 
 ## For Developers
 ### 1) Download the code
