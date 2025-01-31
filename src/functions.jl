@@ -218,7 +218,6 @@ Finds the top `n` words that best complete the analogy: `inp1 - inp2 + inp3 = ?`
 # Notes
 - Input words are converted to vectors automatically.
 - The computed analogy vector is normalized.
-- Input words (if given as strings) are excluded from results.
 
 # Example
 ```julia
@@ -226,7 +225,7 @@ get_word_analogy(model, "king", "man", "woman", 3)
 # → ["queen", "princess", "duchess"]
 ```
 """
-function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=5)
+function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, inp3::Union{String, Vector{Float64}}, n::Int=10)
     # Check input for forbidden arguments:
     if n == 0
         throw(ArgumentError("n must be greater than 0"))
