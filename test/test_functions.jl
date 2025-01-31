@@ -221,3 +221,36 @@ end
         @test_throws ArgumentError get_similar_words(wv, "Banana", 3)
     end
 end
+
+@testset "get_word_analogy" begin
+    # Test data setup
+    words = ["king", "queen", "man", "woman", "prince", "princess"]
+    embeddings = Float64[
+        1.0  0.9  0.8  0.7  0.6  0.5;
+        0.8  0.7  0.6  0.5  0.4  0.3;
+        0.6  0.5  0.4  0.3  0.2  0.1
+    ]  # 3D vectors representing semantic relationships
+
+    wv = WordEmbedding(words, embeddings)
+
+    @testset "basic functionality" begin
+        result = get_word_analogy(wv, "king", "man", "woman", 1)
+        @test result == ["queen"]
+    end
+
+    @testset "vector and word inputs consistency" begin
+        king_vec, man_vec, woman_vec = get_any2vec(wv, "king"), get_any2vec(wv, "man"), get_any2vec(wv, "woman")
+        @test get_word_analogy(wv, "king", "man", "woman", 1) == get_word_analogy(wv, king_vec, man_vec, woman_vec, 1)
+    end
+
+    @testset "exclusion of input words" begin
+        result = get_word_analogy(wv, "king", "man", "woman", 3)
+        @test "king" ∉ result && "man" ∉ result && "woman" ∉ result
+    end
+
+    @testset "error cases" begin
+        @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)
+        @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 3, metric=:invalid_metric)
+        @test_throws ArgumentError get_word_analogy(wv, "unknown", "man", "woman", 3)
+    end
+end
