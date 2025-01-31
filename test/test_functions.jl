@@ -200,7 +200,7 @@ end
 @testset "get_similar_words" begin
     # Test data setup
     words = ["cat", "dog", "bird", "fish", "lion"]
-    embeddings = [1.0  0.9  0.1  0.0  0.7;  # Simulated word vectors
+    embeddings = [1.0  0.9  0.1  0.0  0.7;  
                   0.8  0.7  0.1  0.0  0.6;
                   0.6  0.5  0.1  0.0  0.4]
     wv = WordEmbedding(words, embeddings)
@@ -213,55 +213,43 @@ end
 
     @testset "top-n similarity results" begin
         similar_to_cat = get_similar_words(wv, "cat", 2)
-        @test similar_to_cat[1] == "dog"  # "dog" should be most similar to "cat"
-        @test "cat" ∉ similar_to_cat  # "cat" should not appear in its own results
+        @test similar_to_cat[1] == "dog"
+        @test "cat" ∉ similar_to_cat
 
         similar_to_dog = get_similar_words(wv, "dog", 3)
-        @test similar_to_dog[1] == "cat"  # "cat" should be most similar to "dog"
-        @test "dog" ∉ similar_to_dog  # "dog" should not appear in its own results
+        @test similar_to_dog[1] == "cat"
+        @test "dog" ∉ similar_to_dog
 
-        # Check if lion is correctly positioned based on the given embedding data
         similar_to_lion = get_similar_words(wv, "lion", 3)
-        @test "cat" in similar_to_lion  # "lion" should be similar to "cat"
-        @test "dog" in similar_to_lion  # "lion" should be similar to "dog"
+        @test "cat" in similar_to_lion
+        @test "dog" in similar_to_lion
     end
 
     @testset "using custom vectors" begin
-        vec = [1.0, 0.8, 0.6]  # Close to "cat"
+        vec = [1.0, 0.8, 0.6]
         similar_to_vec = get_similar_words(wv, vec, 2)
         @test similar_to_vec[1] == "cat"
         @test similar_to_vec[2] == "dog"
     end
 
     @testset "edge cases" begin
-        # Requesting more words than available (excluding query word)
-        @test length(get_similar_words(wv, "cat", 10)) == 4  # Should return max possible excluding "cat"
+        @test length(get_similar_words(wv, "cat", 10)) == 4  
 
-        # Requesting 0 words should return an empty list
-        @test get_similar_words(wv, "cat", 0) == []
+        @test_throws ArgumentError get_similar_words(wv, "cat", 0)  
 
-        # Single word vocabulary should return an empty list when queried
-        single_word_wv = WordEmbedding(["onlyword"], [1.0; 0.5; 0.2])
+        single_word_wv = WordEmbedding(["onlyword"], [1.0 0.5 0.2]')  
         @test get_similar_words(single_word_wv, "onlyword", 5) == []
     end
 
     @testset "numerical stability" begin
-        # Checking that words with zero vectors don't cause issues
         zero_vector_wv = WordEmbedding(["zero1", "zero2"], [0.0 0.0; 0.0 0.0; 0.0 0.0])
         @test_throws ArgumentError get_similar_words(zero_vector_wv, "zero1", 2)
     end
 
     @testset "error cases" begin
-        # Unknown words should throw an error
         @test_throws ArgumentError get_similar_words(wv, "unknown")
-
-        # Vector of incorrect dimensions should throw an error
         @test_throws DimensionMismatch get_similar_words(wv, [1.0, 2.0], 2)
-
-        # Zero vector should throw an error
         @test_throws ArgumentError get_similar_words(wv, [0.0, 0.0, 0.0], 2)
-
-        # Negative `n` should throw an error
         @test_throws ArgumentError get_similar_words(wv, "cat", -1)
     end
 end
