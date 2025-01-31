@@ -55,7 +55,7 @@ embedding = WordEmbedding(words, vectors)
 get_vec2word(embedding, [0.51, 0.19])  # Returns "cat"
 ```
 """
-function get_vec2word(wv::WordEmbedding{S, T}, vec::Vector{T}) where {S<:AbstractString, T<:Real}
+function get_vec2word(wv::WordEmbedding, vec::Vector{Float64})
     # Ensure input vector has correct dimension
     if length(vec) != size(wv.embeddings, 1)
         throw(DimensionMismatch("Input vector must have the same dimension as word vectors. Expected $(size(wv.embeddings, 1)), got $(length(vec))."))
@@ -101,16 +101,16 @@ get_any2vec(wv, "cat")  # Returns [0.5, 0.2]
 get_any2vec(wv, [0.5, 0.2])  # Returns [0.5, 0.2]
 ```
 """
-function get_any2vec(wv::WordEmbedding{S, T}, word_or_vec::Union{S, Vector{<:Real}}) where {S<:AbstractString, T<:Real}
-    if word_or_vec isa S
+function get_any2vec(wv::WordEmbedding, word_or_vec::Union{String, Vector{Float64}})
+    if word_or_vec isa String
         # Convert word to vector
         return get_word2vec(wv, word_or_vec)
-    elseif word_or_vec isa Vector{<:Real}
+    elseif word_or_vec isa Vector{Float64}
         # Check dimension match for vector input
         if length(word_or_vec) != size(wv.embeddings, 1)
             throw(DimensionMismatch("Input vector dimension $(length(word_or_vec)) does not match embedding dimension $(size(wv.embeddings, 1))"))
         end
-        return convert(Vector{T}, word_or_vec)
+        return word_or_vec
     else
         # Explicitly handle invalid input types
         throw(ArgumentError("Input must be a String (word) or a Vector of real numbers matching the embedding dimension."))
@@ -145,8 +145,7 @@ similarity = get_vector_operation(model, "cat", "dog", :cosine)
 distance = get_vector_operation(model, "car", "bicycle", :euclid)
 ```
 """
-function get_vector_operation(ww::WordEmbedding, inp1::Union{String, AbstractVector{<:Real}}, 
-                              inp2::Union{String, AbstractVector{<:Real}}, operator::Symbol)
+function get_vector_operation(ww::WordEmbedding, inp1::Union{String, Vector{Float64}}, inp2::Union{String, Vector{Float64}}, operator::Symbol)
     # Convert inputs to vectors
     inp1_vec = get_any2vec(ww, inp1)
     inp2_vec = get_any2vec(ww, inp2)
