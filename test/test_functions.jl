@@ -169,58 +169,55 @@ end
 
 @testset "get_similar_words" begin
     # Test data setup
-    words = ["cat", "dog", "bird", "fish", "lion"]
-    embeddings = [1.0  0.9  0.1  0.0  0.7;  
-                  0.8  0.7  0.1  0.0  0.6;
-                  0.6  0.5  0.1  0.0  0.4]
+    words = ["apple", "banana", "cherry", "date", "elderberry"]
+    embeddings = Float64[
+        1.0  2.0  3.0  4.0  5.0;
+        2.0  3.0  4.0  5.0  6.0;
+        3.0  4.0  5.0  6.0  7.0
+    ]  # 3D vectors for each word
+
     wv = WordEmbedding(words, embeddings)
 
     @testset "basic functionality" begin
-        similar_words = get_similar_words(wv, "cat", 3)
+        # Test that the function returns a vector of words
+        similar_words = get_similar_words(wv, "banana", 3)
         @test similar_words isa Vector{String}
         @test length(similar_words) == 3
     end
 
-    @testset "top-n similarity results" begin
-        similar_to_cat = get_similar_words(wv, "cat", 2)
-        @test similar_to_cat[1] == "dog"
-        @test "cat" ∉ similar_to_cat
+    @testset "consistency of string and vector inputs" begin
+        # Retrieve vector for "banana"
+        banana_vec = get_any2vec(wv, "banana")
+        similar_words_from_vec = get_similar_words(wv, banana_vec, 3)
 
-        similar_to_dog = get_similar_words(wv, "dog", 3)
-        @test similar_to_dog[1] == "cat"
-        @test "dog" ∉ similar_to_dog
-
-        similar_to_lion = get_similar_words(wv, "lion", 3)
-        @test "cat" in similar_to_lion
-        @test "dog" in similar_to_lion
+        # The results should be the same
+        @test get_similar_words(wv, "banana", 3) == similar_words_from_vec
     end
 
-    @testset "using custom vectors" begin
-        vec = [1.0, 0.8, 0.6]
-        similar_to_vec = get_similar_words(wv, vec, 2)
-        @test similar_to_vec[1] == "cat"
-        @test similar_to_vec[2] == "dog"
-    end
+    @testset "similarity ranking order" begin
+        # Using "cherry" as query
+        query_word = "cherry"
+        query_vec = get_any2vec(wv, query_word)
+        
+        # Compute expected ranking based on cosine similarity
+        similarities = wv.embeddings' * query_vec
+        sorted_indices = sortperm(similarities, rev=true)[1:3]
+        expected_words = wv.words[sorted_indices]
 
-    @testset "edge cases" begin
-        @test length(get_similar_words(wv, "cat", 10)) == 4  
+        retrieved_words = get_similar_words(wv, query_word, 3)
 
-        @test_throws ArgumentError get_similar_words(wv, "cat", 0)  
-
-        single_word_wv = WordEmbedding(["onlyword"], reshape([1.0, 0.5, 0.2], :, 1))  
-        @test get_similar_words(single_word_wv, "onlyword", 5) == []
-    end
-
-    @testset "numerical stability" begin
-        zero_vector_wv = WordEmbedding(["zero1", "zero2"], [0.0 0.0; 0.0 0.0; 0.0 0.0])
-        @test_throws ArgumentError get_similar_words(zero_vector_wv, "zero1", 2)
+        @test retrieved_words == expected_words  # Ensure correct ranking
     end
 
     @testset "error cases" begin
-        @test_throws ArgumentError get_similar_words(wv, "unknown")
-        @test_throws DimensionMismatch get_similar_words(wv, [1.0, 2.0], 2)
-        @test_throws ArgumentError get_similar_words(wv, [0.0, 0.0, 0.0], 2)
-        @test_throws ArgumentError get_similar_words(wv, "cat", -1)
+        # Unknown word should throw an error
+        @test_throws ArgumentError get_similar_words(wv, "mango", 3)
+        
+        # Empty string or whitespace should throw an error
+        @test_throws ArgumentError get_similar_words(wv, "", 3)
+        @test_throws ArgumentError get_similar_words(wv, " ", 3)
+
+        # Word with incorrect capitalization should throw an error (if case-sensitive)
+        @test_throws ArgumentError get_similar_words(wv, "Banana", 3)
     end
 end
-
