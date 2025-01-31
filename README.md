@@ -51,20 +51,6 @@ julia> using GroupIWord2Vec
 
 
 ## Examples
-### Train Model and Create Word Embeddings - Text8
-
-Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use `train_model()``
-
-```julia
-julia> train_model("text8", "text8.txt", verbose = true)
-```
-
-The resulting word vectors are saved in a text format file (here) named _text8.txt_.
-Import the obtained word vectors from _text8.txt_ into Julia using `load_embeddings()``
-
-```julia
-julia> model = load_embeddings("./text8.txt")
-```
 
 ### Train custom Model from own text file
 
@@ -95,6 +81,23 @@ You can now load your custom model with `load_embeddings()``
 
 ```julia
 julia> WordEmbedding = load_embeddings("data/saved_model.txt")
+```
+
+### Train Model and Create Word Embeddings with Word2Vec package (Only Linux and MacOS systems!) - Text8
+> [!IMPORTANT]
+> As this approach uses the external C-code based package it is only compatible with Linux operating systems and MacOS running with an Intel processor. M1 or M2 chips for Apple Mac are not supported.
+
+Download the text corpus [_text8_](https://mattmahoney.net/dc/text8.zip) and store it in the current working directory. To train the model with this text corpus use `train_model()``
+
+```julia
+julia> train_model("text8", "text8.txt", verbose = true)
+```
+
+The resulting word vectors are saved in a text format file (here) named _text8.txt_.
+Import the obtained word vectors from _text8.txt_ into Julia using `load_embeddings()``
+
+```julia
+julia> model = load_embeddings("./text8.txt")
 ```
 
 ### Examples
