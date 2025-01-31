@@ -20,5 +20,7 @@ This package uses [![Julia](https://img.shields.io/badge/Julia-v1.10-blue)](http
        Word2vec.jll          # Links to the underlying Word2Vec implementation (C code)
        Statistics            # For basic statistical operations (mean, std, var, etc.)
 
+# All Functions List
+
 ```@index
 ```
