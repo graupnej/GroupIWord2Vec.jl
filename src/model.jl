@@ -11,6 +11,9 @@ export WordEmbedding
 
 Trains a Word2Vec model using the specified parameters.
 
+# CAUTION! 
+This Function can only be used with Linux or MacOS operating systems! MacOS is only supported with Intel processors M1, M2 are not supported!
+
 # Arguments
 - `train::AbstractString`: Path to the input text file used for training.
 - `output::AbstractString`: Path to save the trained word vectors.
