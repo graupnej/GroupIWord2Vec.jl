@@ -73,7 +73,7 @@ end
     end
 
     @testset "embedding extraction and projection" begin
-        selected_words = ["king", "queen", "dog", "cat"]
+        selected_words = ["king", "queen", "banana", "apple"]
         indices = Dict(word => get(wv.word_indices, word, nothing) for word in selected_words)
 
         # Extract embeddings
