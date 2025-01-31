@@ -63,7 +63,7 @@ julia> model = load_embeddings("./text8.txt")
 
 ### Example Functions
 
-Now that a model is loaded the functions of this package can be used to work wih the embedding vectors.
+Now that a model is loaded the functions of this package can be used to work with the embedding vectors.
 
 
 - ``get_word2vec()``: Retrieves the embedding vector corresponding to a given word.
