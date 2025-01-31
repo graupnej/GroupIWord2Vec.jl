@@ -68,9 +68,8 @@ end
         # Fix: Correctly write binary format
         write(io, "3 3\n")  # Metadata line
         for i in 1:3
-            write(io, words[i] * " ")  # Write word + space
+            write(io, words[i] * "\n")  # Separate words properly with newline
             write(io, reinterpret(UInt8, embeddings[:, i]))  # Ensure Float64 writing
-            write(io, "\n")
         end
         close(io)
 
@@ -96,4 +95,3 @@ end
         @test_throws ArgumentError load_embeddings(path, format=:text)
     end
 end
-
