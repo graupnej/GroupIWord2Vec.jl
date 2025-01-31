@@ -38,6 +38,13 @@ using GroupIWord2Vec
         @test get_word2vec(wv, "cat") != get_word2vec(wv, "dog")
         @test get_word2vec(wv, "dog") != get_word2vec(wv, "bird")
         @test get_word2vec(wv, "bird") != get_word2vec(wv, "fish")
+
+        # Test immutability (ensure function returns a copy)
+        cat_vec = get_word2vec(wv, "cat")
+        cat_vec[1] = 999.0  # Modify retrieved vector
+
+        # The original embeddings should remain unchanged
+        @test get_word2vec(wv, "cat") == [1.0, 5.0, 9.0]  # Ensure original values are intact
     end
     
     @testset "error cases" begin
@@ -47,6 +54,7 @@ using GroupIWord2Vec
         @test_throws ArgumentError get_word2vec(wv, " ")  # Added whitespace test
         @test_throws ArgumentError get_word2vec(wv, "Cat")  # Case sensitivity check
         @test_throws ArgumentError get_word2vec(wv, "birdd")  # Small typo test
+        @test_throws ArgumentError get_word2vec(wv, " cat ")  # Leading/trailing spaces
     end
 end
 
