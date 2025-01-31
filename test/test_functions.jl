@@ -48,8 +48,6 @@ using GroupIWord2Vec
         @test_throws ArgumentError get_word2vec(wv, "Cat")  # Case sensitivity check
         @test_throws ArgumentError get_word2vec(wv, "birdd")  # Small typo test
     end
-
-    end
 end
 
 @testset "get_vec2word" begin
