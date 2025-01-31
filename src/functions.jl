@@ -255,11 +255,17 @@ get_word_analogy(model, "king", "man", "woman", 3)
 # → ["queen", "princess", "duchess"]
 """
 function get_word_analogy(wv::WordEmbedding, inp1::T, inp2::T, inp3::T, n::Int=5) where {T<:Union{AbstractString, AbstractVector{<:Real}}}
+    # Ensure n is valid
+    if n ≤ 0
+        throw(ArgumentError("n must be greater than 0"))
+    end
+
     # Convert inputs to vectors
     vec1, vec2, vec3 = get_any2vec(wv, inp1), get_any2vec(wv, inp2), get_any2vec(wv, inp3)
 
     # Compute analogy vector (normalized)
-    analogy_vec = (vec1 - vec2 + vec3) / norm(vec1 - vec2 + vec3)
+    analogy_vec = vec1 - vec2 + vec3
+    analogy_vec /= norm(analogy_vec)  # Normalize
 
     # Compute cosine similarity scores
     similarities = wv.embeddings' * analogy_vec
@@ -276,3 +282,4 @@ function get_word_analogy(wv::WordEmbedding, inp1::T, inp2::T, inp3::T, n::Int=5
     # Return top n words
     return wv.words[filtered_indices]
 end
+
