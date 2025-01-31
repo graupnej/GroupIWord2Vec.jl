@@ -4,9 +4,7 @@ using GroupIWord2Vec
 @testset "get_word2vec" begin
     # Test data setup
     words = ["cat", "dog", "bird", "fish"]
-    embeddings = Float64[1.0 2.0 3.0 4.0;
-                         5.0 6.0 7.0 8.0;
-                         9.0 10.0 11.0 12.0]  # ✅ Convert to Float64
+    embeddings = Float64[1.0 2.0 3.0 4.0; 5.0 6.0 7.0 8.0; 9.0 10.0 11.0 12.0]
 
     wv = WordEmbedding(words, embeddings)
 
@@ -35,24 +33,21 @@ using GroupIWord2Vec
     end
 
     @testset "error cases" begin
+        # Some case sensitivity, typo etc tests
         @test_throws ArgumentError get_word2vec(wv, "unknown")
         @test_throws ArgumentError get_word2vec(wv, "")
         @test_throws ArgumentError get_word2vec(wv, " ")
-        @test_throws ArgumentError get_word2vec(wv, "Cat")  # Case sensitivity check
-        @test_throws ArgumentError get_word2vec(wv, "birdd")  # Small typo test
-        @test_throws ArgumentError get_word2vec(wv, " cat ")  # Leading/trailing spaces
+        @test_throws ArgumentError get_word2vec(wv, "Cat")  
+        @test_throws ArgumentError get_word2vec(wv, "birdd")
+        @test_throws ArgumentError get_word2vec(wv, " cat ")
     end
 end
-
 
 @testset "get_vec2word" begin
     # Test setup with clear pattern and normalized vectors
     words = ["cat", "dog", "bird", "fish"]
-    embeddings = [
-        1/√2  0.0   0.0   1/√2;    # First dimension
-        1/√2  1.0   0.0   -1/√2;   # Second dimension
-        0.0   0.0   1.0   0.0      # Third dimension
-    ]
+    embeddings = [1/√2  0.0   0.0   1/√2; 1/√2  1.0   0.0   -1/√2; 0.0   0.0   1.0   0.0]
+    
     wv = WordEmbedding(words, embeddings)
     
     @testset "exact matches" begin
@@ -85,9 +80,8 @@ end
 
 @testset "get_any2vec" begin
     words = ["cat", "dog", "bird", "fish"]
-    embeddings = Float64[1.0 2.0 3.0 4.0;
-                         5.0 6.0 7.0 8.0;
-                         9.0 10.0 11.0 12.0]  # ✅ Convert to Float64
+    embeddings = Float64[1.0 2.0 3.0 4.0; 5.0 6.0 7.0 8.0; 9.0 10.0 11.0 12.0]
+    
     wv = WordEmbedding(words, embeddings)
 
     @testset "word lookups" begin
@@ -105,7 +99,7 @@ end
 
     @testset "special values" begin
         special_vec = [Inf, -Inf, NaN]
-        @test get_any2vec(wv, special_vec) === special_vec  # Should return unchanged
+        @test get_any2vec(wv, special_vec) === special_vec 
     end
 
     @testset "empty vocabulary" begin
@@ -118,13 +112,11 @@ end
     end
 end
 
-
 @testset "get_vector_operation" begin
     # Test data setup with meaningful relationships
     words = ["king", "queen", "man", "woman"]
-    embeddings = [1.0  2.0  3.0  4.0;    # First dimension
-                  2.0  3.0  1.0  2.0;    # Second dimension
-                  3.0  3.0  1.0  1.0]    # Third dimension - similar for royal pairs
+    embeddings = [1.0  2.0  3.0  4.0; 2.0  3.0  1.0  2.0; 3.0  3.0  1.0  1.0]
+    
     wv = WordEmbedding(words, embeddings)
     
     @testset "basic operations" begin
@@ -156,8 +148,7 @@ end
         @test_throws ArgumentError get_vector_operation(wv, zero_vec, "queen", :cosine)
 
         # Test Euclidean distance
-        @test get_vector_operation(wv, "king", "queen", :euclid) < 
-              get_vector_operation(wv, "king", "woman", :euclid)  # Related pairs should be closer
+        @test get_vector_operation(wv, "king", "queen", :euclid) < get_vector_operation(wv, "king", "woman", :euclid)  # Related pairs should be closer
     end
     
     @testset "error cases" begin
