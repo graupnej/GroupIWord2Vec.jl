@@ -18,7 +18,7 @@ data = randn(100, 50)  # 100 samples, 50 features
 reduced_data = reduce_to_2d(data, 2)
 ```
 """
-function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
+function reduce_to_2d(data::Matrix{Float64}, number_of_pc::Int=2)::Matrix{Float64}
         # Center the data
         c_data = data .- mean(data, dims=1)
 
