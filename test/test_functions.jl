@@ -196,24 +196,45 @@ end
         1.0  0.9  0.8  0.7  0.6  0.5;
         0.8  0.7  0.6  0.5  0.4  0.3;
         0.6  0.5  0.4  0.3  0.2  0.1
-    ]  # 3D vectors
+    ]  # 3D word embeddings representing semantic relationships
 
     wv = WordEmbedding(words, embeddings)
 
     @testset "basic functionality" begin
         result = get_word_analogy(wv, "king", "man", "woman", 1)
-        @test result isa Vector{String}  # Ensure it returns a list
-        @test length(result) ≥ 0  # Avoid index errors
+
+        @test result isa Vector{String}  # Ensure correct return type
+        @test length(result) == 1  # Should return exactly one word
+        @test result[1] ∈ words  # Ensure the word is in the vocabulary
+    end
+
+    @testset "vector and word input consistency" begin
+        king_vec, man_vec, woman_vec = get_any2vec(wv, "king"), get_any2vec(wv, "man"), get_any2vec(wv, "woman")
+
+        result1 = get_word_analogy(wv, "king", "man", "woman", 1)
+        result2 = get_word_analogy(wv, king_vec, man_vec, woman_vec, 1)
+
+        @test result1 == result2  # Ensuring same output for word and vector inputs
     end
 
     @testset "exclusion of input words" begin
-        result = get_word_analogy(wv, "king", "man", "woman", 2)
+        result = get_word_analogy(wv, "king", "man", "woman", 3)
+
+        @test length(result) ≤ 3  # Ensure it returns at most `n` words
+
+        # Ensure excluded words are not in the result
         exclude_set = Set(["king", "man", "woman"])
-        @test all(word -> word ∉ exclude_set, result)  # Ensure excluded words are not in output
+        @test all(word -> word ∉ exclude_set, result)
+    end
+
+    @testset "handling empty output" begin
+        # Construct a test where all closest words are excluded
+        exclude_all = get_word_analogy(wv, "king", "queen", "man", 10)
+        @test exclude_all isa Vector{String}  # Function should return an empty list, not fail
     end
 
     @testset "error cases" begin
-        @test_throws MethodError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid `n`
-        @test_throws ArgumentError get_word_analogy(wv, "unknown", "man", "woman", 2)  # Invalid word
+        @test_throws ArgumentError get_word_analogy(wv, "king", "man", "woman", 0)  # Invalid `n`
+        @test_throws ArgumentError get_word_analogy(wv, "unknown", "man", "woman", 3)  # Invalid input word
     end
 end
