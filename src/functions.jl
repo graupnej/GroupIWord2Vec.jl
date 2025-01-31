@@ -237,10 +237,6 @@ function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}
     end
     # Get vectors for all inputs for vector calculations
     vec1, vec2, vec3 = get_any2vec(wv, inp1), get_any2vec(wv, inp2), get_any2vec(wv, inp3)
-    # Get words for all inputs for excluding in result
-    word1, word2, word3 = get_vec2word(wv, vec1), get_vec2word(wv, vec2), get_vec2word(wv, vec3)
-    # Make a list of all input words
-    all_words = [word1, word2, word3]
     
     # Compute analogy vector
     analogy_vec = vec1 - vec2 + vec3
@@ -248,11 +244,6 @@ function get_word_analogy(wv::WordEmbedding, inp1::Union{String, Vector{Float64}
         throw(ArgumentError("inp3 must be a String or a Vector{Float64}"))
     end
     analogy_vec /= norm(analogy_vec)  # Normalize to unit length
-    # Compute the cosine similarity score for each embedding vector with the analogy vector
-    similarities = wv.embeddings' * analogy_vec
-    # Make a set including all input words
-    exclude_set = exclude_set = Set(get(wv.word_indices, word, nothing)
-    # Search for n vectors with highest similarity score excluding input words
-    filtered_indices = filter(i -> !(i in exclude_set), sortperm(similarities[:], rev=true))
-    return wv.words[filtered_indices[1:min(n, length(filtered_indices))]]
+    
+    return get_similar_words(wv,analogy_vec,n)
 end
