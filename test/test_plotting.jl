@@ -78,7 +78,7 @@ end
 
         # Extract embeddings
         embeddings_test = permutedims(hcat([wv.embeddings[:, indices[word]] for word in selected_words]...))
-        @test size(embeddings_test) == (length(selected_words), 5)  # Words × Embedding Dimension
+        @test size(embeddings_test) == (5, length(selected_words))  # Words × Embedding Dimension
 
         # Apply PCA
         projection_test = reduce_to_2d(embeddings_test)
@@ -126,5 +126,4 @@ end
         show_relations("king", "queen", "man", "woman"; wv=wv, save_path=test_file)
         @test isfile(test_file)  # Ensure file was created
     end
-end
 end
