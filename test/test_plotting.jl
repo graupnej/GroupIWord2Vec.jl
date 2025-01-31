@@ -38,16 +38,15 @@ using GroupIWord2Vec
     end
     
     @testset "edge cases" begin
-        # Single row case (should return the same row after centering)
+        # Single row case - PCA is undefined for a single sample
         single_row = reshape([1.0, 2.0, 3.0], (1, 3))
-        projected_single = reduce_to_2d(single_row, 2)
-        @test size(projected_single) == (2, 1)
-        @test all(isfinite, projected_single)  # Ensure no NaNs/Infs
+        @test_throws ArgumentError reduce_to_2d(single_row, 2)
         
-        # Single column case (should reduce to itself)
+        # Single column case (should return the same values since variance is undefined in 1D)
         single_column = reshape([1.0, 2.0, 3.0, 4.0], (4, 1))
         projected_column = reduce_to_2d(single_column, 1)
         @test size(projected_column) == (1, 4)
         @test all(isfinite, projected_column)  # Ensure no NaNs/Infs
     end
 end
+
