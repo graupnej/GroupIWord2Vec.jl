@@ -16,6 +16,7 @@ Performs Principal Component Analysis (PCA) to reduce the dimensionality of a gi
 ```julia
 data = randn(100, 50)  # 100 samples, 50 features
 reduced_data = reduce_to_2d(data, 2)
+```
 """
 function reduce_to_2d(data::Matrix, number_of_pc::Int=2)::Matrix
         # Center the data
@@ -62,7 +63,7 @@ Note: Use an even number of inputs!
 # Example
 ```julia
 p = show_relations("king", "queen", "man", "woman"; wv=model, save_path="relations.png")
-
+```
 """
 function show_relations(words::String...; wv::WordEmbedding, save_path::String="word_relations.png")
     # Check input - word_count should only be used inside the function
