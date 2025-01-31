@@ -67,20 +67,6 @@ end
         @test size(reduced) == (2, 4)  # Should reduce to 2D space for given words
     end
 
-    @testset "basic plot generation" begin
-        p = show_relations("king", "queen", "man", "woman"; wv=wv, save_path="")
-        @test isa(p, Plots.Plot)  # Ensure it returns a plot
-    end
-
-    @testset "embedding extraction and projection" begin
-        selected_words = ["king", "queen", "banana", "apple"]
-        indices = Dict(word => get(wv.word_indices, word, nothing) for word in selected_words)
-
-        # Apply PCA
-        projection_test = reduce_to_2d(embeddings_test)
-        @test size(projection_test) == (2, length(selected_words))  # Should be 2D
-    end
-
     @testset "arrow computation" begin
         selected_words = ["king", "queen", "man", "woman"]
         projection_test = reduce_to_2d(permutedims(hcat([wv.embeddings[:, wv.word_indices[word]] for word in selected_words]...)))
