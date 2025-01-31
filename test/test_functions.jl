@@ -196,3 +196,39 @@ end
         @test_throws ArgumentError get_vector_operation(wv, zero_vec, zero_vec, :cosine)
     end
 end
+
+@testset "get_similar_words" begin
+    # Test setup with clear pattern and normalized vectors
+    words = ["cat", "dog", "bird", "fish", "car"]
+    embeddings = [
+        1/√2   0.0   0.0   1/√2   0.5;
+        1/√2   1.0   0.0  -1/√2  -0.5;
+        0.0    0.0   1.0   0.0    0.7;
+        0.0    0.0   0.0   0.0    0.3
+    ]
+    wv = WordEmbedding(words, embeddings)
+
+    @testset "Basic functionality" begin
+        @test get_similar_words(wv, "cat", 1) == ["cat"]
+        @test get_similar_words(wv, "dog", 1) == ["dog"]
+        @test get_similar_words(wv, "bird", 1) == ["bird"]
+    end
+
+    @testset "Vector input" begin
+        @test get_similar_words(wv, [1/√2, 1/√2, 0.0, 0.0], 1) == ["cat"]
+        @test get_similar_words(wv, [0.0, 0.5, 0.0, 0.0], 1) == ["dog"]
+    end
+
+    @testset "Similarity ranking" begin
+        @test get_similar_words(wv, "cat", 2) == ["cat", "fish"]
+        @test get_similar_words(wv, "fish", 2) == ["fish", "cat"]
+    end
+
+    @testset "Edge cases" begin
+        @test length(get_similar_words(wv, "car", 10)) == length(words)  # Capping `n`
+        @test_throws ArgumentError get_similar_words(wv, "elephant", 3)
+        @test_throws ArgumentError get_similar_words(wv, "", 3)
+        @test_throws ArgumentError get_similar_words(wv, [0.0, 0.0, 0.0, 0.0], 3)
+        @test_throws DimensionMismatch get_similar_words(wv, [1.0, 0.0], 3)
+    end
+end
