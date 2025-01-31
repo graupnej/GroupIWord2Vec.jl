@@ -204,29 +204,32 @@ similar_words = get_similar_words(model, vec, 3)
 """
 function get_similar_words(wv::WordEmbedding, word_or_vec::Union{AbstractString, AbstractVector{<:Real}}, n::Int=10)
     vec = get_any2vec(wv, word_or_vec)
-    if vec === nothing
-        throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
-    end
+    vec === nothing && throw(ArgumentError("Word not found in vocabulary, and input is not a valid vector."))
 
     embedding_dim = size(wv.embeddings, 1)
-    if length(vec) != embedding_dim
-        throw(DimensionMismatch("Vector length ($(length(vec))) does not match embedding dimension ($embedding_dim)"))
-    end
+    length(vec) != embedding_dim && throw(DimensionMismatch("Vector length ($(length(vec))) ≠ embedding dimension ($embedding_dim)"))
 
     vec_norm = norm(vec)
-    if vec_norm == 0
-        throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
-    end
+    vec_norm == 0 && throw(ArgumentError("Input vector has zero norm, cannot compute cosine similarity."))
     vec /= vec_norm  # Normalize input
 
     embedding_norms = sqrt.(sum(wv.embeddings .^ 2, dims=1))
-    embeddings_normed = wv.embeddings ./ max.(embedding_norms, eps())
+    embeddings_normed = wv.embeddings ./ max.(embedding_norms, eps())  # Avoid division by zero
 
     similarities = embeddings_normed' * vec
-    top_indices = partialsortperm(similarities, 1:min(n, length(wv.words)), rev=true)
 
-    return wv.words[top_indices]
+    # Get top `n+1` indices and exclude the query word if it's in the vocabulary
+    top_indices = partialsortperm(similarities, 1:min(n + 1, length(wv.words)), rev=true)
+    similar_words = wv.words[top_indices]
+
+    # Exclude the query word itself (if it was in the vocabulary)
+    if word_or_vec isa AbstractString
+        similar_words = filter(w -> w != word_or_vec, similar_words)
+    end
+
+    return similar_words[1:min(n, length(similar_words))]
 end
+
 
 """
     get_word_analogy(wv::WordEmbedding, inp1::T, inp2::T, inp3::T, n::Int=5) where {T<:Union{AbstractString, AbstractVector{<:Real}}} -> Vector{String}
