@@ -196,3 +196,59 @@ end
         @test_throws ArgumentError get_vector_operation(wv, zero_vec, zero_vec, :cosine)
     end
 end
+
+@testset "get_similar_words" begin
+    # Test data setup
+    words = ["cat", "dog", "bird", "fish"]
+    embeddings = [1.0 0.9 0.1 0.0;  # Simulated word vectors
+                  0.8 0.7 0.1 0.0;
+                  0.6 0.5 0.1 0.0]
+    wv = WordEmbedding(words, embeddings)
+
+    @testset "basic functionality" begin
+        # Test return type
+        similar_words = get_similar_words(wv, "cat", 3)
+        @test similar_words isa Vector{String}
+        @test length(similar_words) == 3
+    end
+
+    @testset "top-n similarity results" begin
+        # Test that "dog" is most similar to "cat"
+        similar_to_cat = get_similar_words(wv, "cat", 2)
+        @test similar_to_cat[1] == "dog"  # Should return "dog" as most similar
+        @test "cat" ∉ similar_to_cat  # Should not return itself
+
+        # Test that "bird" is more similar to "dog" than "fish"
+        similar_to_dog = get_similar_words(wv, "dog", 3)
+        @test similar_to_dog[1] == "cat"
+        @test "fish" ∉ similar_to_dog  # "fish" is too different
+    end
+
+    @testset "custom vectors" begin
+        # Use a manual vector to check similarity
+        vec = [1.0, 0.8, 0.6]  # Close to "cat"
+        similar_to_vec = get_similar_words(wv, vec, 2)
+        @test similar_to_vec[1] == "cat"
+        @test similar_to_vec[2] == "dog"
+    end
+
+    @testset "edge cases" begin
+        # Requesting more words than available
+        @test length(get_similar_words(wv, "cat", 10)) == 3  # Should return max possible
+        
+        # Requesting 0 words should return an empty list
+        @test get_similar_words(wv, "cat", 0) == []
+    end
+
+    @testset "error cases" begin
+        # Unknown words should throw an error
+        @test_throws ArgumentError get_similar_words(wv, "unknown")
+        
+        # Vector of incorrect dimensions should throw an error
+        @test_throws DimensionMismatch get_similar_words(wv, [1.0, 2.0], 2)
+        
+        # Zero vector should throw an error
+        @test_throws ArgumentError get_similar_words(wv, [0.0, 0.0, 0.0], 2)
+    end
+end
+
