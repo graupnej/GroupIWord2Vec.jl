@@ -30,7 +30,9 @@ GroupIWord2Vec.jl
 ├── test/                       # Unit tests to validate functionalities
 │   ├── runtests.jl             # Combination of every testing routine
 │   ├── test_functions.jl       # Testing routine for word/vector functions 
-│   └── test_model.jl           # Testing routine for model functions
+│   ├── test_model.jl           # Testing routine for model loading and external word2vec functions
+│   ├── test_plotting.jl        # Testing plotting vector functions
+│   └── test_training.jl        # Testing for custom model training functions
 ├── docs/                       # Documentation for the package
 ├── Manifest.toml               # Detailed dependency lock file that tracks exact versions of project dependencies
 ├── Project.toml                # Project configuration file defining package dependencies
