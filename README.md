@@ -194,10 +194,14 @@ julia> Pkg.test("GroupIWord2Vec", test_args=["Functions"])
 The package relies on the following non-standard Julia packages:
 
        DelimitedFiles        # Provides functionality for reading and writing delimited text files
+       Flux                  # Approach to machine learning
        LinearAlgebra         # Offers a suite of mathematical tools and operations for linear algebra
+       OneHotArrays          # Memory efficient one-hot array encodings
        Plots                 # For visualization functions
-       Word2vec.jll          # Links to the underlying Word2Vec implementation (C code)
+       ProgressMeter         # Progress meter for long-running operations in Julia
        Statistics            # For basic statistical operations (mean, std, var, etc.)
+       Test                  # Testing
+       Word2vec.jll          # Links to the underlying Word2Vec implementation (C code)
 
 The files Project.toml and Manifest.toml in the created environment manage dependencies.
 
